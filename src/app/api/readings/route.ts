@@ -23,6 +23,7 @@ export async function GET() {
         question: true,
         createdAt: true,
         tarotReaderId: true,
+        shareToken: true,
       },
     });
 

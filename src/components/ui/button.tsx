@@ -19,7 +19,7 @@ const buttonVariants = cva(
         ghost:
           "text-white hover:bg-[rgba(100,200,255,0.1)] focus:ring-[rgba(100,200,255,0.5)]",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+          "bg-gradient-to-r from-red-600 to-red-700 text-white hover:from-red-700 hover:to-red-800 hover:shadow-[0_0_20px_rgba(239,68,68,0.5)] focus:ring-red-500",
         outline:
           "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",

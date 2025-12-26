@@ -8,6 +8,14 @@ import { ReadingCard } from "@/components/reading-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { Button } from "@/components/ui/button";
+import { QRCodeDisplay } from "@/components/qr-code-display";
+import { DeleteConfirmation } from "@/components/delete-confirmation";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { useLocale } from "@/hooks/use-locale";
 import { getTranslations } from "@/lib/i18n";
 import { BookOpen } from "lucide-react";
@@ -19,6 +27,11 @@ export default function ReadingsPage() {
   const t = getTranslations(locale);
   const [readings, setReadings] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedReading, setSelectedReading] = useState<any | null>(null);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [deleteReading, setDeleteReading] = useState<any | null>(null);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -56,6 +69,47 @@ export default function ReadingsPage() {
     return null;
   }
 
+  const handleShareClick = (reading: any) => {
+    setSelectedReading(reading);
+    setIsSheetOpen(true);
+  };
+
+  const handleDeleteClick = (reading: any) => {
+    setDeleteReading(reading);
+    setIsDeleteOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteReading) return;
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/readings/${deleteReading.id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete reading");
+      }
+
+      // Remove from local state
+      setReadings((prev) => prev.filter((r) => r.id !== deleteReading.id));
+      setIsDeleteOpen(false);
+      setDeleteReading(null);
+    } catch (error) {
+      console.error("Error deleting reading:", error);
+      alert(t.readings.deleteError);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const shareUrl = selectedReading?.shareToken
+    ? typeof window !== "undefined"
+      ? `${window.location.origin}/readings/share/${selectedReading.shareToken}`
+      : `/readings/share/${selectedReading.shareToken}`
+    : "";
+
   return (
     <div className="min-h-screen mystical-gradient">
       <Navbar />
@@ -87,12 +141,43 @@ export default function ReadingsPage() {
                   reading={reading}
                   href={`/readings/${reading.id}`}
                   locale={locale}
+                  onShareClick={handleShareClick}
+                  onDeleteClick={handleDeleteClick}
                 />
               ))}
             </div>
           )}
         </div>
       </main>
+
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <SheetContent side="bottom" className="max-h-[90vh] overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="text-white">Поделиться прогнозом</SheetTitle>
+          </SheetHeader>
+          <div className="mt-6">
+            {selectedReading && (
+              <QRCodeDisplay
+                shareToken={selectedReading.shareToken}
+                shareUrl={shareUrl}
+                question={selectedReading.question}
+              />
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      {deleteReading && (
+        <DeleteConfirmation
+          open={isDeleteOpen}
+          onOpenChange={setIsDeleteOpen}
+          onConfirm={handleDeleteConfirm}
+          title={t.readings.deleteTitle}
+          description={t.readings.deleteDescription}
+          locale={locale}
+          isLoading={isDeleting}
+        />
+      )}
     </div>
   );
 }

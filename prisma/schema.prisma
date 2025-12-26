@@ -68,11 +68,13 @@ model Reading {
   cardsImageUrl String?
   userImageUrl  String?
   tarotReaderId String   @default("default")
+  shareToken    String?  @unique
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([createdAt])
+  @@index([shareToken])
 }
 

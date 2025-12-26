@@ -2,8 +2,14 @@
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { createTarotReading, CreateReadingParams } from "@/lib/openai";
+import {
+  createTarotReadingStub,
+  createTarotReading,
+  CreateReadingParams,
+} from "@/lib/openai";
+import { isUserAllowedForAI } from "@/lib/ai-whitelist";
 import { revalidatePath } from "next/cache";
+import { randomUUID } from "crypto";
 
 // Parse date from dd-mm-yy format
 function parseDate(dateString: string): Date {
@@ -56,17 +62,17 @@ export async function createReading(formData: FormData) {
       throw new Error("User ID not found in session");
     }
 
-    // Check user credits
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { credits: true },
-    });
+    // Check user credits - TEMPORARILY DISABLED FOR STUB
+    // const user = await prisma.user.findUnique({
+    //   where: { id: userId },
+    //   select: { credits: true },
+    // });
 
-    if (!user || user.credits < 1) {
-      throw new Error(
-        "Insufficient credits. Please purchase credits to create a reading."
-      );
-    }
+    // if (!user || user.credits < 1) {
+    //   throw new Error(
+    //     "Insufficient credits. Please purchase credits to create a reading."
+    //   );
+    // }
 
     // Get form data
     const userImageBase64 = formData.get("userImage") as string;
@@ -97,14 +103,67 @@ export async function createReading(formData: FormData) {
       parsedDate.getMonth() + 1
     ).padStart(2, "0")}-${String(parsedDate.getDate()).padStart(2, "0")}`;
 
-    // Create AI prediction
-    const predictionText = await createTarotReading({
-      userImageBase64,
-      cardsImageBase64,
-      birthDate: formattedDate,
-      question,
-      tarotReaderId: tarotReaderId as any,
-    });
+    // Generate unique share token for public access
+    const shareToken = randomUUID();
+
+    // Check if user is allowed to use AI
+    const userEmail = session.user.email;
+    const isAllowed = isUserAllowedForAI(userEmail);
+
+    // Prepare image data - ensure proper format for OpenAI API
+    // OpenAI expects data URI format: data:image/jpeg;base64,{base64string}
+    const formatImageBase64 = (base64: string): string => {
+      if (base64.startsWith("data:image/")) {
+        return base64; // Already formatted
+      }
+      // Assume JPEG if no prefix, can be improved to detect actual format
+      return `data:image/jpeg;base64,${base64}`;
+    };
+
+    const formattedUserImage = formatImageBase64(userImageBase64);
+    const formattedCardsImage = formatImageBase64(cardsImageBase64);
+
+    // Create AI prediction - use real AI for whitelisted users, stub for others
+    let predictionText: string;
+    try {
+      if (isAllowed) {
+        // Use real AI with image analysis
+        predictionText = await createTarotReading({
+          userImageBase64: formattedUserImage,
+          cardsImageBase64: formattedCardsImage,
+          birthDate: formattedDate,
+          question,
+          tarotReaderId: tarotReaderId as any,
+        });
+      } else {
+        // Use stub for non-whitelisted users
+        predictionText = await createTarotReadingStub({
+          userImageBase64: formattedUserImage,
+          cardsImageBase64: formattedCardsImage,
+          birthDate: formattedDate,
+          question,
+          tarotReaderId: tarotReaderId as any,
+        });
+      }
+    } catch (error) {
+      console.error("Error generating AI prediction:", error);
+      // Fallback to stub if AI fails
+      if (isAllowed) {
+        console.warn(
+          "AI request failed, falling back to stub for user:",
+          userEmail
+        );
+        predictionText = await createTarotReadingStub({
+          userImageBase64: formattedUserImage,
+          cardsImageBase64: formattedCardsImage,
+          birthDate: formattedDate,
+          question,
+          tarotReaderId: tarotReaderId as any,
+        });
+      } else {
+        throw error;
+      }
+    }
 
     // Save to database
     const reading = await prisma.reading.create({
@@ -116,23 +175,24 @@ export async function createReading(formData: FormData) {
         userImageUrl: userImageBase64.substring(0, 100) + "...", // Store reference only
         cardsImageUrl: cardsImageBase64.substring(0, 100) + "...",
         tarotReaderId,
+        shareToken,
       },
     });
 
-    // Deduct credit
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        credits: {
-          decrement: 1,
-        },
-      },
-    });
+    // Deduct credit - TEMPORARILY DISABLED FOR STUB
+    // await prisma.user.update({
+    //   where: { id: userId },
+    //   data: {
+    //     credits: {
+    //       decrement: 1,
+    //     },
+    //   },
+    // });
 
     revalidatePath("/dashboard");
     revalidatePath("/readings");
 
-    return { success: true, readingId: reading.id };
+    return { success: true, readingId: reading.id, shareToken: reading.shareToken };
   } catch (error) {
     console.error("Error creating reading:", error);
     return {

@@ -30,6 +30,27 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
+  // Date input mask handler - formats as dd-mm-yy
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, ""); // Remove all non-digits
+    
+    // Limit to 6 digits (ddmmyy)
+    if (value.length > 6) {
+      value = value.slice(0, 6);
+    }
+    
+    // Format with dashes
+    let formatted = value;
+    if (value.length > 2) {
+      formatted = value.slice(0, 2) + "-" + value.slice(2);
+    }
+    if (value.length > 4) {
+      formatted = value.slice(0, 2) + "-" + value.slice(2, 4) + "-" + value.slice(4);
+    }
+    
+    setBirthDate(formatted);
+  };
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/auth/signin");
@@ -147,8 +168,9 @@ export default function DashboardPage() {
                 <Input
                   type="text"
                   value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
-                  placeholder="dd-mm-yy (e.g., 15-03-90)"
+                  onChange={handleDateChange}
+                  placeholder="12 07 87"
+                  maxLength={8}
                   pattern="\d{2}-\d{2}-\d{2}"
                 />
               </FormField>

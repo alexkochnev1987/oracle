@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { Card } from "@/components/ui/card";
+import { QRCodeDisplay } from "@/components/qr-code-display";
 import { format } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
 import { useLocale } from "@/hooks/use-locale";
@@ -62,12 +63,19 @@ export default function ReadingDetailPage() {
     ? new Date(reading.createdAt) 
     : reading.createdAt;
 
+  // Generate share URL
+  const shareUrl = reading.shareToken
+    ? typeof window !== "undefined"
+      ? `${window.location.origin}/readings/share/${reading.shareToken}`
+      : `/readings/share/${reading.shareToken}`
+    : "";
+
   return (
-    <div className="min-h-screen mystical-gradient">
+    <div className="min-h-screen mystical-gradient starry-background">
       <Navbar />
       <main className="container mx-auto px-4 py-6 sm:py-8">
-        <div className="mx-auto max-w-4xl">
-          <Card className="mb-6 sm:mb-8 p-4 sm:p-6">
+        <div className="mx-auto max-w-4xl space-y-6">
+          <Card className="p-4 sm:p-6" glow>
             <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
               <h1 className="text-2xl sm:text-3xl font-bold text-white">
                 {reading.question}
@@ -85,16 +93,26 @@ export default function ReadingDetailPage() {
             </div>
           </Card>
 
-          <Card className="p-4 sm:p-6 md:p-8">
+          <Card className="p-4 sm:p-6 md:p-8 cosmic-particles" glow>
             <h2 className="mb-4 text-xl sm:text-2xl font-semibold text-white">
               {t.readings.yourReading}
             </h2>
             <div className="prose prose-invert max-w-none">
-              <p className="whitespace-pre-wrap text-[#e5e7eb] leading-relaxed text-base sm:text-lg">
+              <p className="whitespace-pre-wrap text-[#e5e7eb] leading-relaxed text-base sm:text-lg reading-text">
                 {reading.predictionText}
               </p>
             </div>
           </Card>
+
+          {reading.shareToken && (
+            <div className="w-full">
+              <QRCodeDisplay
+                shareToken={reading.shareToken}
+                shareUrl={shareUrl}
+                question={reading.question}
+              />
+            </div>
+          )}
         </div>
       </main>
     </div>

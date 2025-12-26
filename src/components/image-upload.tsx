@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Image from "next/image";
 import { Upload, X, Loader2 } from "lucide-react";
 import { compressImage, fileToBase64 } from "@/lib/image-compression";
 import { cn } from "@/lib/utils";
@@ -58,14 +59,16 @@ export function ImageUpload({
       <div className="relative">
         {value ? (
           <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-[rgba(100,200,255,0.4)] bg-[rgba(26,26,58,0.7)] backdrop-blur-md transition-all duration-300 hover:border-[rgba(100,200,255,0.6)]">
-            <img
+            <Image
               src={value}
               alt="Preview"
-              className="h-full w-full object-cover"
+              fill
+              className="object-cover"
+              unoptimized={value.startsWith("data:")}
             />
             <button
               type="button"
-              className="absolute right-2 top-2 h-11 w-11 sm:h-10 sm:w-10 flex items-center justify-center bg-red-600/80 hover:bg-red-700/80 text-white rounded-xl transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-transparent min-w-[44px] min-h-[44px] sm:min-w-[40px] sm:min-h-[40px]"
+              className="absolute right-2 top-2 h-11 w-11 sm:h-10 sm:w-10 flex items-center justify-center bg-red-600/80 hover:bg-red-700/80 text-white rounded-xl transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-transparent min-w-[44px] min-h-[44px] sm:min-w-[40px] sm:min-h-[40px] z-10"
               onClick={handleRemove}
               aria-label="Remove image"
             >

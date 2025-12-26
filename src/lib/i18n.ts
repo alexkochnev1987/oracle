@@ -92,6 +92,12 @@ export const translations = {
       emptyDescription: "Создайте свой первый прогноз, чтобы увидеть его здесь",
       goToDashboard: "Перейти в дашборд",
       yourReading: "Ваш прогноз",
+      delete: "Удалить",
+      deleteTitle: "Удалить прогноз?",
+      deleteDescription: "Вы уверены, что хотите удалить этот прогноз? Это действие нельзя отменить.",
+      deleteConfirm: "Удалить",
+      deleteSuccess: "Прогноз успешно удален",
+      deleteError: "Ошибка при удалении прогноза",
     },
     // Billing
     billing: {
@@ -201,6 +207,12 @@ export const translations = {
       emptyDescription: "Create your first reading to see it here",
       goToDashboard: "Go to Dashboard",
       yourReading: "Your Reading",
+      delete: "Delete",
+      deleteTitle: "Delete reading?",
+      deleteDescription: "Are you sure you want to delete this reading? This action cannot be undone.",
+      deleteConfirm: "Delete",
+      deleteSuccess: "Reading deleted successfully",
+      deleteError: "Error deleting reading",
     },
     // Billing
     billing: {
