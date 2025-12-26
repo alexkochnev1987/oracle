@@ -34,12 +34,12 @@ export function OracleSelector({
                 ? "border-2 border-[#d4af37] gold-glow bg-[rgba(212,175,55,0.1)] scale-105"
                 : "border-2 border-[rgba(100,200,255,0.4)] hover:border-[rgba(100,200,255,0.7)] hover:scale-105 hover:shadow-[0_0_20px_rgba(100,200,255,0.4)]"
             )}
-            aria-label={oracle.name[locale]}
+            aria-label={oracle.name}
           >
             <div className="relative w-full h-full min-h-[140px] sm:min-h-[160px] md:min-h-[200px]">
               <Image
                 src={oracle.imagePath}
-                alt={oracle.name[locale]}
+                alt={oracle.name}
                 fill
                 className="object-cover"
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 200px"
@@ -59,10 +59,10 @@ export function OracleSelector({
                   isSelected && "text-[#d4af37]"
                 )}
               >
-                {oracle.name[locale]}
+                {oracle.name}
               </h3>
               <p className="hidden md:block text-xs text-[#9ca3af] mt-1 line-clamp-2">
-                {oracle.description[locale]}
+                {oracle.description}
               </p>
             </div>
             {isSelected && (

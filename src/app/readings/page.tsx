@@ -56,8 +56,8 @@ export default function ReadingsPage() {
     return (
       <div className="min-h-screen mystical-gradient">
         <Navbar />
-        <div className="container mx-auto px-4 py-6 sm:py-8">
-          <div className="mx-auto max-w-4xl space-y-4">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
+          <div className="mx-auto max-w-4xl flex flex-col gap-3 sm:gap-3 md:gap-4 lg:gap-5">
             <LoadingSkeleton variant="card" count={3} />
           </div>
         </div>
@@ -113,28 +113,30 @@ export default function ReadingsPage() {
   return (
     <div className="min-h-screen mystical-gradient">
       <Navbar />
-      <main className="container mx-auto px-4 py-6 sm:py-8">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
         <div className="mx-auto max-w-4xl">
-          <h1 className="mb-6 sm:mb-8 text-3xl sm:text-4xl font-bold text-white">
+          <h1 className="mb-8 sm:mb-10 lg:mb-12 text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
             {t.nav.readings}
           </h1>
 
           {readings.length === 0 ? (
-            <EmptyState
-              icon={<BookOpen className="h-12 w-12 sm:h-16 sm:w-16" />}
-              title={t.readings.emptyTitle}
-              description={t.readings.emptyDescription}
-              action={
-                <Button
-                  variant="primary"
-                  onClick={() => router.push("/dashboard")}
-                >
-                  {t.readings.goToDashboard}
-                </Button>
-              }
-            />
+            <div className="mt-8 sm:mt-12">
+              <EmptyState
+                icon={<BookOpen className="h-12 w-12 sm:h-16 sm:w-16" />}
+                title={t.readings.emptyTitle}
+                description={t.readings.emptyDescription}
+                action={
+                  <Button
+                    variant="primary"
+                    onClick={() => router.push("/dashboard")}
+                  >
+                    {t.readings.goToDashboard}
+                  </Button>
+                }
+              />
+            </div>
           ) : (
-            <div className="space-y-3 sm:space-y-4">
+            <div className="flex flex-col gap-3 sm:gap-3 md:gap-4 lg:gap-5">
               {readings.map((reading) => (
                 <ReadingCard
                   key={reading.id}

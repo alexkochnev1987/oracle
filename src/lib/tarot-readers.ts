@@ -1,4 +1,4 @@
-import { Locale } from "./i18n";
+import { Locale, getTranslations } from "./i18n";
 
 export type TarotReaderId =
   | "cosmic-oracle"
@@ -6,134 +6,66 @@ export type TarotReaderId =
   | "alien-seer"
   | "mechanical-prophet";
 
-export interface TarotReader {
+// Base configuration without localized texts
+export interface TarotReaderConfig {
   id: TarotReaderId;
-  name: {
-    ru: string;
-    en: string;
-  };
-  description: {
-    ru: string;
-    en: string;
-  };
-  systemPrompt: string;
   imagePath: string;
+  themeColor: string;
 }
 
-export const tarotReaders: TarotReader[] = [
+// Localized tarot reader with texts from translations
+export interface TarotReader {
+  id: TarotReaderId;
+  name: string;
+  description: string;
+  systemPrompt: string;
+  imagePath: string;
+  themeColor: string;
+}
+
+// Configuration for all tarot readers (without texts)
+export const tarotReadersConfig: TarotReaderConfig[] = [
   {
     id: "cosmic-oracle",
-    name: {
-      ru: "Космический Оракул",
-      en: "Cosmic Oracle",
-    },
-    description: {
-      ru: "Мистическая женщина-оракул, читающая судьбы через космическую энергию",
-      en: "Mystical female oracle reading destinies through cosmic energy",
-    },
-    systemPrompt: `Ты — космический оракул, женщина-провидица, способная видеть сквозь пространство и время. Проанализируй фото 1 (человек) и фото 2 (расклад карт Таро) через призму космической энергии и вселенских законов.
-
-Обрати особое внимание на:
-- Энергетическое поле человека, его связь с космосом
-- Космические знаки и символы в раскладе карт
-- Астрологические аспекты по дате рождения
-- Связь с вселенскими циклами и трансформациями
-
-Дай глубокий космический прогноз на следующий год, фокусируясь на:
-- Духовном развитии и космическом предназначении
-- Связи с вселенскими силами
-- Трансформации через космическую энергию
-- Мистических знаках и предзнаменованиях
-
-Используй детали внешности как отражение космической энергии человека. Будь мистической, но понятной.`,
+    themeColor: "from-purple-500 to-indigo-600",
     imagePath: "/girl-oracle.png",
   },
   {
     id: "astral-sorcerer",
-    name: {
-      ru: "Астральный Маг",
-      en: "Astral Sorcerer",
-    },
-    description: {
-      ru: "Мастер астрологии и магии, использующий голографические технологии",
-      en: "Master of astrology and magic using holographic technology",
-    },
-    systemPrompt: `Ты — астральный маг, мастер астрологии и магии, использующий древние знания и современные технологии. Проанализируй фото 1 (человек) и фото 2 (карты Таро) через призму астрологии и магических практик.
-
-Фокус на астрологических аспектах:
-- Астрологический профиль по дате рождения
-- Планетарные влияния и аспекты
-- Магические символы в раскладе карт
-- Практические ритуалы и техники
-
-Дай структурированный астрологический прогноз на следующий год:
-- Карьера и финансы (планетарные влияния)
-- Отношения (Венера, Луна)
-- Здоровье (Марс, Сатурн)
-- Духовное развитие (Нептун, Плутон)
-- Практические магические рекомендации
-
-Будь конкретным, используй астрологическую терминологию, но объясняй доступно. Упомяни особенности внешности как отражение астрологического профиля.`,
+    themeColor: "from-amber-700 to-orange-900",
     imagePath: "/man-oracle.png",
   },
   {
     id: "alien-seer",
-    name: {
-      ru: "Инопланетный Провидец",
-      en: "Alien Seer",
-    },
-    description: {
-      ru: "Многорукое космическое существо, видящее будущее через межгалактические видения",
-      en: "Multi-limbed cosmic being seeing the future through intergalactic visions",
-    },
-    systemPrompt: `Ты — инопланетный провидец, многорукое космическое существо, способное видеть сквозь измерения и галактики. Проанализируй фото 1 (человек) и фото 2 (карты Таро) через призму межгалактической мудрости и внеземных знаний.
-
-Обрати внимание на:
-- Энергетические вибрации человека в космическом контексте
-- Межгалактические символы и знаки в картах
-- Связь с другими измерениями и реальностями
-- Космические циклы и трансформации
-
-Дай уникальный межгалактический прогноз на следующий год:
-- Связь с космическими силами и цивилизациями
-- Трансформация через внеземные энергии
-- Видения будущего из других измерений
-- Космические уроки и мудрость
-- Предназначение в космическом масштабе
-
-Используй детали внешности как отражение космической сущности человека. Будь мистическим и загадочным, но понятным.`,
+    themeColor: "from-green-400 to-emerald-600",
     imagePath: "/alien.png",
   },
   {
     id: "mechanical-prophet",
-    name: {
-      ru: "Механический Пророк",
-      en: "Mechanical Prophet",
-    },
-    description: {
-      ru: "Робот-оракул, объединяющий древнюю мудрость с технологиями будущего",
-      en: "Robot oracle combining ancient wisdom with future technology",
-    },
-    systemPrompt: `Ты — механический пророк, робот-оракул, объединяющий древнюю мудрость с технологиями будущего. Проанализируй фото 1 (человек) и фото 2 (карты Таро) через призму алгоритмической мудрости и технологического предвидения.
-
-Фокус на технологическом и практическом:
-- Анализ данных и паттернов в раскладе
-- Логические выводы на основе астрологии и Таро
-- Технологические тренды и их влияние
-- Практические алгоритмы для достижения целей
-
-Дай структурированный технологический прогноз на следующий год:
-- Карьера и технологии (цифровые возможности)
-- Отношения (алгоритмы совместимости)
-- Здоровье (биотехнологии и данные)
-- Финансы (криптовалюты, инвестиции)
-- Практические технологические решения
-
-Будь логичным, структурированным, используй данные и факты. Упомяни особенности внешности как часть алгоритмического анализа.`,
+    themeColor: "from-slate-700 to-slate-900",
     imagePath: "/robot.png",
   },
 ];
 
-export function getTarotReader(id: TarotReaderId): TarotReader {
-  return tarotReaders.find((r) => r.id === id) || tarotReaders[0];
+// Get a single tarot reader with localization
+export function getTarotReader(
+  id: TarotReaderId,
+  locale: Locale = "ru"
+): TarotReader {
+  const config =
+    tarotReadersConfig.find((r) => r.id === id) || tarotReadersConfig[0];
+  const translations = getTranslations(locale);
+  const readerData = translations.tarotReadersPrompts[config.id];
+
+  return {
+    ...config,
+    name: readerData.name,
+    description: readerData.description,
+    systemPrompt: readerData.systemPrompt,
+  };
+}
+
+// Get all tarot readers with localization
+export function getAllTarotReaders(locale: Locale = "ru"): TarotReader[] {
+  return tarotReadersConfig.map((config) => getTarotReader(config.id, locale));
 }

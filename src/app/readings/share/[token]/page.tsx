@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { TarotCardsDisplay } from "@/components/tarot-cards-display";
 import { format } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
 import { useLocale } from "@/hooks/use-locale";
@@ -115,7 +116,7 @@ export default function PublicReadingPage() {
     );
   }
 
-  const reader = getTarotReader(reading.tarotReaderId);
+  const reader = getTarotReader(reading.tarotReaderId, locale);
   const date =
     typeof reading.createdAt === "string"
       ? new Date(reading.createdAt)
@@ -173,10 +174,18 @@ export default function PublicReadingPage() {
             </div>
             <div className="mb-4">
               <span className="text-sm sm:text-base text-[rgba(100,200,255,0.8)] font-medium">
-                {reader.name[locale]} - {reader.description[locale]}
+                {reader.name} - {reader.description}
               </span>
             </div>
           </Card>
+
+          {/* Tarot Cards Display - only show if cards were selected */}
+          {reading.selectedCards && reading.cardSelectionMode === "random" && (
+            <TarotCardsDisplay
+              cardIds={reading.selectedCards as string[]}
+              locale={locale}
+            />
+          )}
 
           <Card className="p-4 sm:p-6 md:p-8 cosmic-particles" glow>
             <h2 className="mb-4 text-xl sm:text-2xl font-semibold text-white">

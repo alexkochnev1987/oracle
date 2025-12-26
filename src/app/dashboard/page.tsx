@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/navbar";
 import { ImageUpload } from "@/components/image-upload";
+import { TarotCardSelector } from "@/components/tarot-card-selector";
 import { OracleSelector } from "@/components/oracle-selector";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,7 +14,8 @@ import { FormField } from "@/components/ui/form-field";
 import { createReading } from "@/app/actions/reading";
 import { getTranslations } from "@/lib/i18n";
 import { useLocale } from "@/hooks/use-locale";
-import { tarotReaders } from "@/lib/tarot-readers";
+import { getAllTarotReaders } from "@/lib/tarot-readers";
+import { type TarotCard } from "@/lib/tarot-cards";
 import { Sparkles } from "lucide-react";
 
 export default function DashboardPage() {
@@ -24,30 +26,38 @@ export default function DashboardPage() {
 
   const [userImage, setUserImage] = useState<string>("");
   const [cardsImage, setCardsImage] = useState<string>("");
+  const [selectedCards, setSelectedCards] = useState<TarotCard[]>([]);
+  const [cardSelectionMode, setCardSelectionMode] = useState<
+    "upload" | "random"
+  >("upload");
   const [birthDate, setBirthDate] = useState<string>("");
   const [question, setQuestion] = useState("");
-  const [selectedReader, setSelectedReader] = useState<string>(tarotReaders[0].id);
+  const tarotReaders = getAllTarotReaders(locale);
+  const [selectedReader, setSelectedReader] = useState<string>(
+    tarotReaders[0].id
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
   // Date input mask handler - formats as dd-mm-yy
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/\D/g, ""); // Remove all non-digits
-    
+
     // Limit to 6 digits (ddmmyy)
     if (value.length > 6) {
       value = value.slice(0, 6);
     }
-    
+
     // Format with dashes
     let formatted = value;
     if (value.length > 2) {
       formatted = value.slice(0, 2) + "-" + value.slice(2);
     }
     if (value.length > 4) {
-      formatted = value.slice(0, 2) + "-" + value.slice(2, 4) + "-" + value.slice(4);
+      formatted =
+        value.slice(0, 2) + "-" + value.slice(2, 4) + "-" + value.slice(4);
     }
-    
+
     setBirthDate(formatted);
   };
 
@@ -76,15 +86,27 @@ export default function DashboardPage() {
     e.preventDefault();
     setError("");
 
-    if (!userImage || !cardsImage || !birthDate || !question) {
-      setError("Please fill in all fields");
+    // Validate required fields
+    if (!userImage || !birthDate || !question) {
+      setError("Please fill in all required fields");
+      return;
+    }
+
+    // Validate that either cards image or selected cards are provided
+    if (cardSelectionMode === "upload" && !cardsImage) {
+      setError("Please upload cards photo or select random spread");
+      return;
+    }
+
+    if (cardSelectionMode === "random" && selectedCards.length === 0) {
+      setError("Please generate a random spread");
       return;
     }
 
     // Validate date format (dd-mm-yy)
     const dateRegex = /^\d{2}-\d{2}-\d{2}$/;
     if (!dateRegex.test(birthDate)) {
-      setError("Please enter date in dd-mm-yy format (e.g., 15-03-90)");
+      setError("Please enter date in dd-mm-yy format (e.g., 12-07-87)");
       return;
     }
 
@@ -92,10 +114,23 @@ export default function DashboardPage() {
 
     const formData = new FormData();
     formData.append("userImage", userImage);
-    formData.append("cardsImage", cardsImage);
+
+    // Add cards data based on mode
+    if (cardSelectionMode === "upload") {
+      formData.append("cardsImage", cardsImage);
+    } else {
+      // Send selected cards as JSON
+      formData.append(
+        "selectedCards",
+        JSON.stringify(selectedCards.map((card) => card.id))
+      );
+    }
+
+    formData.append("cardSelectionMode", cardSelectionMode);
     formData.append("birthDate", birthDate);
     formData.append("question", question);
     formData.append("tarotReaderId", selectedReader);
+    formData.append("locale", locale);
 
     const result = await createReading(formData);
 
@@ -125,10 +160,7 @@ export default function DashboardPage() {
           <Card className="p-4 sm:p-6 md:p-8">
             <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
               {/* Oracle Selection */}
-              <FormField
-                label={t.dashboard.selectTarotReader}
-                required
-              >
+              <FormField label={t.dashboard.selectTarotReader} required>
                 <OracleSelector
                   oracles={tarotReaders}
                   selectedId={selectedReader}
@@ -139,7 +171,7 @@ export default function DashboardPage() {
                   <p className="text-xs sm:text-sm text-[#9ca3af] mt-2">
                     {
                       tarotReaders.find((r) => r.id === selectedReader)
-                        ?.description[locale]
+                        ?.description
                     }
                   </p>
                 )}
@@ -152,11 +184,16 @@ export default function DashboardPage() {
                 onChange={setUserImage}
               />
 
-              {/* Cards Image Upload */}
-              <ImageUpload
+              {/* Cards Selection - Upload or Random */}
+              <TarotCardSelector
                 label={t.dashboard.uploadCardsPhoto}
-                value={cardsImage}
-                onChange={setCardsImage}
+                cardsImage={cardsImage}
+                selectedCards={selectedCards}
+                mode={cardSelectionMode}
+                locale={locale}
+                onCardsImageChange={setCardsImage}
+                onSelectedCardsChange={setSelectedCards}
+                onModeChange={setCardSelectionMode}
               />
 
               {/* Birth Date */}
@@ -169,17 +206,14 @@ export default function DashboardPage() {
                   type="text"
                   value={birthDate}
                   onChange={handleDateChange}
-                  placeholder="12 07 87"
+                  placeholder="12-07-87"
                   maxLength={8}
                   pattern="\d{2}-\d{2}-\d{2}"
                 />
               </FormField>
 
               {/* Question */}
-              <FormField
-                label={t.dashboard.question}
-                required
-              >
+              <FormField label={t.dashboard.question} required>
                 <Input
                   type="text"
                   value={question}

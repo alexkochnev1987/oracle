@@ -10,6 +10,7 @@ import {
 import { isUserAllowedForAI } from "@/lib/ai-whitelist";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
+import { getCardById, formatCardsForPrompt } from "@/lib/tarot-cards";
 
 // Parse date from dd-mm-yy format
 function parseDate(dateString: string): Date {
@@ -76,14 +77,27 @@ export async function createReading(formData: FormData) {
 
     // Get form data
     const userImageBase64 = formData.get("userImage") as string;
-    const cardsImageBase64 = formData.get("cardsImage") as string;
+    const cardsImageBase64 = formData.get("cardsImage") as string | null;
+    const selectedCardsJson = formData.get("selectedCards") as string | null;
+    const cardSelectionMode =
+      (formData.get("cardSelectionMode") as string) || "upload";
     const birthDate = formData.get("birthDate") as string;
     const question = formData.get("question") as string;
     const tarotReaderId =
       (formData.get("tarotReaderId") as string) || "default";
+    const locale = (formData.get("locale") as "ru" | "en") || "ru";
 
-    if (!userImageBase64 || !cardsImageBase64 || !birthDate || !question) {
+    if (!userImageBase64 || !birthDate || !question) {
       throw new Error("Missing required fields");
+    }
+
+    // Validate that either cards image or selected cards are provided
+    if (cardSelectionMode === "upload" && !cardsImageBase64) {
+      throw new Error("Please upload cards photo or select random spread");
+    }
+
+    if (cardSelectionMode === "random" && !selectedCardsJson) {
+      throw new Error("Please generate a random spread");
     }
 
     // Parse date from dd-mm-yy format
@@ -121,28 +135,47 @@ export async function createReading(formData: FormData) {
     };
 
     const formattedUserImage = formatImageBase64(userImageBase64);
-    const formattedCardsImage = formatImageBase64(cardsImageBase64);
+
+    // Handle cards data based on selection mode
+    let formattedCardsImage: string | undefined;
+    let selectedCardsNames: string | undefined;
+    let selectedCardsArray: string[] | undefined;
+
+    if (cardSelectionMode === "upload" && cardsImageBase64) {
+      formattedCardsImage = formatImageBase64(cardsImageBase64);
+    } else if (cardSelectionMode === "random" && selectedCardsJson) {
+      // Parse selected cards and get their names
+      selectedCardsArray = JSON.parse(selectedCardsJson) as string[];
+      const cards = selectedCardsArray
+        .map((cardId) => getCardById(cardId))
+        .filter((card) => card !== undefined);
+      selectedCardsNames = formatCardsForPrompt(cards as any[], locale);
+    }
 
     // Create AI prediction - use real AI for whitelisted users, stub for others
     let predictionText: string;
     try {
       if (isAllowed) {
-        // Use real AI with image analysis
+        // Use real AI with image analysis or card names
         predictionText = await createTarotReading({
           userImageBase64: formattedUserImage,
           cardsImageBase64: formattedCardsImage,
+          selectedCardsNames,
           birthDate: formattedDate,
           question,
           tarotReaderId: tarotReaderId as any,
+          locale,
         });
       } else {
         // Use stub for non-whitelisted users
         predictionText = await createTarotReadingStub({
           userImageBase64: formattedUserImage,
           cardsImageBase64: formattedCardsImage,
+          selectedCardsNames,
           birthDate: formattedDate,
           question,
           tarotReaderId: tarotReaderId as any,
+          locale,
         });
       }
     } catch (error) {
@@ -156,9 +189,11 @@ export async function createReading(formData: FormData) {
         predictionText = await createTarotReadingStub({
           userImageBase64: formattedUserImage,
           cardsImageBase64: formattedCardsImage,
+          selectedCardsNames,
           birthDate: formattedDate,
           question,
           tarotReaderId: tarotReaderId as any,
+          locale,
         });
       } else {
         throw error;
@@ -173,7 +208,12 @@ export async function createReading(formData: FormData) {
         birthDate: parsedDate,
         predictionText,
         userImageUrl: userImageBase64.substring(0, 100) + "...", // Store reference only
-        cardsImageUrl: cardsImageBase64.substring(0, 100) + "...",
+        cardsImageUrl:
+          cardSelectionMode === "upload" && cardsImageBase64
+            ? cardsImageBase64.substring(0, 100) + "..."
+            : null,
+        selectedCards: selectedCardsArray ? selectedCardsArray : null,
+        cardSelectionMode,
         tarotReaderId,
         shareToken,
       },
@@ -192,7 +232,11 @@ export async function createReading(formData: FormData) {
     revalidatePath("/dashboard");
     revalidatePath("/readings");
 
-    return { success: true, readingId: reading.id, shareToken: reading.shareToken };
+    return {
+      success: true,
+      readingId: reading.id,
+      shareToken: reading.shareToken,
+    };
   } catch (error) {
     console.error("Error creating reading:", error);
     return {

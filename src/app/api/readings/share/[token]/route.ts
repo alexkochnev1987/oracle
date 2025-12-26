@@ -22,6 +22,8 @@ export async function GET(
         tarotReaderId: true,
         createdAt: true,
         shareToken: true,
+        selectedCards: true,
+        cardSelectionMode: true,
       },
     });
 

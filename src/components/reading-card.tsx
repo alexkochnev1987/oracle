@@ -24,10 +24,17 @@ interface ReadingCardProps {
   onDeleteClick?: (reading: Reading) => void;
 }
 
-export function ReadingCard({ reading, href, locale, onShareClick, onDeleteClick }: ReadingCardProps) {
-  const date = typeof reading.createdAt === "string" 
-    ? new Date(reading.createdAt) 
-    : reading.createdAt;
+export function ReadingCard({
+  reading,
+  href,
+  locale,
+  onShareClick,
+  onDeleteClick,
+}: ReadingCardProps) {
+  const date =
+    typeof reading.createdAt === "string"
+      ? new Date(reading.createdAt)
+      : reading.createdAt;
 
   const handleShareClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -50,45 +57,44 @@ export function ReadingCard({ reading, href, locale, onShareClick, onDeleteClick
       <Card
         hover
         glow
-        className="p-4 sm:p-5 md:p-6 cursor-pointer relative"
+        className="p-5 sm:p-6 md:p-7 lg:p-8 cursor-pointer relative"
       >
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-          <h3 className="text-lg sm:text-xl font-semibold text-white line-clamp-2 flex-1">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 md:gap-5">
+          <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-white line-clamp-2 flex-1 pr-2 sm:pr-4">
             {reading.question}
           </h3>
-          <div className="flex items-center gap-2 sm:gap-4">
-            <span className="text-xs sm:text-sm text-[#9ca3af] whitespace-nowrap">
+          <div className="flex items-center gap-3 sm:gap-4 md:gap-5 flex-shrink-0">
+            <span className="text-xs sm:text-sm md:text-base text-[#9ca3af] whitespace-nowrap">
               {format(date, "PPP", {
                 locale: locale === "ru" ? ru : enUS,
               })}
             </span>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 sm:gap-2">
               {reading.shareToken && onShareClick && (
                 <button
                   onClick={handleShareClick}
-                  className="p-2 rounded-md hover:bg-[rgba(100,200,255,0.1)] transition-colors text-[rgba(100,200,255,0.8)] hover:text-[rgba(100,200,255,1)]"
+                  className="p-2 sm:p-2.5 rounded-md hover:bg-[rgba(100,200,255,0.1)] transition-colors text-[rgba(100,200,255,0.8)] hover:text-[rgba(100,200,255,1)]"
                   title="Поделиться"
                 >
-                  <QrCode className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <QrCode className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                 </button>
               )}
               {onDeleteClick && (
                 <button
                   onClick={handleDeleteClick}
-                  className="p-2 rounded-md hover:bg-[rgba(239,68,68,0.1)] transition-colors text-[rgba(239,68,68,0.8)] hover:text-[rgba(239,68,68,1)]"
+                  className="p-2 sm:p-2.5 rounded-md hover:bg-[rgba(239,68,68,0.1)] transition-colors text-[rgba(239,68,68,0.8)] hover:text-[rgba(239,68,68,1)]"
                   title="Удалить"
                 >
-                  <Trash2 className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <Trash2 className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                 </button>
               )}
             </div>
           </div>
         </div>
-        <p className="text-xs sm:text-sm text-[#9ca3af] mt-2">
+        <p className="text-xs sm:text-sm md:text-base text-[#9ca3af] mt-3 sm:mt-4">
           Click to view full reading
         </p>
       </Card>
     </Link>
   );
 }
-
