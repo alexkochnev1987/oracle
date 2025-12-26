@@ -112,18 +112,21 @@ const majorArcana: TarotCard[] = [
     name: { ru: "Умеренность", en: "Temperance" },
     arcana: "major",
     number: 14,
+    imageUrl: "/tarot/temperance.png",
   },
   {
     id: "major-15",
     name: { ru: "Дьявол", en: "The Devil" },
     arcana: "major",
     number: 15,
+    imageUrl: "/tarot/devil.png",
   },
   {
     id: "major-16",
     name: { ru: "Башня", en: "The Tower" },
     arcana: "major",
     number: 16,
+    imageUrl: "/tarot/tower.png",
   },
   {
     id: "major-17",
@@ -137,6 +140,7 @@ const majorArcana: TarotCard[] = [
     name: { ru: "Луна", en: "The Moon" },
     arcana: "major",
     number: 18,
+    imageUrl: "/tarot/moon.png",
   },
   {
     id: "major-19",
@@ -157,6 +161,7 @@ const majorArcana: TarotCard[] = [
     name: { ru: "Мир", en: "The World" },
     arcana: "major",
     number: 21,
+    imageUrl: "/tarot/world.png",
   },
 ];
 
@@ -220,9 +225,18 @@ const cupsCards: TarotCard[] = [
     ...createMinorArcanaCard("cups", 11, "Паж Кубков", "Page of Cups"),
     imageUrl: "/tarot/cups/page.png",
   },
-  createMinorArcanaCard("cups", 12, "Рыцарь Кубков", "Knight of Cups"),
-  createMinorArcanaCard("cups", 13, "Королева Кубков", "Queen of Cups"),
-  createMinorArcanaCard("cups", 14, "Король Кубков", "King of Cups"),
+  {
+    ...createMinorArcanaCard("cups", 12, "Рыцарь Кубков", "Knight of Cups"),
+    imageUrl: "/tarot/cups/knight.png",
+  },
+  {
+    ...createMinorArcanaCard("cups", 13, "Королева Кубков", "Queen of Cups"),
+    imageUrl: "/tarot/cups/queen.png",
+  },
+  {
+    ...createMinorArcanaCard("cups", 14, "Король Кубков", "King of Cups"),
+    imageUrl: "/tarot/cups/king.png",
+  },
 ];
 
 // Pentacles (Пентакли/Монеты)
@@ -385,50 +399,6 @@ export function getCardImageUrl(cardId: string): string {
   const card = getCardById(cardId);
   if (card?.imageUrl) {
     return card.imageUrl;
-  }
-
-  // Try to generate local path based on card name
-  if (card) {
-    // For minor arcana cards, check if they're in suit subfolders
-    if (card.arcana === "minor" && card.suit && card.number) {
-      const suit = card.suit;
-      const number = card.number;
-
-      // Map numbers to file names
-      const numberMap: Record<number, string> = {
-        1: "ace",
-        2: "two",
-        3: "three",
-        4: "four",
-        5: "five",
-        6: "six",
-        7: "seven",
-        8: "eight",
-        9: "nine",
-        10: "ten",
-        11: "page",
-        12: "knight",
-        13: "queen",
-        14: "king",
-      };
-
-      const numberName = numberMap[number];
-      if (numberName) {
-        // Check if suit folder exists (cups, pentacles, swords, wands)
-        return `/tarot/${suit}/${numberName}.png`;
-      }
-    }
-
-    // For major arcana or cards without suit, use original logic
-    // Convert card name to filename format (lowercase, replace spaces with hyphens)
-    const fileName = card.name.en
-      .toLowerCase()
-      .replace(/the /g, "")
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "");
-    const localPath = `/tarot/${fileName}.png`;
-    // Return local path (browser will handle 404 if file doesn't exist)
-    return localPath;
   }
 
   // Fallback to placeholder if card not found
