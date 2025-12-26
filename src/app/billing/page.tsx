@@ -1,8 +1,6 @@
 "use client";
 
 import { Navbar } from "@/components/navbar";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Sparkles, CreditCard } from "lucide-react";
 
 /**
@@ -43,52 +41,48 @@ export default function BillingPage() {
           <h1 className="mb-8 text-4xl font-bold text-white">Billing & Credits</h1>
 
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="border-purple-500/20 bg-black/30 backdrop-blur">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
-                  <CreditCard className="h-5 w-5" />
+            <div className="rounded-lg border border-purple-500/30 bg-black/40 backdrop-blur-md shadow-lg transition-all hover:border-purple-500/50 hover:shadow-purple-500/20 p-6">
+              <div className="mb-4">
+                <h3 className="flex items-center gap-2 text-xl font-semibold text-white mb-2">
+                  <CreditCard className="h-5 w-5 text-purple-400" />
                   Single Reading
-                </CardTitle>
-                <CardDescription className="text-gray-400">
+                </h3>
+                <p className="text-gray-300 text-sm">
                   Get 1 credit for a single reading
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-4">
-                  <span className="text-3xl font-bold text-white">$5</span>
-                  <span className="text-gray-400"> / reading</span>
-                </div>
-                <Button className="w-full mystical-glow bg-purple-600 hover:bg-purple-700" disabled>
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Coming Soon
-                </Button>
-              </CardContent>
-            </Card>
+                </p>
+              </div>
+              <div className="mb-4">
+                <span className="text-3xl font-bold text-white">$5</span>
+                <span className="text-gray-300"> / reading</span>
+              </div>
+              <button className="w-full mystical-glow bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-md transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2" disabled>
+                <Sparkles className="h-4 w-4" />
+                Coming Soon
+              </button>
+            </div>
 
-            <Card className="border-purple-500/20 bg-black/30 backdrop-blur">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
-                  <Sparkles className="h-5 w-5" />
+            <div className="rounded-lg border border-purple-500/30 bg-black/40 backdrop-blur-md shadow-lg transition-all hover:border-purple-500/50 hover:shadow-purple-500/20 p-6">
+              <div className="mb-4">
+                <h3 className="flex items-center gap-2 text-xl font-semibold text-white mb-2">
+                  <Sparkles className="h-5 w-5 text-purple-400" />
                   Package Deal
-                </CardTitle>
-                <CardDescription className="text-gray-400">
+                </h3>
+                <p className="text-gray-300 text-sm">
                   Get 5 credits at a discounted price
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-4">
-                  <span className="text-3xl font-bold text-white">$20</span>
-                  <span className="text-gray-400"> / 5 readings</span>
-                </div>
-                <Button className="w-full mystical-glow bg-purple-600 hover:bg-purple-700" disabled>
-                  <Sparkles className="mr-2 h-4 w-4" />
-                  Coming Soon
-                </Button>
-              </CardContent>
-            </Card>
+                </p>
+              </div>
+              <div className="mb-4">
+                <span className="text-3xl font-bold text-white">$20</span>
+                <span className="text-gray-300"> / 5 readings</span>
+              </div>
+              <button className="w-full mystical-glow bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-md transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2" disabled>
+                <Sparkles className="h-4 w-4" />
+                Coming Soon
+              </button>
+            </div>
           </div>
 
-          <div className="mt-8 rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-4 backdrop-blur">
+          <div className="mt-8 rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-4 backdrop-blur-md">
             <p className="text-sm text-yellow-200">
               <strong>Note:</strong> The billing system is not yet implemented. This is a placeholder page.
               To implement, choose between Stripe or LemonSqueezy and follow the instructions in the code comments.

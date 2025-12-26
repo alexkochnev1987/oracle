@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { Navbar } from "@/components/navbar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
 import { useLocale } from "@/hooks/use-locale";
@@ -44,7 +43,7 @@ export default function ReadingDetailPage() {
       <div className="min-h-screen mystical-gradient">
         <Navbar />
         <div className="container mx-auto px-4 py-16">
-          <Skeleton className="h-96 w-full" />
+          <div className="h-96 w-full bg-black/40 rounded-lg animate-pulse" />
         </div>
       </div>
     );
@@ -61,26 +60,26 @@ export default function ReadingDetailPage() {
       <Navbar />
       <main className="container mx-auto px-4 py-8">
         <div className="mx-auto max-w-4xl">
-          <div className="mb-8 rounded-lg border border-purple-500/20 bg-black/30 p-6 backdrop-blur">
+          <div className="mb-8 rounded-lg border border-purple-500/30 bg-black/40 p-6 backdrop-blur-md shadow-lg">
             <div className="mb-4 flex items-center justify-between">
               <h1 className="text-3xl font-bold text-white">{reading.question}</h1>
-              <span className="text-sm text-gray-400">
+              <span className="text-sm text-purple-300">
                 {format(new Date(reading.createdAt), "PPP", {
                   locale: locale === "ru" ? ru : enUS,
                 })}
               </span>
             </div>
             <div className="mb-4">
-              <span className="text-sm text-purple-400">
+              <span className="text-sm text-purple-400 font-medium">
                 {reader.name[locale]} - {reader.description[locale]}
               </span>
             </div>
           </div>
 
-          <div className="rounded-lg border border-purple-500/20 bg-black/30 p-8 backdrop-blur">
+          <div className="rounded-lg border border-purple-500/30 bg-black/40 p-8 backdrop-blur-md shadow-lg">
             <h2 className="mb-4 text-2xl font-semibold text-white">Your Reading</h2>
             <div className="prose prose-invert max-w-none">
-              <p className="whitespace-pre-wrap text-gray-300 leading-relaxed">
+              <p className="whitespace-pre-wrap text-gray-200 leading-relaxed text-lg">
                 {reading.predictionText}
               </p>
             </div>

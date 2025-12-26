@@ -1,18 +1,20 @@
-import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./prisma";
 import NextAuth from "next-auth";
+import type { Session, User } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 
 // Check if required environment variables are set
 const hasGoogleCredentials = !!(
   process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
 );
 
-const hasDatabase = !!process.env.DATABASE_URL;
+const hasDatabase = !!process.env.POSTGRES_URL;
 
-export const authOptions: NextAuthOptions = {
-  adapter: hasDatabase && hasGoogleCredentials ? PrismaAdapter(prisma) : undefined,
+export const authOptions = {
+  adapter:
+    hasDatabase && hasGoogleCredentials ? PrismaAdapter(prisma) : undefined,
   providers: hasGoogleCredentials
     ? [
         GoogleProvider({
@@ -22,7 +24,15 @@ export const authOptions: NextAuthOptions = {
       ]
     : [],
   callbacks: {
-    async session({ session, user, token }) {
+    async session({
+      session,
+      user,
+      token,
+    }: {
+      session: Session;
+      user?: User;
+      token?: JWT;
+    }): Promise<Session> {
       if (session.user) {
         // For JWT strategy, use token.id; for database strategy, use user.id
         const userId = user?.id || token?.id;
@@ -51,7 +61,7 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user?: User }): Promise<JWT> {
       if (user) {
         token.id = user.id;
         token.credits = (user as any).credits || 0;
@@ -63,7 +73,9 @@ export const authOptions: NextAuthOptions = {
     signIn: "/auth/signin",
   },
   session: {
-    strategy: hasDatabase && hasGoogleCredentials ? "database" : "jwt",
+    strategy: (hasDatabase && hasGoogleCredentials ? "database" : "jwt") as
+      | "database"
+      | "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development-only",
@@ -73,4 +85,3 @@ export const authOptions: NextAuthOptions = {
 
 // Export auth function for server-side usage
 export const { auth, signIn, signOut, handlers } = NextAuth(authOptions);
-

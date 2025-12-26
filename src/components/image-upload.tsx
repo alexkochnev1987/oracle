@@ -2,7 +2,6 @@
 
 import { useRef, useState } from "react";
 import { Upload, X } from "lucide-react";
-import { Button } from "./ui/button";
 import { compressImage, fileToBase64 } from "@/lib/image-compression";
 import { cn } from "@/lib/utils";
 
@@ -48,31 +47,29 @@ export function ImageUpload({ label, value, onChange, className }: ImageUploadPr
 
   return (
     <div className={cn("space-y-2", className)}>
-      <label className="text-sm font-medium">{label}</label>
+      <label className="text-sm font-medium text-white">{label}</label>
       <div className="relative">
         {value ? (
-          <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-border bg-muted">
+          <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-purple-500/30 bg-black/40">
             <img src={value} alt="Preview" className="h-full w-full object-cover" />
-            <Button
+            <button
               type="button"
-              variant="destructive"
-              size="icon"
-              className="absolute right-2 top-2"
+              className="absolute right-2 top-2 bg-red-600/80 hover:bg-red-700/80 text-white p-2 rounded-md transition-colors"
               onClick={handleRemove}
             >
               <X className="h-4 w-4" />
-            </Button>
+            </button>
           </div>
         ) : (
           <div
             className={cn(
-              "flex aspect-video w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border bg-muted transition-colors hover:bg-muted/80",
+              "flex aspect-video w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-500/30 bg-black/40 transition-colors hover:border-purple-500/50 hover:bg-black/50",
               isCompressing && "opacity-50"
             )}
             onClick={() => fileInputRef.current?.click()}
           >
-            <Upload className="mb-2 h-8 w-8 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
+            <Upload className="mb-2 h-8 w-8 text-purple-400" />
+            <p className="text-sm text-gray-300">
               {isCompressing ? "Compressing..." : "Click to upload"}
             </p>
           </div>

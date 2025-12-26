@@ -4,14 +4,8 @@ import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/navbar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ImageUpload } from "@/components/image-upload";
-import { Skeleton } from "@/components/ui/skeleton";
 import { createReading } from "@/app/actions/reading";
-import { useToast } from "@/components/ui/use-toast";
 import { getTranslations } from "@/lib/i18n";
 import { useLocale } from "@/hooks/use-locale";
 import { tarotReaders } from "@/lib/tarot-readers";
@@ -22,7 +16,6 @@ import "react-datepicker/dist/react-datepicker.css";
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { toast } = useToast();
   const locale = useLocale();
   const t = getTranslations(locale);
 
@@ -38,7 +31,7 @@ export default function DashboardPage() {
       <div className="min-h-screen mystical-gradient">
         <Navbar />
         <div className="container mx-auto px-4 py-16">
-          <Skeleton className="h-96 w-full" />
+          <div className="h-96 w-full bg-black/40 rounded-lg animate-pulse" />
         </div>
       </div>
     );
@@ -53,11 +46,7 @@ export default function DashboardPage() {
     e.preventDefault();
 
     if (!userImage || !cardsImage || !birthDate || !question) {
-      toast({
-        title: "Error",
-        description: "Please fill in all fields",
-        variant: "destructive",
-      });
+      alert("Please fill in all fields");
       return;
     }
 
@@ -75,17 +64,10 @@ export default function DashboardPage() {
     setIsLoading(false);
 
     if (result.success) {
-      toast({
-        title: t.dashboard.readingCreated,
-        description: "Your reading has been created successfully",
-      });
+      alert("Your reading has been created successfully");
       router.push(`/readings/${result.readingId}`);
     } else {
-      toast({
-        title: "Error",
-        description: result.error || "Failed to create reading",
-        variant: "destructive",
-      });
+      alert(result.error || "Failed to create reading");
     }
   };
 
@@ -99,24 +81,27 @@ export default function DashboardPage() {
             <p className="text-gray-400">Create your personalized New Year reading</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border border-purple-500/20 bg-black/30 p-6 backdrop-blur">
+          <form onSubmit={handleSubmit} className="space-y-6 rounded-lg border border-purple-500/30 bg-black/40 p-6 backdrop-blur-md shadow-lg">
             {/* Tarot Reader Selection */}
             <div className="space-y-2">
-              <Label className="text-white">{t.dashboard.selectTarotReader}</Label>
-              <Select value={selectedReader} onValueChange={setSelectedReader}>
-                <SelectTrigger className="bg-background">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {tarotReaders.map((reader) => (
-                    <SelectItem key={reader.id} value={reader.id}>
-                      {reader.name[locale]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <label className="text-sm font-medium text-white block">{t.dashboard.selectTarotReader}</label>
+              <select 
+                value={selectedReader} 
+                onChange={(e) => setSelectedReader(e.target.value)}
+                className="w-full h-9 rounded-md border border-purple-500/30 bg-black/40 px-3 py-1 text-sm text-white hover:border-purple-500/50 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 focus:outline-none"
+              >
+                {tarotReaders.map((reader) => (
+                  <option 
+                    key={reader.id} 
+                    value={reader.id}
+                    className="bg-black text-white"
+                  >
+                    {reader.name[locale]}
+                  </option>
+                ))}
+              </select>
               {selectedReader && (
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-purple-200/80">
                   {tarotReaders.find((r) => r.id === selectedReader)?.description[locale]}
                 </p>
               )}
@@ -138,47 +123,47 @@ export default function DashboardPage() {
 
             {/* Birth Date */}
             <div className="space-y-2">
-              <Label className="text-white">{t.dashboard.birthDate}</Label>
+              <label className="text-sm font-medium text-white block">{t.dashboard.birthDate}</label>
               <DatePicker
                 selected={birthDate}
                 onChange={(date) => setBirthDate(date)}
                 dateFormat="yyyy-MM-dd"
                 maxDate={new Date()}
-                className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                className="flex h-9 w-full rounded-md border border-purple-500/30 bg-black/40 px-3 py-1 text-sm text-white placeholder:text-gray-500 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 focus:outline-none"
                 placeholderText="Select your birth date"
               />
             </div>
 
             {/* Question */}
             <div className="space-y-2">
-              <Label className="text-white">{t.dashboard.question}</Label>
-              <Input
+              <label className="text-sm font-medium text-white block">{t.dashboard.question}</label>
+              <input
+                type="text"
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
                 placeholder={t.dashboard.questionPlaceholder}
-                className="bg-background"
+                className="w-full h-9 rounded-md border border-purple-500/30 bg-black/40 px-3 py-1 text-sm text-white placeholder:text-gray-500 focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 focus:outline-none"
               />
             </div>
 
             {/* Submit Button */}
-            <Button
+            <button
               type="submit"
               disabled={isLoading}
-              className="w-full mystical-glow bg-purple-600 hover:bg-purple-700"
-              size="lg"
+              className="w-full mystical-glow bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-md transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
             >
               {isLoading ? (
                 <>
-                  <Sparkles className="mr-2 h-4 w-4 animate-spin" />
+                  <Sparkles className="h-4 w-4 animate-spin" />
                   {t.dashboard.loading}
                 </>
               ) : (
                 <>
-                  <Sparkles className="mr-2 h-4 w-4" />
+                  <Sparkles className="h-4 w-4" />
                   {t.dashboard.createReading}
                 </>
               )}
-            </Button>
+            </button>
           </form>
         </div>
       </main>
