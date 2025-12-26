@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Upload, X } from "lucide-react";
+import { Upload, X, Loader2 } from "lucide-react";
 import { compressImage, fileToBase64 } from "@/lib/image-compression";
 import { cn } from "@/lib/utils";
 
@@ -12,7 +12,12 @@ interface ImageUploadProps {
   className?: string;
 }
 
-export function ImageUpload({ label, value, onChange, className }: ImageUploadProps) {
+export function ImageUpload({
+  label,
+  value,
+  onChange,
+  className,
+}: ImageUploadProps) {
   const [isCompressing, setIsCompressing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -46,32 +51,54 @@ export function ImageUpload({ label, value, onChange, className }: ImageUploadPr
   };
 
   return (
-    <div className={cn("space-y-2", className)}>
-      <label className="text-sm font-medium text-white">{label}</label>
+    <div className={cn("space-y-2 sm:space-y-3", className)}>
+      <label className="block text-sm sm:text-base font-medium text-white">
+        {label}
+      </label>
       <div className="relative">
         {value ? (
-          <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-purple-500/30 bg-black/40">
-            <img src={value} alt="Preview" className="h-full w-full object-cover" />
+          <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-[rgba(100,200,255,0.4)] bg-[rgba(26,26,58,0.7)] backdrop-blur-md transition-all duration-300 hover:border-[rgba(100,200,255,0.6)]">
+            <img
+              src={value}
+              alt="Preview"
+              className="h-full w-full object-cover"
+            />
             <button
               type="button"
-              className="absolute right-2 top-2 bg-red-600/80 hover:bg-red-700/80 text-white p-2 rounded-md transition-colors"
+              className="absolute right-2 top-2 h-11 w-11 sm:h-10 sm:w-10 flex items-center justify-center bg-red-600/80 hover:bg-red-700/80 text-white rounded-xl transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-transparent min-w-[44px] min-h-[44px] sm:min-w-[40px] sm:min-h-[40px]"
               onClick={handleRemove}
+              aria-label="Remove image"
             >
-              <X className="h-4 w-4" />
+              <X className="h-5 w-5 sm:h-5 sm:w-5" />
             </button>
           </div>
         ) : (
           <div
             className={cn(
-              "flex aspect-video w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-purple-500/30 bg-black/40 transition-colors hover:border-purple-500/50 hover:bg-black/50",
-              isCompressing && "opacity-50"
+              "flex aspect-video w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-all duration-300",
+              "border-[rgba(100,200,255,0.4)] bg-[rgba(26,26,58,0.6)]",
+              "hover:border-[rgba(100,200,255,0.7)] hover:bg-[rgba(26,26,58,0.8)] hover:shadow-[0_0_20px_rgba(100,200,255,0.3)]",
+              "focus-within:border-[rgba(100,200,255,0.8)] focus-within:ring-2 focus-within:ring-[rgba(100,200,255,0.3)]",
+              "p-4 sm:p-6 md:p-8",
+              isCompressing && "opacity-50 cursor-not-allowed"
             )}
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => !isCompressing && fileInputRef.current?.click()}
           >
-            <Upload className="mb-2 h-8 w-8 text-purple-400" />
-            <p className="text-sm text-gray-300">
-              {isCompressing ? "Compressing..." : "Click to upload"}
-            </p>
+            {isCompressing ? (
+              <>
+                <Loader2 className="mb-3 h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 text-[rgba(100,200,255,0.6)] animate-spin" />
+                <p className="text-sm sm:text-base text-[#9ca3af] font-medium">
+                  Compressing...
+                </p>
+              </>
+            ) : (
+              <>
+                <Upload className="mb-3 h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 text-[rgba(100,200,255,0.6)]" />
+                <p className="text-sm sm:text-base text-[#9ca3af] font-medium">
+                  Click to upload
+                </p>
+              </>
+            )}
           </div>
         )}
         <input
@@ -86,4 +113,3 @@ export function ImageUpload({ label, value, onChange, className }: ImageUploadPr
     </div>
   );
 }
-

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await auth();
@@ -18,8 +18,9 @@ export async function GET(
       return NextResponse.json({ error: "User ID not found" }, { status: 401 });
     }
 
+    const { id } = await params;
     const reading = await prisma.reading.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!reading || reading.userId !== userId) {
@@ -29,7 +30,9 @@ export async function GET(
     return NextResponse.json(reading);
   } catch (error) {
     console.error("Error fetching reading:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
-

@@ -30,4 +30,3 @@ export const { GET, POST } = authHandlers;
 // Configure runtime
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-

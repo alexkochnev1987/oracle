@@ -1,18 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Locale, defaultLocale } from "@/lib/i18n";
+import { Locale } from "@/lib/i18n";
+import { useLocaleContext } from "@/contexts/locale-context";
 
-export function useLocale(): Locale {
-  const [locale, setLocale] = useState<Locale>(defaultLocale);
-
-  useEffect(() => {
-    const stored = localStorage.getItem("locale") as Locale | null;
-    if (stored && ["ru", "en"].includes(stored)) {
-      setLocale(stored);
-    }
-  }, []);
-
-  return locale;
+export function useLocale(): [Locale, (locale: Locale) => void] {
+  const { locale, setLocale } = useLocaleContext();
+  return [locale, setLocale];
 }
-

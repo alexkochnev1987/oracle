@@ -4,24 +4,26 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { Navbar } from "@/components/navbar";
+import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
 import { useLocale } from "@/hooks/use-locale";
 import { getTranslations } from "@/lib/i18n";
 import { getTarotReader } from "@/lib/tarot-readers";
+import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 
 export default function ReadingDetailPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const params = useParams();
-  const locale = useLocale();
+  const [locale] = useLocale();
   const t = getTranslations(locale);
   const [reading, setReading] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.push("/");
+      router.push("/auth/signin");
       return;
     }
 
@@ -42,8 +44,10 @@ export default function ReadingDetailPage() {
     return (
       <div className="min-h-screen mystical-gradient">
         <Navbar />
-        <div className="container mx-auto px-4 py-16">
-          <div className="h-96 w-full bg-black/40 rounded-lg animate-pulse" />
+        <div className="container mx-auto px-4 py-6 sm:py-8">
+          <div className="mx-auto max-w-4xl">
+            <LoadingSkeleton variant="card" count={2} />
+          </div>
         </div>
       </div>
     );
@@ -54,39 +58,45 @@ export default function ReadingDetailPage() {
   }
 
   const reader = getTarotReader(reading.tarotReaderId);
+  const date = typeof reading.createdAt === "string" 
+    ? new Date(reading.createdAt) 
+    : reading.createdAt;
 
   return (
     <div className="min-h-screen mystical-gradient">
       <Navbar />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-6 sm:py-8">
         <div className="mx-auto max-w-4xl">
-          <div className="mb-8 rounded-lg border border-purple-500/30 bg-black/40 p-6 backdrop-blur-md shadow-lg">
-            <div className="mb-4 flex items-center justify-between">
-              <h1 className="text-3xl font-bold text-white">{reading.question}</h1>
-              <span className="text-sm text-purple-300">
-                {format(new Date(reading.createdAt), "PPP", {
+          <Card className="mb-6 sm:mb-8 p-4 sm:p-6">
+            <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white">
+                {reading.question}
+              </h1>
+              <span className="text-xs sm:text-sm text-[#9ca3af] whitespace-nowrap">
+                {format(date, "PPP", {
                   locale: locale === "ru" ? ru : enUS,
                 })}
               </span>
             </div>
             <div className="mb-4">
-              <span className="text-sm text-purple-400 font-medium">
+              <span className="text-sm sm:text-base text-[rgba(100,200,255,0.8)] font-medium">
                 {reader.name[locale]} - {reader.description[locale]}
               </span>
             </div>
-          </div>
+          </Card>
 
-          <div className="rounded-lg border border-purple-500/30 bg-black/40 p-8 backdrop-blur-md shadow-lg">
-            <h2 className="mb-4 text-2xl font-semibold text-white">Your Reading</h2>
+          <Card className="p-4 sm:p-6 md:p-8">
+            <h2 className="mb-4 text-xl sm:text-2xl font-semibold text-white">
+              {t.readings.yourReading}
+            </h2>
             <div className="prose prose-invert max-w-none">
-              <p className="whitespace-pre-wrap text-gray-200 leading-relaxed text-lg">
+              <p className="whitespace-pre-wrap text-[#e5e7eb] leading-relaxed text-base sm:text-lg">
                 {reading.predictionText}
               </p>
             </div>
-          </div>
+          </Card>
         </div>
       </main>
     </div>
   );
 }
-

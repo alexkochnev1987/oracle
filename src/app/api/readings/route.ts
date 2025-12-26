@@ -29,7 +29,9 @@ export async function GET() {
     return NextResponse.json(readings);
   } catch (error) {
     console.error("Error fetching readings:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
-

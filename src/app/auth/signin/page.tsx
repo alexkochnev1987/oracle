@@ -2,26 +2,36 @@
 
 import { signIn } from "next-auth/react";
 import { Navbar } from "@/components/navbar";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { getTranslations } from "@/lib/i18n";
+import { useLocale } from "@/hooks/use-locale";
 
 export default function SignInPage() {
+  const [locale] = useLocale();
+  const t = getTranslations(locale);
+
   return (
     <div className="min-h-screen mystical-gradient">
       <Navbar />
-      <main className="container mx-auto flex min-h-[calc(100vh-4rem)] items-center justify-center px-4">
-        <div className="w-full max-w-md rounded-lg border border-purple-500/30 bg-black/40 p-8 backdrop-blur-md shadow-lg">
-          <h1 className="mb-6 text-center text-3xl font-bold text-white">Sign In</h1>
-          <p className="mb-6 text-center text-gray-300">
-            Sign in with your Google account to continue
+      <main className="container mx-auto flex min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] items-center justify-center px-4">
+        <Card className="w-full max-w-md p-6 sm:p-8">
+          <h1 className="mb-4 sm:mb-6 text-center text-2xl sm:text-3xl font-bold text-white">
+            {t.auth.signInTitle}
+          </h1>
+          <p className="mb-4 sm:mb-6 text-center text-sm sm:text-base text-[#9ca3af]">
+            {t.auth.signInDescription}
           </p>
-          <button
+          <Button
+            variant="primary"
+            size="lg"
             onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            className="w-full mystical-glow bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-md transition-colors font-medium"
+            className="w-full"
           >
-            Sign in with Google
-          </button>
-        </div>
+            {t.auth.signInWithGoogle}
+          </Button>
+        </Card>
       </main>
     </div>
   );
 }
-

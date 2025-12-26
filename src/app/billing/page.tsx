@@ -1,96 +1,84 @@
 "use client";
 
 import { Navbar } from "@/components/navbar";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Sparkles, CreditCard } from "lucide-react";
-
-/**
- * BILLING SYSTEM - TO BE IMPLEMENTED
- * 
- * This page is a placeholder for the billing system integration.
- * You can implement either Stripe or LemonSqueezy here.
- * 
- * Recommended approach:
- * 1. Choose your payment provider (Stripe or LemonSqueezy)
- * 2. Set up webhook endpoints for payment confirmation
- * 3. Create Server Actions to handle payment intents
- * 4. Update user credits after successful payment
- * 
- * Example flow:
- * - User clicks "Buy Credits" button
- * - Create payment intent via Server Action
- * - Redirect to payment provider checkout
- * - Webhook confirms payment and adds credits to user account
- * 
- * Stripe Setup:
- * - Install: @stripe/stripe-js, stripe
- * - Create checkout session
- * - Handle webhook: /api/webhooks/stripe
- * 
- * LemonSqueezy Setup:
- * - Install: @lemonsqueezy/lemonsqueezy.js
- * - Create checkout session
- * - Handle webhook: /api/webhooks/lemonsqueezy
- */
+import { getTranslations } from "@/lib/i18n";
+import { useLocale } from "@/hooks/use-locale";
 
 export default function BillingPage() {
+  const [locale] = useLocale();
+  const t = getTranslations(locale);
+
   return (
     <div className="min-h-screen mystical-gradient">
       <Navbar />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-6 sm:py-8">
         <div className="mx-auto max-w-4xl">
-          <h1 className="mb-8 text-4xl font-bold text-white">Billing & Credits</h1>
+          <h1 className="mb-6 sm:mb-8 text-3xl sm:text-4xl font-bold text-white">
+            {t.billing.title}
+          </h1>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-lg border border-purple-500/30 bg-black/40 backdrop-blur-md shadow-lg transition-all hover:border-purple-500/50 hover:shadow-purple-500/20 p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+            <Card hover glow className="p-4 sm:p-6">
               <div className="mb-4">
-                <h3 className="flex items-center gap-2 text-xl font-semibold text-white mb-2">
-                  <CreditCard className="h-5 w-5 text-purple-400" />
-                  Single Reading
+                <h3 className="flex items-center gap-2 text-lg sm:text-xl font-semibold text-white mb-2">
+                  <CreditCard className="h-5 w-5 text-[rgba(100,200,255,0.8)]" />
+                  {t.billing.singleReading.title}
                 </h3>
-                <p className="text-gray-300 text-sm">
-                  Get 1 credit for a single reading
+                <p className="text-sm sm:text-base text-[#9ca3af]">
+                  {t.billing.singleReading.description}
                 </p>
               </div>
               <div className="mb-4">
-                <span className="text-3xl font-bold text-white">$5</span>
-                <span className="text-gray-300"> / reading</span>
+                <span className="text-2xl sm:text-3xl font-bold text-white">{t.billing.singleReading.price}</span>
+                <span className="text-sm sm:text-base text-[#9ca3af]">{t.billing.singleReading.priceUnit}</span>
               </div>
-              <button className="w-full mystical-glow bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-md transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2" disabled>
-                <Sparkles className="h-4 w-4" />
-                Coming Soon
-              </button>
-            </div>
+              <Button
+                variant="primary"
+                size="lg"
+                disabled
+                className="w-full"
+                icon={<Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />}
+              >
+                {t.billing.singleReading.button}
+              </Button>
+            </Card>
 
-            <div className="rounded-lg border border-purple-500/30 bg-black/40 backdrop-blur-md shadow-lg transition-all hover:border-purple-500/50 hover:shadow-purple-500/20 p-6">
+            <Card hover glow className="p-4 sm:p-6">
               <div className="mb-4">
-                <h3 className="flex items-center gap-2 text-xl font-semibold text-white mb-2">
-                  <Sparkles className="h-5 w-5 text-purple-400" />
-                  Package Deal
+                <h3 className="flex items-center gap-2 text-lg sm:text-xl font-semibold text-white mb-2">
+                  <Sparkles className="h-5 w-5 text-[rgba(100,200,255,0.8)]" />
+                  {t.billing.package.title}
                 </h3>
-                <p className="text-gray-300 text-sm">
-                  Get 5 credits at a discounted price
+                <p className="text-sm sm:text-base text-[#9ca3af]">
+                  {t.billing.package.description}
                 </p>
               </div>
               <div className="mb-4">
-                <span className="text-3xl font-bold text-white">$20</span>
-                <span className="text-gray-300"> / 5 readings</span>
+                <span className="text-2xl sm:text-3xl font-bold text-white">{t.billing.package.price}</span>
+                <span className="text-sm sm:text-base text-[#9ca3af]">{t.billing.package.priceUnit}</span>
               </div>
-              <button className="w-full mystical-glow bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-md transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2" disabled>
-                <Sparkles className="h-4 w-4" />
-                Coming Soon
-              </button>
-            </div>
+              <Button
+                variant="primary"
+                size="lg"
+                disabled
+                className="w-full"
+                icon={<Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />}
+              >
+                {t.billing.package.button}
+              </Button>
+            </Card>
           </div>
 
-          <div className="mt-8 rounded-lg border border-yellow-500/30 bg-yellow-500/10 p-4 backdrop-blur-md">
-            <p className="text-sm text-yellow-200">
-              <strong>Note:</strong> The billing system is not yet implemented. This is a placeholder page.
-              To implement, choose between Stripe or LemonSqueezy and follow the instructions in the code comments.
+          <Card className="mt-6 sm:mt-8 p-4 border-[rgba(212,175,55,0.3)] bg-[rgba(212,175,55,0.1)]">
+            <p className="text-xs sm:text-sm text-[#d4af37]">
+              <strong>{locale === "ru" ? "Примечание:" : "Note:"}</strong> {t.billing.note}
             </p>
-          </div>
+          </Card>
         </div>
       </main>
     </div>
   );
 }
-

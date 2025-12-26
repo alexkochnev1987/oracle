@@ -15,7 +15,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     if (typeof window !== "undefined") {
       const originalError = console.error;
       const originalDebug = console.debug;
-      
+
       // Filter NextAuth errors
       const shouldIgnore = (args: any[]) => {
         const message = args[0]?.toString() || "";
