@@ -212,7 +212,7 @@ export async function createReading(formData: FormData) {
           cardSelectionMode === "upload" && cardsImageBase64
             ? cardsImageBase64.substring(0, 100) + "..."
             : null,
-        selectedCards: selectedCardsArray ? selectedCardsArray : null,
+        selectedCards: selectedCardsArray ?? undefined,
         cardSelectionMode,
         tarotReaderId,
         shareToken,

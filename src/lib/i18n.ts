@@ -107,6 +107,13 @@ export const translations = {
       deleteConfirm: "Удалить",
       deleteSuccess: "Прогноз успешно удален",
       deleteError: "Ошибка при удалении прогноза",
+      sendEmail: "Отправить на почту",
+      sendEmailDescription: "Отправьте красивый прогноз на вашу электронную почту",
+      emailPlaceholder: "your@email.com",
+      sendButton: "Отправить",
+      sending: "Отправка...",
+      emailSent: "Отправлено!",
+      emailError: "Ошибка при отправке письма",
     },
     // Billing
     billing: {
@@ -275,6 +282,13 @@ export const translations = {
       deleteConfirm: "Delete",
       deleteSuccess: "Reading deleted successfully",
       deleteError: "Error deleting reading",
+      sendEmail: "Send by Email",
+      sendEmailDescription: "Send a beautiful reading to your email address",
+      emailPlaceholder: "your@email.com",
+      sendButton: "Send",
+      sending: "Sending...",
+      emailSent: "Sent!",
+      emailError: "Error sending email",
     },
     // Billing
     billing: {

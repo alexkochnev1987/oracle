@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TarotCardsDisplay } from "@/components/tarot-cards-display";
+import { EmailReadingForm } from "@/components/email-reading-form";
 import { format } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
 import { useLocale } from "@/hooks/use-locale";
@@ -197,6 +198,10 @@ export default function PublicReadingPage() {
               </p>
             </div>
           </Card>
+
+          <div className="w-full">
+            <EmailReadingForm shareToken={params.token as string} />
+          </div>
         </div>
       </main>
     </div>

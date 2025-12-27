@@ -241,111 +241,252 @@ const cupsCards: TarotCard[] = [
 
 // Pentacles (Пентакли/Монеты)
 const pentaclesCards: TarotCard[] = [
-  createMinorArcanaCard("pentacles", 1, "Туз Пентаклей", "Ace of Pentacles"),
-  createMinorArcanaCard("pentacles", 2, "Двойка Пентаклей", "Two of Pentacles"),
-  createMinorArcanaCard(
-    "pentacles",
-    3,
-    "Тройка Пентаклей",
-    "Three of Pentacles"
-  ),
-  createMinorArcanaCard(
-    "pentacles",
-    4,
-    "Четверка Пентаклей",
-    "Four of Pentacles"
-  ),
-  createMinorArcanaCard(
-    "pentacles",
-    5,
-    "Пятерка Пентаклей",
-    "Five of Pentacles"
-  ),
-  createMinorArcanaCard(
-    "pentacles",
-    6,
-    "Шестерка Пентаклей",
-    "Six of Pentacles"
-  ),
-  createMinorArcanaCard(
-    "pentacles",
-    7,
-    "Семерка Пентаклей",
-    "Seven of Pentacles"
-  ),
-  createMinorArcanaCard(
-    "pentacles",
-    8,
-    "Восьмерка Пентаклей",
-    "Eight of Pentacles"
-  ),
-  createMinorArcanaCard(
-    "pentacles",
-    9,
-    "Девятка Пентаклей",
-    "Nine of Pentacles"
-  ),
-  createMinorArcanaCard(
-    "pentacles",
-    10,
-    "Десятка Пентаклей",
-    "Ten of Pentacles"
-  ),
-  createMinorArcanaCard("pentacles", 11, "Паж Пентаклей", "Page of Pentacles"),
-  createMinorArcanaCard(
-    "pentacles",
-    12,
-    "Рыцарь Пентаклей",
-    "Knight of Pentacles"
-  ),
-  createMinorArcanaCard(
-    "pentacles",
-    13,
-    "Королева Пентаклей",
-    "Queen of Pentacles"
-  ),
-  createMinorArcanaCard(
-    "pentacles",
-    14,
-    "Король Пентаклей",
-    "King of Pentacles"
-  ),
+  {
+    ...createMinorArcanaCard(
+      "pentacles",
+      1,
+      "Туз Пентаклей",
+      "Ace of Pentacles"
+    ),
+    imageUrl: "/tarot/pentacles/ace.png",
+  },
+  {
+    ...createMinorArcanaCard(
+      "pentacles",
+      2,
+      "Двойка Пентаклей",
+      "Two of Pentacles"
+    ),
+    imageUrl: "/tarot/pentacles/two.png",
+  },
+  {
+    ...createMinorArcanaCard(
+      "pentacles",
+      3,
+      "Тройка Пентаклей",
+      "Three of Pentacles"
+    ),
+    imageUrl: "/tarot/pentacles/three.png",
+  },
+  {
+    ...createMinorArcanaCard(
+      "pentacles",
+      4,
+      "Четверка Пентаклей",
+      "Four of Pentacles"
+    ),
+    imageUrl: "/tarot/pentacles/four.png",
+  },
+  {
+    ...createMinorArcanaCard(
+      "pentacles",
+      5,
+      "Пятерка Пентаклей",
+      "Five of Pentacles"
+    ),
+    imageUrl: "/tarot/pentacles/five.png",
+  },
+  {
+    ...createMinorArcanaCard(
+      "pentacles",
+      6,
+      "Шестерка Пентаклей",
+      "Six of Pentacles"
+    ),
+    imageUrl: "/tarot/pentacles/six.png",
+  },
+  {
+    ...createMinorArcanaCard(
+      "pentacles",
+      7,
+      "Семерка Пентаклей",
+      "Seven of Pentacles"
+    ),
+    imageUrl: "/tarot/pentacles/seven.png",
+  },
+  {
+    ...createMinorArcanaCard(
+      "pentacles",
+      8,
+      "Восьмерка Пентаклей",
+      "Eight of Pentacles"
+    ),
+    imageUrl: "/tarot/pentacles/eight.png",
+  },
+  {
+    ...createMinorArcanaCard(
+      "pentacles",
+      9,
+      "Девятка Пентаклей",
+      "Nine of Pentacles"
+    ),
+    imageUrl: "/tarot/pentacles/nine.png",
+  },
+  {
+    ...createMinorArcanaCard(
+      "pentacles",
+      10,
+      "Десятка Пентаклей",
+      "Ten of Pentacles"
+    ),
+    imageUrl: "/tarot/pentacles/ten.png",
+  },
+  {
+    ...createMinorArcanaCard(
+      "pentacles",
+      11,
+      "Паж Пентаклей",
+      "Page of Pentacles"
+    ),
+    imageUrl: "/tarot/pentacles/page.png",
+  },
+  {
+    ...createMinorArcanaCard(
+      "pentacles",
+      12,
+      "Рыцарь Пентаклей",
+      "Knight of Pentacles"
+    ),
+    imageUrl: "/tarot/pentacles/knight.png",
+  },
+  {
+    ...createMinorArcanaCard(
+      "pentacles",
+      13,
+      "Королева Пентаклей",
+      "Queen of Pentacles"
+    ),
+    imageUrl: "/tarot/pentacles/queen.png",
+  },
+  {
+    ...createMinorArcanaCard(
+      "pentacles",
+      14,
+      "Король Пентаклей",
+      "King of Pentacles"
+    ),
+    imageUrl: "/tarot/pentacles/king.png",
+  },
 ];
 
 // Swords (Мечи)
 const swordsCards: TarotCard[] = [
-  createMinorArcanaCard("swords", 1, "Туз Мечей", "Ace of Swords"),
-  createMinorArcanaCard("swords", 2, "Двойка Мечей", "Two of Swords"),
-  createMinorArcanaCard("swords", 3, "Тройка Мечей", "Three of Swords"),
-  createMinorArcanaCard("swords", 4, "Четверка Мечей", "Four of Swords"),
-  createMinorArcanaCard("swords", 5, "Пятерка Мечей", "Five of Swords"),
-  createMinorArcanaCard("swords", 6, "Шестерка Мечей", "Six of Swords"),
-  createMinorArcanaCard("swords", 7, "Семерка Мечей", "Seven of Swords"),
-  createMinorArcanaCard("swords", 8, "Восьмерка Мечей", "Eight of Swords"),
-  createMinorArcanaCard("swords", 9, "Девятка Мечей", "Nine of Swords"),
-  createMinorArcanaCard("swords", 10, "Десятка Мечей", "Ten of Swords"),
-  createMinorArcanaCard("swords", 11, "Паж Мечей", "Page of Swords"),
-  createMinorArcanaCard("swords", 12, "Рыцарь Мечей", "Knight of Swords"),
-  createMinorArcanaCard("swords", 13, "Королева Мечей", "Queen of Swords"),
-  createMinorArcanaCard("swords", 14, "Король Мечей", "King of Swords"),
+  {
+    ...createMinorArcanaCard("swords", 1, "Туз Мечей", "Ace of Swords"),
+    imageUrl: "/tarot/swords/ace.png",
+  },
+  {
+    ...createMinorArcanaCard("swords", 2, "Двойка Мечей", "Two of Swords"),
+    imageUrl: "/tarot/swords/two.png",
+  },
+  {
+    ...createMinorArcanaCard("swords", 3, "Тройка Мечей", "Three of Swords"),
+    imageUrl: "/tarot/swords/three.png",
+  },
+  {
+    ...createMinorArcanaCard("swords", 4, "Четверка Мечей", "Four of Swords"),
+    imageUrl: "/tarot/swords/four.png",
+  },
+  {
+    ...createMinorArcanaCard("swords", 5, "Пятерка Мечей", "Five of Swords"),
+    imageUrl: "/tarot/swords/five.png",
+  },
+  {
+    ...createMinorArcanaCard("swords", 6, "Шестерка Мечей", "Six of Swords"),
+    imageUrl: "/tarot/swords/six.png",
+  },
+  {
+    ...createMinorArcanaCard("swords", 7, "Семерка Мечей", "Seven of Swords"),
+    imageUrl: "/tarot/swords/seven.png",
+  },
+  {
+    ...createMinorArcanaCard("swords", 8, "Восьмерка Мечей", "Eight of Swords"),
+    imageUrl: "/tarot/swords/eight.png",
+  },
+  {
+    ...createMinorArcanaCard("swords", 9, "Девятка Мечей", "Nine of Swords"),
+    imageUrl: "/tarot/swords/nine.png",
+  },
+  {
+    ...createMinorArcanaCard("swords", 10, "Десятка Мечей", "Ten of Swords"),
+    imageUrl: "/tarot/swords/ten.png",
+  },
+  {
+    ...createMinorArcanaCard("swords", 11, "Паж Мечей", "Page of Swords"),
+    imageUrl: "/tarot/swords/page.png",
+  },
+  {
+    ...createMinorArcanaCard("swords", 12, "Рыцарь Мечей", "Knight of Swords"),
+    imageUrl: "/tarot/swords/knight.png",
+  },
+  {
+    ...createMinorArcanaCard("swords", 13, "Королева Мечей", "Queen of Swords"),
+    imageUrl: "/tarot/swords/queen.png",
+  },
+  {
+    ...createMinorArcanaCard("swords", 14, "Король Мечей", "King of Swords"),
+    imageUrl: "/tarot/swords/king.png",
+  },
 ];
 
 // Wands (Жезлы/Посохи)
 const wandsCards: TarotCard[] = [
-  createMinorArcanaCard("wands", 1, "Туз Жезлов", "Ace of Wands"),
-  createMinorArcanaCard("wands", 2, "Двойка Жезлов", "Two of Wands"),
-  createMinorArcanaCard("wands", 3, "Тройка Жезлов", "Three of Wands"),
-  createMinorArcanaCard("wands", 4, "Четверка Жезлов", "Four of Wands"),
-  createMinorArcanaCard("wands", 5, "Пятерка Жезлов", "Five of Wands"),
-  createMinorArcanaCard("wands", 6, "Шестерка Жезлов", "Six of Wands"),
-  createMinorArcanaCard("wands", 7, "Семерка Жезлов", "Seven of Wands"),
-  createMinorArcanaCard("wands", 8, "Восьмерка Жезлов", "Eight of Wands"),
-  createMinorArcanaCard("wands", 9, "Девятка Жезлов", "Nine of Wands"),
-  createMinorArcanaCard("wands", 10, "Десятка Жезлов", "Ten of Wands"),
-  createMinorArcanaCard("wands", 11, "Паж Жезлов", "Page of Wands"),
-  createMinorArcanaCard("wands", 12, "Рыцарь Жезлов", "Knight of Wands"),
-  createMinorArcanaCard("wands", 13, "Королева Жезлов", "Queen of Wands"),
-  createMinorArcanaCard("wands", 14, "Король Жезлов", "King of Wands"),
+  {
+    ...createMinorArcanaCard("wands", 1, "Туз Жезлов", "Ace of Wands"),
+    imageUrl: "/tarot/wands/ace.png",
+  },
+  {
+    ...createMinorArcanaCard("wands", 2, "Двойка Жезлов", "Two of Wands"),
+    imageUrl: "/tarot/wands/two.png",
+  },
+  {
+    ...createMinorArcanaCard("wands", 3, "Тройка Жезлов", "Three of Wands"),
+    imageUrl: "/tarot/wands/three.png",
+  },
+  {
+    ...createMinorArcanaCard("wands", 4, "Четверка Жезлов", "Four of Wands"),
+    imageUrl: "/tarot/wands/four.png",
+  },
+  {
+    ...createMinorArcanaCard("wands", 5, "Пятерка Жезлов", "Five of Wands"),
+    imageUrl: "/tarot/wands/five.png",
+  },
+  {
+    ...createMinorArcanaCard("wands", 6, "Шестерка Жезлов", "Six of Wands"),
+    imageUrl: "/tarot/wands/six.png",
+  },
+  {
+    ...createMinorArcanaCard("wands", 7, "Семерка Жезлов", "Seven of Wands"),
+    imageUrl: "/tarot/wands/seven.png",
+  },
+  {
+    ...createMinorArcanaCard("wands", 8, "Восьмерка Жезлов", "Eight of Wands"),
+    imageUrl: "/tarot/wands/eight.png",
+  },
+  {
+    ...createMinorArcanaCard("wands", 9, "Девятка Жезлов", "Nine of Wands"),
+    imageUrl: "/tarot/wands/nine.png",
+  },
+  {
+    ...createMinorArcanaCard("wands", 10, "Десятка Жезлов", "Ten of Wands"),
+    imageUrl: "/tarot/wands/ten.png",
+  },
+  {
+    ...createMinorArcanaCard("wands", 11, "Паж Жезлов", "Page of Wands"),
+    imageUrl: "/tarot/wands/page.png",
+  },
+  {
+    ...createMinorArcanaCard("wands", 12, "Рыцарь Жезлов", "Knight of Wands"),
+    imageUrl: "/tarot/wands/knight.png",
+  },
+  {
+    ...createMinorArcanaCard("wands", 13, "Королева Жезлов", "Queen of Wands"),
+    imageUrl: "/tarot/wands/queen.png",
+  },
+  {
+    ...createMinorArcanaCard("wands", 14, "Король Жезлов", "King of Wands"),
+    imageUrl: "/tarot/wands/king.png",
+  },
 ];
 
 // All 78 tarot cards

@@ -7,6 +7,7 @@ import { Navbar } from "@/components/navbar";
 import { Card } from "@/components/ui/card";
 import { QRCodeDisplay } from "@/components/qr-code-display";
 import { TarotCardsDisplay } from "@/components/tarot-cards-display";
+import { EmailReadingForm } from "@/components/email-reading-form";
 import { format } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
 import { useLocale } from "@/hooks/use-locale";
@@ -122,6 +123,10 @@ export default function ReadingDetailPage() {
               />
             </div>
           )}
+
+          <div className="w-full">
+            <EmailReadingForm readingId={reading.id} />
+          </div>
         </div>
       </main>
     </div>
