@@ -60,18 +60,6 @@ export async function createReading(formData: FormData) {
       throw new Error("User ID not found in session");
     }
 
-    // Check user credits - TEMPORARILY DISABLED FOR STUB
-    // const user = await prisma.user.findUnique({
-    //   where: { id: userId },
-    //   select: { credits: true },
-    // });
-
-    // if (!user || user.credits < 1) {
-    //   throw new Error(
-    //     "Insufficient credits. Please purchase credits to create a reading."
-    //   );
-    // }
-
     // Get form data
     const userImageBase64 = formData.get("userImage") as string | null;
     const selectedCardsJson = formData.get("selectedCards") as string | null;
@@ -82,6 +70,26 @@ export async function createReading(formData: FormData) {
     const tarotReaderId =
       (formData.get("tarotReaderId") as string) || "default";
     const locale = (formData.get("locale") as "ru" | "en") || "ru";
+
+    // Check if user is in whitelist (unlimited credits)
+    const userEmail = session.user.email;
+    const isWhitelisted = isUserAllowedForAI(userEmail);
+
+    // Check user credits only if not in whitelist
+    if (!isWhitelisted) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { credits: true },
+      });
+
+      if (!user || user.credits < 1) {
+        throw new Error(
+          locale === "ru"
+            ? "Недостаточно кредитов. Пожалуйста, приобретите кредиты для создания расклада."
+            : "Insufficient credits. Please purchase credits to create a reading."
+        );
+      }
+    }
 
     if (!birthDate || !question) {
       throw new Error("Missing required fields");
@@ -125,9 +133,8 @@ export async function createReading(formData: FormData) {
     // Generate unique share token for public access
     const shareToken = randomUUID();
 
-    // Check if user is allowed to use AI
-    const userEmail = session.user.email;
-    const isAllowed = isUserAllowedForAI(userEmail);
+    // Check if user is allowed to use AI (already checked above for whitelist)
+    const isAllowed = isWhitelisted;
 
     // Prepare image data - ensure proper format for OpenAI API
     // OpenAI expects data URI format: data:image/jpeg;base64,{base64string}
@@ -212,15 +219,17 @@ export async function createReading(formData: FormData) {
       },
     });
 
-    // Deduct credit - TEMPORARILY DISABLED FOR STUB
-    // await prisma.user.update({
-    //   where: { id: userId },
-    //   data: {
-    //     credits: {
-    //       decrement: 1,
-    //     },
-    //   },
-    // });
+    // Deduct credit only if user is not in whitelist
+    if (!isWhitelisted) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: {
+          credits: {
+            decrement: 1,
+          },
+        },
+      });
+    }
 
     revalidatePath("/dashboard");
     revalidatePath("/readings");

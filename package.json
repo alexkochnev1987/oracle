@@ -10,7 +10,8 @@
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "migrate:credits": "tsx scripts/migrate-existing-users.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.6.0",
@@ -19,6 +20,7 @@
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-slot": "^1.2.4",
+    "@stripe/stripe-js": "^8.6.0",
     "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -34,6 +36,7 @@
     "react-markdown": "^10.1.0",
     "react-qr-code": "^2.0.18",
     "remark-gfm": "^4.0.1",
+    "stripe": "^20.1.0",
     "tailwind-merge": "^3.4.0",
     "zod": "^3.24.1"
   },
@@ -49,6 +52,7 @@
     "postcss": "^8.4.47",
     "prisma": "^5.22.0",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.2",
     "typescript": "^5"
   }
 }

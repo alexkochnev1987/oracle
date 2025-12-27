@@ -383,20 +383,20 @@ export const translations = {
     billing: {
       title: "Оплата и кредиты",
       singleReading: {
-        title: "Одно гадание",
-        description: "Получите 1 кредит на одно гадание",
-        price: "$5",
-        priceUnit: " / гадание",
-        button: "Скоро",
+        title: "10 кредитов",
+        description: "Получите 10 кредитов для гаданий",
+        price: "$1",
+        priceUnit: " / 10 кредитов",
+        button: "Купить",
       },
       package: {
-        title: "Пакет",
-        description: "Получите 5 кредитов по сниженной цене",
-        price: "$20",
-        priceUnit: " / 5 гаданий",
-        button: "Скоро",
+        title: "100 кредитов",
+        description: "Получите 100 кредитов для гаданий по выгодной цене",
+        price: "$5",
+        priceUnit: " / 100 кредитов",
+        button: "Купить",
       },
-      note: "Примечание: Система оплаты еще не реализована. Это страница-заглушка.",
+      note: "После успешной оплаты кредиты будут автоматически добавлены на ваш счет.",
     },
     // Tarot Readers Prompts
     tarotReadersPrompts: {
@@ -897,20 +897,20 @@ ARCHETYPE: PROBABILITY ENGINE
     billing: {
       title: "Billing & Credits",
       singleReading: {
-        title: "Single Reading",
-        description: "Get 1 credit for a single reading",
-        price: "$5",
-        priceUnit: " / reading",
-        button: "Coming Soon",
+        title: "10 Credits",
+        description: "Get 10 credits for readings",
+        price: "$1",
+        priceUnit: " / 10 credits",
+        button: "Purchase",
       },
       package: {
-        title: "Package Deal",
-        description: "Get 5 credits at a discounted price",
-        price: "$20",
-        priceUnit: " / 5 readings",
-        button: "Coming Soon",
+        title: "100 Credits",
+        description: "Get 100 credits for readings at a great price",
+        price: "$5",
+        priceUnit: " / 100 credits",
+        button: "Purchase",
       },
-      note: "Note: The billing system is not yet implemented. This is a placeholder page.",
+      note: "Credits will be automatically added to your account after successful payment.",
     },
     // Tarot Readers Prompts
     tarotReadersPrompts: {

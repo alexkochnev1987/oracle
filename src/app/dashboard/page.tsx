@@ -16,7 +16,9 @@ import { getTranslations } from "@/lib/i18n";
 import { useLocale } from "@/hooks/use-locale";
 import { getAllTarotReaders } from "@/lib/tarot-readers";
 import { type TarotCard } from "@/lib/tarot-cards";
-import { Sparkles } from "lucide-react";
+import { Sparkles, AlertCircle } from "lucide-react";
+import Link from "next/link";
+import { isUserAllowedForAI } from "@/lib/ai-whitelist";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -38,6 +40,13 @@ export default function DashboardPage() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
+
+  // Check if user is in whitelist (unlimited credits)
+  const isWhitelisted = session?.user?.email
+    ? isUserAllowedForAI(session.user.email)
+    : false;
+  const userCredits = session?.user?.credits ?? 0;
+  const hasCredits = isWhitelisted || userCredits >= 1;
 
   // Date input mask handler - formats as dd-mm-yy
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,6 +162,61 @@ export default function DashboardPage() {
             </p>
           </div>
 
+          {/* Credits warning - only show if user is not in whitelist */}
+          {session && !isWhitelisted && userCredits < 1 && (
+            <Card className="mb-6 p-4 border-yellow-500/50 bg-yellow-500/10">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm text-yellow-200 font-medium mb-1">
+                    {locale === "ru"
+                      ? "У вас закончились кредиты"
+                      : "You're out of credits"}
+                  </p>
+                  <p className="text-xs text-yellow-300/80 mb-3">
+                    {locale === "ru"
+                      ? "Приобретите кредиты, чтобы создавать новые расклады."
+                      : "Purchase credits to create new readings."}
+                  </p>
+                  <Link href="/billing">
+                    <Button variant="primary" size="sm">
+                      {locale === "ru" ? "Купить кредиты" : "Buy Credits"}
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {/* Low credits warning - only show if user is not in whitelist */}
+          {session && !isWhitelisted && userCredits > 0 && userCredits <= 3 && (
+            <Card className="mb-6 p-4 border-[rgba(100,200,255,0.3)] bg-[rgba(100,200,255,0.1)]">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-[rgba(100,200,255,0.8)] flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm text-white font-medium mb-1">
+                    {locale === "ru"
+                      ? `У вас осталось ${userCredits} ${
+                          userCredits === 1
+                            ? "кредит"
+                            : userCredits < 5
+                            ? "кредита"
+                            : "кредитов"
+                        }`
+                      : `You have ${userCredits} credit${
+                          userCredits === 1 ? "" : "s"
+                        } remaining`}
+                  </p>
+                  <Link href="/billing">
+                    <Button variant="secondary" size="sm" className="mt-2">
+                      {locale === "ru" ? "Пополнить баланс" : "Top Up Credits"}
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </Card>
+          )}
+
           <Card className="p-4 sm:p-6 md:p-8">
             <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
               {/* Oracle Selection */}
@@ -229,11 +293,19 @@ export default function DashboardPage() {
                 variant="primary"
                 size="lg"
                 loading={isLoading}
+                disabled={!hasCredits || isLoading}
                 icon={<Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />}
                 className="w-full sm:w-auto"
               >
                 {t.dashboard.createReading}
               </Button>
+              {!hasCredits && !isWhitelisted && (
+                <p className="text-xs text-red-400 mt-2">
+                  {locale === "ru"
+                    ? "Недостаточно кредитов для создания расклада"
+                    : "Insufficient credits to create a reading"}
+                </p>
+              )}
             </form>
           </Card>
         </div>

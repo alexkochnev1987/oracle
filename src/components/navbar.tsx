@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSession, signIn, signOut } from "next-auth/react";
-import { Sparkles, User, Menu, LogOut, Globe } from "lucide-react";
+import { Sparkles, User, Menu, LogOut, Globe, CreditCard } from "lucide-react";
 import { getTranslations, locales, type Locale } from "@/lib/i18n";
 import { useLocale } from "@/hooks/use-locale";
 import { useEffect, useState } from "react";
@@ -72,12 +72,18 @@ export function Navbar() {
               >
                 {t.nav.readings}
               </Link>
+              <Link
+                href="/billing"
+                className="px-4 py-2.5 text-sm sm:text-base text-white hover:text-[rgba(100,200,255,0.8)] hover:bg-[rgba(100,200,255,0.1)] rounded-xl transition-colors min-h-[44px] flex items-center"
+              >
+                {t.billing.title}
+              </Link>
               <div className="flex items-center gap-2.5 text-white">
                 <User className="h-5 w-5 text-[rgba(100,200,255,0.8)] flex-shrink-0" />
                 <span className="text-sm whitespace-nowrap">
                   {t.nav.credits}:{" "}
                   <span className="font-semibold text-[rgba(100,200,255,0.9)]">
-                    {session.user.credits || 0}
+                    {session.user.credits ?? 0}
                   </span>
                 </span>
               </div>
@@ -142,12 +148,19 @@ export function Navbar() {
                     <User className="h-5 w-5 text-[rgba(100,200,255,0.8)] flex-shrink-0" />
                     <span>{t.nav.readings}</span>
                   </Link>
+                  <Link
+                    href="/billing"
+                    className="flex items-center gap-3 px-4 py-3 text-white hover:text-[rgba(100,200,255,0.8)] hover:bg-[rgba(100,200,255,0.1)] rounded-xl transition-colors min-h-[44px]"
+                  >
+                    <CreditCard className="h-5 w-5 text-[rgba(100,200,255,0.8)] flex-shrink-0" />
+                    <span>{t.billing.title}</span>
+                  </Link>
                   <div className="flex items-center gap-3 px-4 py-3 text-white rounded-xl bg-[rgba(100,200,255,0.05)]">
                     <User className="h-5 w-5 text-[rgba(100,200,255,0.8)] flex-shrink-0" />
                     <span className="text-sm">
                       {t.nav.credits}:{" "}
                       <span className="font-semibold text-[rgba(100,200,255,0.9)]">
-                        {session.user.credits || 0}
+                        {session.user.credits ?? 0}
                       </span>
                     </span>
                   </div>
