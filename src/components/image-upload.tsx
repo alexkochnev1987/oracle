@@ -63,7 +63,7 @@ export function ImageUpload({
               src={value}
               alt="Preview"
               fill
-              className="object-cover"
+              className="object-contain"
               unoptimized={value.startsWith("data:")}
             />
             <button

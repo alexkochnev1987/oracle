@@ -73,28 +73,36 @@ export async function createReading(formData: FormData) {
     // }
 
     // Get form data
-    const userImageBase64 = formData.get("userImage") as string;
-    const cardsImageBase64 = formData.get("cardsImage") as string | null;
+    const userImageBase64 = formData.get("userImage") as string | null;
     const selectedCardsJson = formData.get("selectedCards") as string | null;
     const cardSelectionMode =
-      (formData.get("cardSelectionMode") as string) || "upload";
+      (formData.get("cardSelectionMode") as string) || "random";
     const birthDate = formData.get("birthDate") as string;
     const question = formData.get("question") as string;
     const tarotReaderId =
       (formData.get("tarotReaderId") as string) || "default";
     const locale = (formData.get("locale") as "ru" | "en") || "ru";
 
-    if (!userImageBase64 || !birthDate || !question) {
+    if (!birthDate || !question) {
       throw new Error("Missing required fields");
     }
 
-    // Validate that either cards image or selected cards are provided
-    if (cardSelectionMode === "upload" && !cardsImageBase64) {
-      throw new Error("Please upload cards photo or select random spread");
+    // Validate that 3 cards are selected
+    if (!selectedCardsJson) {
+      throw new Error(
+        locale === "ru"
+          ? "Пожалуйста, выберите 3 карты"
+          : "Please select 3 cards"
+      );
     }
 
-    if (cardSelectionMode === "random" && !selectedCardsJson) {
-      throw new Error("Please generate a random spread");
+    const selectedCardsArray = JSON.parse(selectedCardsJson) as string[];
+    if (selectedCardsArray.length !== 3) {
+      throw new Error(
+        locale === "ru"
+          ? "Пожалуйста, выберите ровно 3 карты"
+          : "Please select exactly 3 cards"
+      );
     }
 
     // Parse date from dd-mm-yy format
@@ -131,23 +139,15 @@ export async function createReading(formData: FormData) {
       return `data:image/jpeg;base64,${base64}`;
     };
 
-    const formattedUserImage = formatImageBase64(userImageBase64);
+    const formattedUserImage = userImageBase64
+      ? formatImageBase64(userImageBase64)
+      : undefined;
 
-    // Handle cards data based on selection mode
-    let formattedCardsImage: string | undefined;
-    let selectedCardsNames: string | undefined;
-    let selectedCardsArray: string[] | undefined;
-
-    if (cardSelectionMode === "upload" && cardsImageBase64) {
-      formattedCardsImage = formatImageBase64(cardsImageBase64);
-    } else if (cardSelectionMode === "random" && selectedCardsJson) {
-      // Parse selected cards and get their names
-      selectedCardsArray = JSON.parse(selectedCardsJson) as string[];
-      const cards = selectedCardsArray
-        .map((cardId) => getCardById(cardId))
-        .filter((card) => card !== undefined);
-      selectedCardsNames = formatCardsForPrompt(cards as any[], locale);
-    }
+    // Parse selected cards and get their names
+    const cards = selectedCardsArray
+      .map((cardId) => getCardById(cardId))
+      .filter((card) => card !== undefined);
+    const selectedCardsNames = formatCardsForPrompt(cards as any[], locale);
 
     // Create AI prediction - use real AI for whitelisted users, stub for others
     let predictionText: string;
@@ -156,7 +156,6 @@ export async function createReading(formData: FormData) {
         // Use real AI with image analysis or card names
         predictionText = await createTarotReading({
           userImageBase64: formattedUserImage,
-          cardsImageBase64: formattedCardsImage,
           selectedCardsNames,
           birthDate: formattedDate,
           question,
@@ -167,7 +166,6 @@ export async function createReading(formData: FormData) {
         // Use stub for non-whitelisted users
         predictionText = await createTarotReadingStub({
           userImageBase64: formattedUserImage,
-          cardsImageBase64: formattedCardsImage,
           selectedCardsNames,
           birthDate: formattedDate,
           question,
@@ -185,7 +183,6 @@ export async function createReading(formData: FormData) {
         );
         predictionText = await createTarotReadingStub({
           userImageBase64: formattedUserImage,
-          cardsImageBase64: formattedCardsImage,
           selectedCardsNames,
           birthDate: formattedDate,
           question,
@@ -204,12 +201,11 @@ export async function createReading(formData: FormData) {
         question,
         birthDate: parsedDate,
         predictionText,
-        userImageUrl: userImageBase64.substring(0, 100) + "...", // Store reference only
-        cardsImageUrl:
-          cardSelectionMode === "upload" && cardsImageBase64
-            ? cardsImageBase64.substring(0, 100) + "..."
-            : null,
-        selectedCards: selectedCardsArray ?? undefined,
+        userImageUrl: userImageBase64
+          ? userImageBase64.substring(0, 100) + "..."
+          : null, // Store reference only
+        cardsImageUrl: null, // No longer used
+        selectedCards: selectedCardsArray,
         cardSelectionMode,
         tarotReaderId,
         shareToken,

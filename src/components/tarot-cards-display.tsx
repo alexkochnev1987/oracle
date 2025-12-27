@@ -34,12 +34,27 @@ export function TarotCardsDisplay({
     return null;
   }
 
+  // Determine grid columns based on number of cards
+  const getGridCols = (count: number) => {
+    if (count === 1) return "grid-cols-1";
+    if (count === 2) return "grid-cols-2";
+    if (count === 3) return "grid-cols-3";
+    if (count === 4) return "grid-cols-2 sm:grid-cols-4";
+    if (count === 5) return "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5";
+    if (count === 6) return "grid-cols-2 sm:grid-cols-3 lg:grid-cols-6";
+    // For 7+ cards, use responsive grid that adapts
+    if (count <= 9) return "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4";
+    if (count <= 12) return "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6";
+    // For more than 12 cards
+    return "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6";
+  };
+
   return (
     <Card className={`p-4 sm:p-6 ${className || ""}`} glow>
       <h2 className="mb-4 text-xl sm:text-2xl font-semibold text-white">
         {locale === "ru" ? "Карты расклада" : "Tarot Cards Spread"}
       </h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+      <div className={`grid ${getGridCols(cards.length)} gap-3 sm:gap-4`}>
         {cards.map((card, index) => {
           const cardImageUrl = getCardImageUrl(card.id);
           const hasImage = card.imageUrl !== undefined;

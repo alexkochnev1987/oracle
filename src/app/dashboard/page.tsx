@@ -25,11 +25,10 @@ export default function DashboardPage() {
   const t = getTranslations(locale);
 
   const [userImage, setUserImage] = useState<string>("");
-  const [cardsImage, setCardsImage] = useState<string>("");
   const [selectedCards, setSelectedCards] = useState<TarotCard[]>([]);
   const [cardSelectionMode, setCardSelectionMode] = useState<
-    "upload" | "random"
-  >("upload");
+    "random" | "manual"
+  >("random");
   const [birthDate, setBirthDate] = useState<string>("");
   const [question, setQuestion] = useState("");
   const tarotReaders = getAllTarotReaders(locale);
@@ -87,19 +86,18 @@ export default function DashboardPage() {
     setError("");
 
     // Validate required fields
-    if (!userImage || !birthDate || !question) {
+    if (!birthDate || !question) {
       setError("Please fill in all required fields");
       return;
     }
 
-    // Validate that either cards image or selected cards are provided
-    if (cardSelectionMode === "upload" && !cardsImage) {
-      setError("Please upload cards photo or select random spread");
-      return;
-    }
-
-    if (cardSelectionMode === "random" && selectedCards.length === 0) {
-      setError("Please generate a random spread");
+    // Validate that 3 cards are selected
+    if (selectedCards.length !== 3) {
+      setError(
+        locale === "ru"
+          ? "Пожалуйста, выберите ровно 3 карты"
+          : "Please select exactly 3 cards"
+      );
       return;
     }
 
@@ -113,18 +111,15 @@ export default function DashboardPage() {
     setIsLoading(true);
 
     const formData = new FormData();
-    formData.append("userImage", userImage);
-
-    // Add cards data based on mode
-    if (cardSelectionMode === "upload") {
-      formData.append("cardsImage", cardsImage);
-    } else {
-      // Send selected cards as JSON
-      formData.append(
-        "selectedCards",
-        JSON.stringify(selectedCards.map((card) => card.id))
-      );
+    if (userImage) {
+      formData.append("userImage", userImage);
     }
+
+    // Send selected cards as JSON
+    formData.append(
+      "selectedCards",
+      JSON.stringify(selectedCards.map((card) => card.id))
+    );
 
     formData.append("cardSelectionMode", cardSelectionMode);
     formData.append("birthDate", birthDate);
@@ -184,14 +179,12 @@ export default function DashboardPage() {
                 onChange={setUserImage}
               />
 
-              {/* Cards Selection - Upload or Random */}
+              {/* Cards Selection - Random or Manual */}
               <TarotCardSelector
                 label={t.dashboard.uploadCardsPhoto}
-                cardsImage={cardsImage}
                 selectedCards={selectedCards}
                 mode={cardSelectionMode}
                 locale={locale}
-                onCardsImageChange={setCardsImage}
                 onSelectedCardsChange={setSelectedCards}
                 onModeChange={setCardSelectionMode}
               />

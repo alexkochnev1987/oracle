@@ -193,3 +193,57 @@
     transform: translateY(0);
   }
 }
+
+/* Markdown styles for reading text */
+.prose-invert {
+  --tw-prose-body: #e5e7eb;
+  --tw-prose-headings: #ffffff;
+  --tw-prose-lead: #9ca3af;
+  --tw-prose-links: #64c8ff;
+  --tw-prose-bold: #ffffff;
+  --tw-prose-counters: #9ca3af;
+  --tw-prose-bullets: #64c8ff;
+  --tw-prose-hr: #374151;
+  --tw-prose-quotes: #ffffff;
+  --tw-prose-quote-borders: #64c8ff;
+  --tw-prose-captions: #9ca3af;
+  --tw-prose-code: #64c8ff;
+  --tw-prose-pre-code: #e5e7eb;
+  --tw-prose-pre-bg: rgba(13, 13, 26, 0.8);
+  --tw-prose-th-borders: #374151;
+  --tw-prose-td-borders: #374151;
+}
+
+.prose-invert h1,
+.prose-invert h2,
+.prose-invert h3,
+.prose-invert h4,
+.prose-invert h5,
+.prose-invert h6 {
+  color: #ffffff;
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.prose-invert strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.prose-invert p {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.prose-invert ul,
+.prose-invert ol {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  padding-left: 1.5em;
+}
+
+.prose-invert li {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}

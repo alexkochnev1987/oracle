@@ -1,0 +1,109 @@
+# Cursor Rules for Oracle Project
+
+## Reading Prompt Documentation Maintenance
+
+When modifying the tarot reading prompt system, you MUST update the documentation file `docs/READING_PROMPT.md` to reflect the changes.
+
+### Trigger Conditions
+
+Update `docs/READING_PROMPT.md` when ANY of the following files are modified:
+
+1. **`src/lib/reading-prompt-builder.ts`**
+   - Changes to prompt structure
+   - Changes to conditional logic
+   - Changes to step numbering
+   - Changes to section ordering
+
+2. **`src/lib/i18n.ts`** (specifically the `readingPrompts` section)
+   - Changes to any prompt text
+   - Addition/removal of sections
+   - Changes to variable placeholders
+   - Changes to conditional text blocks
+
+### Update Requirements
+
+When updating the documentation:
+
+1. **Update the Full Prompt Example**:
+   - Regenerate the example prompt with current structure
+   - Use realistic sample values (birthDate: "1990-05-15", question: "What awaits me in the new year?", cards: "The Fool, The Magician, The High Priestess")
+   - Show the complete prompt for the scenario: WITH photo + WITH cards (most complete case)
+
+2. **Update Structure Section**:
+   - Reflect any new sections added
+   - Update section order if changed
+   - Document any removed sections
+
+3. **Update Step Numbering Logic**:
+   - Document the step numbering for all 4 scenarios:
+     - With photo + cards: Steps 1-5
+     - With photo, no cards: Steps 1-4
+     - No photo + cards: Steps 1-4
+     - No photo, no cards: Steps 1-3
+   - Update if numbering logic changes
+
+4. **Update Variable Placeholders**:
+   - List all variables used in the prompt
+   - Document their purpose and format
+   - Add new variables if introduced
+   - Remove deprecated variables
+
+5. **Update Conditional Sections**:
+   - Document when each conditional section appears
+   - Update step numbers for conditional sections
+   - Document any new conditional logic
+
+6. **Update Analysis Notes**:
+   - Review for new duplications
+   - Check for contradictions
+   - Verify consistency across all branches
+   - Update status of any identified issues
+
+### Documentation Standards
+
+- All documentation must be in **English**
+- Use clear, descriptive section headers
+- Include code blocks for prompt examples
+- Maintain consistent formatting
+- Keep examples realistic and representative
+- Document both English and Russian versions (structure is the same)
+
+### Verification Checklist
+
+Before considering documentation complete, verify:
+
+- [ ] Full prompt example matches current implementation
+- [ ] All sections are documented
+- [ ] Step numbering is correct for all scenarios
+- [ ] Variable placeholders are listed and explained
+- [ ] Conditional sections are properly documented
+- [ ] Analysis notes reflect current state
+- [ ] No outdated information remains
+- [ ] Formatting is consistent
+
+### Example Update Workflow
+
+1. Make changes to `reading-prompt-builder.ts` or `i18n.ts`
+2. Test the changes to ensure they work
+3. Update `docs/READING_PROMPT.md`:
+   - Regenerate the full example prompt
+   - Update relevant sections
+   - Review analysis notes
+4. Verify documentation accuracy
+5. Commit both code and documentation changes together
+
+## General Code Standards
+
+- All code comments must be in English
+- Follow single responsibility principle
+- Keep functions under 20 lines when possible
+- Use descriptive variable names
+- Maintain DRY (Don't Repeat Yourself) principles
+
+## File Organization
+
+- Keep related functionality together
+- Use consistent naming conventions
+- Maintain clear separation of concerns
+- Document complex logic
+

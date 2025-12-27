@@ -4,7 +4,6 @@ import { CreateReadingParams } from "./openai";
 // Stub function for chatbot - generates realistic predictions based on templates
 export async function createTarotReadingStub({
   userImageBase64,
-  cardsImageBase64,
   selectedCardsNames,
   birthDate,
   question,
@@ -22,7 +21,7 @@ export async function createTarotReadingStub({
   // Format cards information for prompt
   const cardsInfo = selectedCardsNames
     ? `Выбранные карты Таро: ${selectedCardsNames}`
-    : "Расклад карт Таро (анализ по фото)";
+    : "Расклад карт Таро";
 
   // Generate prediction based on reader type
   let prediction = "";

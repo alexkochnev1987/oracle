@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Navbar } from "@/components/navbar";
 import { Card } from "@/components/ui/card";
 import { QRCodeDisplay } from "@/components/qr-code-display";
@@ -61,9 +63,10 @@ export default function ReadingDetailPage() {
   }
 
   const reader = getTarotReader(reading.tarotReaderId);
-  const date = typeof reading.createdAt === "string" 
-    ? new Date(reading.createdAt) 
-    : reading.createdAt;
+  const date =
+    typeof reading.createdAt === "string"
+      ? new Date(reading.createdAt)
+      : reading.createdAt;
 
   // Generate share URL
   const shareUrl = reading.shareToken
@@ -95,22 +98,24 @@ export default function ReadingDetailPage() {
             </div>
           </Card>
 
-          {/* Tarot Cards Display - only show if cards were selected */}
-          {reading.selectedCards && reading.cardSelectionMode === "random" && (
-            <TarotCardsDisplay
-              cardIds={reading.selectedCards as string[]}
-              locale={locale}
-            />
-          )}
+          {/* Tarot Cards Display - show if cards were selected */}
+          {reading.selectedCards &&
+            Array.isArray(reading.selectedCards) &&
+            reading.selectedCards.length > 0 && (
+              <TarotCardsDisplay
+                cardIds={reading.selectedCards as string[]}
+                locale={locale}
+              />
+            )}
 
           <Card className="p-4 sm:p-6 md:p-8 cosmic-particles" glow>
             <h2 className="mb-4 text-xl sm:text-2xl font-semibold text-white">
               {t.readings.yourReading}
             </h2>
-            <div className="prose prose-invert max-w-none">
-              <p className="whitespace-pre-wrap text-[#e5e7eb] leading-relaxed text-base sm:text-lg reading-text">
+            <div className="prose prose-invert max-w-none text-[#e5e7eb]">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {reading.predictionText}
-              </p>
+              </ReactMarkdown>
             </div>
           </Card>
 
