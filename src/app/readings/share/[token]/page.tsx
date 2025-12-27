@@ -14,6 +14,7 @@ import { useLocale } from "@/hooks/use-locale";
 import { getTranslations } from "@/lib/i18n";
 import { getTarotReader } from "@/lib/tarot-readers";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
+import { Navbar } from "@/components/navbar";
 
 const BACKGROUND_IMAGES = [
   "/alien/ai.png",
@@ -79,6 +80,7 @@ export default function PublicReadingPage() {
           />
           <div className="absolute inset-0 bg-[rgba(13,13,26,0.7)]" />
         </div>
+        <Navbar />
         <div className="relative z-10 container mx-auto px-4 py-6 sm:py-8">
           <div className="mx-auto max-w-4xl">
             <LoadingSkeleton variant="card" count={2} />
@@ -101,6 +103,7 @@ export default function PublicReadingPage() {
           />
           <div className="absolute inset-0 bg-[rgba(13,13,26,0.7)]" />
         </div>
+        <Navbar />
         <div className="relative z-10 container mx-auto px-4 py-6 sm:py-8">
           <div className="mx-auto max-w-4xl">
             <Card className="p-6 text-center">
@@ -137,8 +140,11 @@ export default function PublicReadingPage() {
         <div className="absolute inset-0 bg-[rgba(13,13,26,0.7)]" />
       </div>
 
+      {/* Navbar */}
+      <Navbar />
+
       {/* Navigation Buttons */}
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+      <div className="fixed top-20 sm:top-24 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
         <Button
           variant="secondary"
           size="icon"

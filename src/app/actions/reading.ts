@@ -2,11 +2,8 @@
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import {
-  createTarotReadingStub,
-  createTarotReading,
-  CreateReadingParams,
-} from "@/lib/openai";
+import { createTarotReading, CreateReadingParams } from "@/lib/openai";
+import { createTarotReadingStub } from "@/lib/tarot-reading-stub";
 import { isUserAllowedForAI } from "@/lib/ai-whitelist";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
