@@ -258,7 +258,7 @@ export const translations = {
           "Руководство для пути вперед",
           "Потенциальный исход, если следовать этому руководству",
         ],
-        synthesisTitle: "### 💫 Синтез и Ответ",
+        synthesisTitle: "### 💫 Прогноз",
         synthesisDescription:
           'Предоставь четкий, обоснованный ответ на вопрос "{question}":',
         synthesisList: [
@@ -349,7 +349,7 @@ export const translations = {
         ],
         outputFormat: "ФОРМАТ ВЫВОДА:",
         outputDescription:
-          "В самом конце твоего чтения, после всего остального контента, добавь этот точный раздел:",
+          "В самом начале твоего чтения, перед всем остальным контентом, добавь этот точный раздел:",
         outputTemplate: "### {mantraTitle}\n«<мантра>»",
         rules: "ПРАВИЛА ПОСТРОЕНИЯ МАНТРЫ:",
         rulesList: [
@@ -771,7 +771,7 @@ ARCHETYPE: PROBABILITY ENGINE
           "Guidance for the path forward",
           "The potential outcome if the guidance is followed",
         ],
-        synthesisTitle: "### 💫 Synthesis & Answer",
+        synthesisTitle: "### 💫 Forecast",
         synthesisDescription:
           'Provide a clear, grounded answer to the question "{question}":',
         synthesisList: [
@@ -863,7 +863,7 @@ ARCHETYPE: PROBABILITY ENGINE
         ],
         outputFormat: "OUTPUT FORMAT:",
         outputDescription:
-          "At the very end of your reading, after all other content, add this exact section:",
+          "At the very beginning of your reading, before all other content, add this exact section:",
         outputTemplate: "### {mantraTitle}\n«<mantra>»",
         rules: "MANTRA CONSTRUCTION RULES:",
         rulesList: [
