@@ -32,9 +32,10 @@ export default function DashboardPage() {
   const [birthDate, setBirthDate] = useState<string>("");
   const [question, setQuestion] = useState("");
   const tarotReaders = getAllTarotReaders(locale);
-  const [selectedReader, setSelectedReader] = useState<string>(
-    tarotReaders[0].id
-  );
+  const [selectedReader, setSelectedReader] = useState<string>(() => {
+    const randomIndex = Math.floor(Math.random() * tarotReaders.length);
+    return tarotReaders[randomIndex].id;
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
