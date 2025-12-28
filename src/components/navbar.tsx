@@ -31,7 +31,11 @@ export function Navbar() {
   };
 
   const toggleLocale = () => {
-    const newLocale: Locale = locale === "ru" ? "en" : "ru";
+    // Cycle through: ru -> en -> be -> ru
+    const localeOrder: Locale[] = ["ru", "en", "be"];
+    const currentIndex = localeOrder.indexOf(locale);
+    const nextIndex = (currentIndex + 1) % localeOrder.length;
+    const newLocale = localeOrder[nextIndex];
     setLocale(newLocale);
   };
 
@@ -55,7 +59,7 @@ export function Navbar() {
             aria-label={t.common.toggleLanguage}
           >
             <Globe className="h-4 w-4" />
-            <span className="uppercase font-medium">{locale}</span>
+            <span className="uppercase font-medium">{t.common.language}</span>
           </button>
 
           {mounted && status !== "loading" && session ? (

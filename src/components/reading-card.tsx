@@ -4,7 +4,7 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
 import { QrCode, Trash2 } from "lucide-react";
-import { Locale } from "@/lib/i18n";
+import { Locale, getTranslations } from "@/lib/i18n";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
