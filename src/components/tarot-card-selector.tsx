@@ -25,6 +25,8 @@ interface TarotCardSelectorProps {
   onSelectedCardsChange?: (cards: TarotCard[]) => void;
   onModeChange?: (mode: SelectionMode) => void;
   className?: string;
+  allCardsRevealed?: boolean; // If false, all cards start face down
+  onRevealedCardsChange?: (revealedCount: number) => void; // Callback for revealed cards count
 }
 
 export function TarotCardSelector({
@@ -35,13 +37,21 @@ export function TarotCardSelector({
   onSelectedCardsChange,
   onModeChange,
   className,
+  allCardsRevealed = false,
+  onRevealedCardsChange,
 }: TarotCardSelectorProps) {
   const [internalMode, setInternalMode] = useState<SelectionMode>("random");
   const [internalSelectedCards, setInternalSelectedCards] = useState<
     TarotCard[]
   >([]);
+  // Initialize revealed cards based on allCardsRevealed prop
   const [revealedCardIndices, setRevealedCardIndices] = useState<Set<number>>(
-    new Set()
+    () => {
+      if (allCardsRevealed && selectedCards && selectedCards.length > 0) {
+        return new Set(selectedCards.map((_, index) => index));
+      }
+      return new Set();
+    }
   );
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [hasGeneratedOnce, setHasGeneratedOnce] = useState<boolean>(false);
@@ -149,6 +159,32 @@ export function TarotCardSelector({
       generateRandomSpread(false);
     }
   }, [mode]);
+
+  // Reset revealed cards when allCardsRevealed changes or cards change
+  useEffect(() => {
+    if (currentSelectedCards.length > 0) {
+      if (allCardsRevealed) {
+        const allRevealed = new Set(
+          currentSelectedCards.map((_, index) => index)
+        );
+        setRevealedCardIndices(allRevealed);
+      } else {
+        setRevealedCardIndices(new Set());
+      }
+    }
+  }, [allCardsRevealed, currentSelectedCards.length]);
+
+  // Notify parent about revealed cards count when it changes (async to avoid setState during render)
+  useEffect(() => {
+    if (onRevealedCardsChange) {
+      if (mode === "random") {
+        onRevealedCardsChange(revealedCardIndices.size);
+      } else {
+        // In manual mode, revealed count is 0 (cards are always visible)
+        onRevealedCardsChange(0);
+      }
+    }
+  }, [revealedCardIndices.size, mode, onRevealedCardsChange]);
 
   return (
     <div className={cn("space-y-4", className)}>
@@ -345,23 +381,6 @@ export function TarotCardSelector({
                   );
                 })}
           </div>
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            icon={<Shuffle className="h-4 w-4" />}
-            onClick={() => generateRandomSpread(false)}
-            disabled={isGenerating}
-            className="w-full sm:w-auto"
-          >
-            {isGenerating
-              ? locale === "ru"
-                ? "Генерация..."
-                : "Generating..."
-              : locale === "ru"
-              ? "Сгенерировать новый расклад"
-              : "Generate New Spread"}
-          </Button>
         </div>
       )}
 

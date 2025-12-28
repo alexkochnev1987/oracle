@@ -15,9 +15,10 @@ export const translations = {
     },
     // Dashboard
     dashboard: {
-      title: "Создать прогноз",
+      title: "Оракул",
       subtitle: "Создайте свой персонализированный прогноз на Новый Год",
       uploadUserPhoto: "Загрузите ваше фото",
+      skipPhoto: "Без фото",
       uploadCardsPhoto:
         "Загрузите фото расклада карт или выберите случайный расклад",
       birthDate: "Дата рождения",
@@ -31,6 +32,28 @@ export const translations = {
       randomSpread: "Случайный расклад",
       generateNewSpread: "Сгенерировать новый расклад",
       majorArcana: "Старший Аркан",
+      cardsLockedMessage: "Сначала заполните дату рождения и вопрос",
+      step2CreateSpread: "Шаг 2: создать расклад",
+      createSpread: "Создать расклад",
+      errors: {
+        uploadPhoto: "Загрузите фото",
+        fillBirthDate: "Заполните дату рождения",
+        fillQuestion: "Заполните вопрос",
+        createSpread: "Создайте расклад",
+        selectCards: "Выберите 3 карты",
+        revealCards: "Посмотрите карты перед прогнозом",
+        invalidDate: "Неверный формат даты",
+        dateInFuture: "Дата не может быть в будущем",
+        insufficientCredits: "Недостаточно кредитов для создания расклада",
+        uploadPhotoMessage: "Загрузите фото",
+        fillBirthDateMessage: "Заполните дату рождения",
+      },
+      customQuestion: "Свой вопрос",
+      defaultQuestions: [
+        "В какой момент года я скажу «ну это был опыт»?",
+        "Что меня ждет в новом году?",
+        "Выйду ли я замуж?",
+      ],
     },
     // Tarot Readers
     tarotReaders: {
@@ -55,7 +78,7 @@ export const translations = {
     // Navigation
     nav: {
       home: "Главная",
-      dashboard: "Дашборд",
+      dashboard: "Оракул",
       readings: "Мои прогнозы",
       signIn: "Войти",
       signOut: "Выйти",
@@ -534,9 +557,10 @@ ARCHETYPE: PROBABILITY ENGINE
     },
     // Dashboard
     dashboard: {
-      title: "Create Reading",
+      title: "Oracle",
       subtitle: "Create your personalized New Year reading",
       uploadUserPhoto: "Upload your photo",
+      skipPhoto: "Without photo",
       uploadCardsPhoto: "Upload Tarot cards photo or select random spread",
       birthDate: "Birth Date",
       question: "Your question",
@@ -549,6 +573,28 @@ ARCHETYPE: PROBABILITY ENGINE
       randomSpread: "Random Spread",
       generateNewSpread: "Generate New Spread",
       majorArcana: "Major Arcana",
+      cardsLockedMessage: "Please fill in birth date and question first",
+      step2CreateSpread: "Step 2: Create Spread",
+      createSpread: "Create Spread",
+      customQuestion: "Custom question",
+      errors: {
+        uploadPhoto: "Upload photo",
+        fillBirthDate: "Fill in birth date",
+        fillQuestion: "Fill in question",
+        createSpread: "Create spread",
+        selectCards: "Select 3 cards",
+        revealCards: "Reveal cards before creating reading",
+        invalidDate: "Invalid date format",
+        dateInFuture: "Date cannot be in the future",
+        insufficientCredits: "Insufficient credits to create a reading",
+        uploadPhotoMessage: "Please upload a photo",
+        fillBirthDateMessage: "Please fill in birth date",
+      },
+      defaultQuestions: [
+        "At what point in the year will I say 'well, that was an experience'?",
+        "What awaits me in the new year?",
+        "Will I get married?",
+      ],
     },
     // Tarot Readers
     tarotReaders: {
@@ -573,7 +619,7 @@ ARCHETYPE: PROBABILITY ENGINE
     // Navigation
     nav: {
       home: "Home",
-      dashboard: "Dashboard",
+      dashboard: "Oracle",
       readings: "My Readings",
       signIn: "Sign In",
       signOut: "Sign Out",

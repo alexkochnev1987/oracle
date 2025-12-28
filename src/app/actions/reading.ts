@@ -8,42 +8,10 @@ import { isUserAllowedForAI } from "@/lib/ai-whitelist";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { getCardById, formatCardsForPrompt } from "@/lib/tarot-cards";
-
-// Parse date from dd-mm-yy format
-function parseDate(dateString: string): Date {
-  const parts = dateString.split("-");
-  if (parts.length !== 3) {
-    throw new Error("Invalid date format. Expected dd-mm-yy");
-  }
-
-  const day = parseInt(parts[0], 10);
-  const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
-  let year = parseInt(parts[2], 10);
-
-  // Convert 2-digit year to 4-digit year
-  // Assume years 00-30 are 2000-2030, years 31-99 are 1931-1999
-  if (year < 100) {
-    year = year <= 30 ? 2000 + year : 1900 + year;
-  }
-
-  const date = new Date(year, month, day);
-
-  // Validate date
-  if (
-    date.getDate() !== day ||
-    date.getMonth() !== month ||
-    date.getFullYear() !== year
-  ) {
-    throw new Error("Invalid date");
-  }
-
-  // Check if date is not in the future
-  if (date > new Date()) {
-    throw new Error("Birth date cannot be in the future");
-  }
-
-  return date;
-}
+import {
+  parseDateString,
+  formatDateForAI,
+} from "@/lib/date-validation";
 
 export async function createReading(formData: FormData) {
   try {
@@ -124,7 +92,7 @@ export async function createReading(formData: FormData) {
     // Parse date from dd-mm-yy format
     let parsedDate: Date;
     try {
-      parsedDate = parseDate(birthDate);
+      parsedDate = parseDateString(birthDate);
     } catch (error) {
       throw new Error(
         error instanceof Error
@@ -134,9 +102,7 @@ export async function createReading(formData: FormData) {
     }
 
     // Format date as YYYY-MM-DD for AI
-    const formattedDate = `${parsedDate.getFullYear()}-${String(
-      parsedDate.getMonth() + 1
-    ).padStart(2, "0")}-${String(parsedDate.getDate()).padStart(2, "0")}`;
+    const formattedDate = formatDateForAI(parsedDate);
 
     // Generate unique share token for public access
     const shareToken = randomUUID();
