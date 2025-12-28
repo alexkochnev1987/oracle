@@ -14,7 +14,7 @@ const openai = new OpenAI({
  * @param locale - Locale for the prompt ("ru" or "en")
  * @returns Textual description of the image, or null if analysis fails
  */
-async function analyzeUserImage(
+export async function analyzeUserImage(
   userImageBase64: string,
   locale: "ru" | "en"
 ): Promise<string | null> {
@@ -142,6 +142,84 @@ export async function createTarotReading({
 
   // Step 3: Create prediction request (text-only, no image)
   // The image analysis result is already included in the text prompt
+  const systemMessageContent = reader.systemPrompt;
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      {
+        role: "system",
+        content: systemMessageContent,
+      },
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: textPrompt,
+          },
+        ],
+      },
+    ],
+    max_tokens: 2000,
+    temperature: 0.8,
+  });
+
+  const predictionText = response.choices[0]?.message?.content || "";
+
+  if (!predictionText) {
+    throw new Error("Failed to generate prediction");
+  }
+
+  return predictionText;
+}
+
+/**
+ * Creates a tarot reading for testing purposes with pre-analyzed image description.
+ * This function is used for testing prompt quality and accepts imageAnalysisResult directly.
+ * @param params - Reading parameters including pre-analyzed image description
+ * @returns Generated reading text
+ */
+export async function createTarotReadingForTest({
+  imageAnalysisResult,
+  selectedCardsNames,
+  birthDate,
+  question,
+  tarotReaderId,
+  locale,
+}: {
+  imageAnalysisResult?: string;
+  selectedCardsNames?: string;
+  birthDate: string;
+  question: string;
+  tarotReaderId: TarotReaderId;
+  locale: "ru" | "en";
+}): Promise<string> {
+  // Get localized tarot reader
+  const reader = getTarotReader(tarotReaderId, locale);
+
+  // Get translations
+  const translations = getTranslations(locale);
+  const responseLanguage = translations.promptLanguage.responseLanguage;
+  const addressForm = translations.promptLanguage.addressForm;
+  const firstPerson = translations.promptLanguage.firstPerson;
+  const mantraTitle = translations.mantra.title;
+
+  // Build reading prompt with image analysis result (if available)
+  const textPrompt = buildReadingPrompt({
+    birthDate,
+    question,
+    userImageBase64: undefined,
+    imageAnalysisResult: imageAnalysisResult || undefined,
+    selectedCardsNames,
+    locale,
+    addressForm,
+    firstPerson,
+    responseLanguage,
+    mantraTitle,
+  });
+
+  // Create prediction request (text-only, no image)
   const systemMessageContent = reader.systemPrompt;
 
   const response = await openai.chat.completions.create({

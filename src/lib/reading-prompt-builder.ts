@@ -26,6 +26,7 @@ export function buildReadingPrompt({
   mantraTitle,
 }: BuildReadingPromptParams): string {
   const t = getTranslations(locale).readingPrompts;
+  const tCommon = getTranslations(locale).common;
 
   // Determine if we have image data (either original or analysis result)
   const hasImageData = !!imageAnalysisResult || !!userImageBase64;
@@ -37,11 +38,15 @@ CONTEXT:
 - ${t.context.question}: "${question}"
 ${
   imageAnalysisResult
-    ? `- ${t.context.userPhoto}\n- ${tCommon(locale).photoAnalysisResult}: ${imageAnalysisResult}`
+    ? `- ${t.context.userPhotoAnalyzed}\n- ${tCommon.photoAnalysisResult}: ${imageAnalysisResult}`
     : userImageBase64
     ? `- ${t.context.userPhoto}`
     : ""
 }
+
+${t.responseStructure.critical}
+
+${t.responseStructure.mustStart.replace("{mantraTitle}", mantraTitle)}
 
 ANALYSIS INSTRUCTIONS:
 
@@ -60,11 +65,19 @@ ${t.synthesis.description}
 ${t.synthesis.task}
 
 ${t.synthesis.means}
-${hasImageData ? t.synthesis.meansList.map((item) => `- ${item}`).join("\n") : `- ${t.synthesis.meansList[0]}\n- ${t.synthesis.meansList[2]}`}
+${
+  hasImageData
+    ? t.synthesis.meansList.map((item) => `- ${item}`).join("\n")
+    : `- ${t.synthesis.meansList[0]}\n- ${t.synthesis.meansList[2]}`
+}
 
 ${t.synthesis.instead}
 
-${hasImageData ? t.synthesis.compareList.map((item) => `• ${item}`).join("\n") : `• ${t.synthesis.compareList[0]}`}
+${
+  hasImageData
+    ? t.synthesis.compareList.map((item) => `• ${item}`).join("\n")
+    : `• ${t.synthesis.compareList[0]}`
+}
 
 ${hasImageData ? t.synthesis.example : ""}
 
@@ -77,26 +90,34 @@ ${
 
 ${
   imageAnalysisResult
-    ? `2. ${t.photoAnalysis.title.replace("(КРИТИЧНО - ОБЯЗАТЕЛЬНО)", "(УЖЕ ВЫПОЛНЕН)").replace("(CRITICAL - MANDATORY)", "(ALREADY COMPLETED)")}:
+    ? `2. ${t.photoAnalysis.completed.title}
 
-${tCommon(locale).photoAnalysisResult}:
+${t.photoAnalysis.completed.description}
+
+${tCommon.photoAnalysisResult}:
 ${imageAnalysisResult}
 
-${tCommon(locale).usePhotoAnalysis}
-- ${tCommon(locale).theQuestion} "${question}"
-- ${tCommon(locale).birthDateSynthesis}
-- ${tCommon(locale).tarotCardsNextStep}`
+${t.photoAnalysis.completed.useResult}
+- ${tCommon.theQuestion} "${question}"
+- ${tCommon.birthDateSynthesis}
+- ${tCommon.tarotCardsNextStep}
+
+${t.photoAnalysis.completed.findContradictions}
+
+${t.photoAnalysis.completed.avoidGeneric}
+
+${t.photoAnalysis.completed.example}`
     : userImageBase64
     ? `${t.photoAnalysis.title}
 ${t.photoAnalysis.description}
-${t.photoAnalysis.mandatoryAnalysis}
 ${t.photoAnalysis.analyzeAnyImage}
 ${t.photoAnalysis.observe}
 ${t.photoAnalysis.observeList.map((item) => `- ${item}`).join("\n")}
-${t.photoAnalysis.important}
 ${t.photoAnalysis.fallback}
 ${t.photoAnalysis.connect}
-${t.photoAnalysis.connectList.map((item) => `- ${item.replace("{question}", question)}`).join("\n")}`
+${t.photoAnalysis.connectList
+  .map((item) => `- ${item.replace("{question}", question)}`)
+  .join("\n")}`
     : ""
 }
 `;
@@ -128,7 +149,11 @@ ${t.cardSpread.doNotMix}
   } else {
     const stepNumber = hasImageData ? "3" : "2";
     prompt += `
-${stepNumber}. ${t.intuitiveReading.title} ${hasImageData ? t.intuitiveReading.withPhoto : t.intuitiveReading.description}
+${stepNumber}. ${t.intuitiveReading.title} ${
+      hasImageData
+        ? t.intuitiveReading.withPhoto
+        : t.intuitiveReading.description
+    }
 `;
   }
 
@@ -162,14 +187,28 @@ ${t.finalSynthesis.card3List.map((item) => `- ${item}`).join("\n")}
 
 ${t.finalSynthesis.synthesisTitle}
 ${t.finalSynthesis.synthesisDescription.replace("{question}", question)}:
-${hasImageData ? t.finalSynthesis.synthesisList.map((item) => `- ${item}`).join("\n") : t.finalSynthesis.synthesisList.filter((_, i) => i !== 1).map((item) => `- ${item}`).join("\n")}
+${
+  hasImageData
+    ? t.finalSynthesis.synthesisList.map((item) => `- ${item}`).join("\n")
+    : t.finalSynthesis.synthesisList
+        .filter((_, i) => i !== 1)
+        .map((item) => `- ${item}`)
+        .join("\n")
+}
 
 ${t.finalSynthesis.important}
 ${t.finalSynthesis.importantText}`;
   } else {
     prompt += `${t.finalSynthesis.intuitiveTitle}
 ${t.finalSynthesis.intuitiveDescription.replace("{question}", question)}:
-${hasImageData ? t.finalSynthesis.intuitiveList.map((item) => `- ${item}`).join("\n") : t.finalSynthesis.intuitiveList.filter((_, i) => i !== 0).map((item) => `- ${item}`).join("\n")}`;
+${
+  hasImageData
+    ? t.finalSynthesis.intuitiveList.map((item) => `- ${item}`).join("\n")
+    : t.finalSynthesis.intuitiveList
+        .filter((_, i) => i !== 0)
+        .map((item) => `- ${item}`)
+        .join("\n")
+}`;
   }
 
   // Add text requirements
@@ -180,6 +219,9 @@ ${t.textRequirements.title}
 - ${t.textRequirements.style.replace("{addressForm}", addressForm)}
 - ${t.textRequirements.formatting}
 - ${t.textRequirements.language.replace("{responseLanguage}", responseLanguage)}
+- ${t.textRequirements.length}
+- ${t.textRequirements.probabilities}
+- ${t.textRequirements.noInstructions}
 `;
 
   // Add mantra generation section
@@ -204,6 +246,27 @@ ${t.mantraGeneration.analysisProcess}
 ${t.mantraGeneration.step1.replace("{question}", question)}:
 ${t.mantraGeneration.step1Options.map((item) => `   - ${item}`).join("\n")}
 
+${
+  selectedCardsNames
+    ? `${t.mantraGeneration.step2Cards}:
+${t.mantraGeneration.step2CardsDescription}
+${(() => {
+  const cards = selectedCardsNames.split(", ");
+  return t.mantraGeneration.step2CardsList
+    .map((item) =>
+      item
+        .replace("{card1}", cards[0] || "")
+        .replace("{card2}", cards[1] || "")
+        .replace("{card3}", cards[2] || "")
+    )
+    .join("\n");
+})()}
+
+${t.mantraGeneration.step2CardsSynthesis}
+
+`
+    : ""
+}
 ${t.mantraGeneration.step2}:
 ${t.mantraGeneration.step2Options.map((item) => `   - ${item}`).join("\n")}
 
@@ -223,22 +286,27 @@ ${t.mantraGeneration.outputFormat}
 
 ${t.mantraGeneration.outputDescription}
 
-${t.mantraGeneration.outputTemplate.replace("{mantraTitle}", mantraTitle)}
-
 ${t.mantraGeneration.rules}:
 ${t.mantraGeneration.rulesList
-  .map((item) => `- ${item.replace("{responseLanguage}", responseLanguage).replace("{firstPerson}", firstPerson)}`)
+  .map(
+    (item) =>
+      `- ${item
+        .replace("{responseLanguage}", responseLanguage)
+        .replace("{firstPerson}", firstPerson)}`
+  )
   .join("\n")}
 
 ${t.mantraGeneration.forbidden}:
 ${t.mantraGeneration.forbiddenList.map((item) => `- ${item}`).join("\n")}
 
 ${t.mantraGeneration.allowedStructure}:
-${t.mantraGeneration.allowedStructureTemplate.replace("{firstPerson}", firstPerson)}
+${t.mantraGeneration.allowedStructureTemplate.replace(
+  "{firstPerson}",
+  firstPerson
+)}
 
 ${t.mantraGeneration.critical}
 `;
 
   return prompt;
 }
-
