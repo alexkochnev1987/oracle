@@ -75,6 +75,9 @@ export async function createReading(formData: FormData) {
     const userEmail = session.user.email;
     const isWhitelisted = isUserAllowedForAI(userEmail);
 
+    // Track whether user has credits for AI access
+    let hasCredits = false;
+
     // Check user credits only if not in whitelist
     if (!isWhitelisted) {
       const user = await prisma.user.findUnique({
@@ -89,6 +92,11 @@ export async function createReading(formData: FormData) {
             : "Insufficient credits. Please purchase credits to create a reading."
         );
       }
+      // If we reach here, user has credits >= 1
+      hasCredits = true;
+    } else {
+      // Whitelisted users have unlimited access
+      hasCredits = true;
     }
 
     if (!birthDate || !question) {
@@ -133,8 +141,8 @@ export async function createReading(formData: FormData) {
     // Generate unique share token for public access
     const shareToken = randomUUID();
 
-    // Check if user is allowed to use AI (already checked above for whitelist)
-    const isAllowed = isWhitelisted;
+    // Check if user is allowed to use AI (whitelist or has credits)
+    const isAllowed = isWhitelisted || hasCredits;
 
     // Prepare image data - ensure proper format for OpenAI API
     // OpenAI expects data URI format: data:image/jpeg;base64,{base64string}
