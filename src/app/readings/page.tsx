@@ -153,17 +153,24 @@ export default function ReadingsPage() {
       </main>
 
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetContent side="bottom" className="max-h-[90vh] overflow-y-auto">
+        <SheetContent
+          side="bottom"
+          className="max-h-[90vh] overflow-y-auto bg-[rgba(26,26,58,0.95)] backdrop-blur-md border-[rgba(100,200,255,0.3)]"
+        >
           <SheetHeader>
-            <SheetTitle className="text-white">{t.common.shareReading}</SheetTitle>
+            <SheetTitle className="text-white text-center">
+              {t.common.shareReading}
+            </SheetTitle>
           </SheetHeader>
-          <div className="mt-6">
+          <div className="mt-6 flex flex-col items-center">
             {selectedReading && (
-              <QRCodeDisplay
-                shareToken={selectedReading.shareToken}
-                shareUrl={shareUrl}
-                question={selectedReading.question}
-              />
+              <div className="w-full max-w-md">
+                <QRCodeDisplay
+                  shareToken={selectedReading.shareToken}
+                  shareUrl={shareUrl}
+                  question={selectedReading.question}
+                />
+              </div>
             )}
           </div>
         </SheetContent>

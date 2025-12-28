@@ -99,16 +99,10 @@ export default function DashboardPage() {
 
   // Handle step 1: create spread - validate only photo, date, question
   const handleCreateSpread = () => {
-    // Mark that button was clicked - this will disable fields
     setCreateSpreadAttempted(true);
-
-    // Clear previous errors for these fields
-    setErrors({});
-
-    // Mark first 3 fields as touched
     setTouched({ photo: true, birthDate: true, question: true });
 
-    // Collect validation errors for first 3 fields only
+    // Collect validation errors
     const newErrors: Record<string, string> = {};
 
     // Validate photo step
@@ -120,7 +114,6 @@ export default function DashboardPage() {
     if (!birthDate.trim()) {
       newErrors.birthDate = t.dashboard.errors.fillBirthDate;
     } else {
-      // Use the same validation function
       const validationError = validateDate(birthDate);
       if (validationError) {
         newErrors.birthDate = validationError;
@@ -138,10 +131,10 @@ export default function DashboardPage() {
       return;
     }
 
-    // If validation passed, create spread and lock fields
+    // Validation passed - create spread and lock fields
     setSpreadCreated(true);
-    // Reset revealed cards count when creating new spread
     setRevealedCardsCount(0);
+
     // Generate random spread if in random mode and no cards selected
     if (cardSelectionMode === "random" && selectedCards.length === 0) {
       const newCards = getRandomSpread(3);
@@ -172,6 +165,18 @@ export default function DashboardPage() {
     return null;
   };
 
+  // Helper function to update error for a field
+  const updateFieldError = (field: string, error: string | null) => {
+    setErrors((prev) => {
+      if (error) {
+        return { ...prev, [field]: error };
+      }
+      const newErrors = { ...prev };
+      delete newErrors[field];
+      return newErrors;
+    });
+  };
+
   // Date input mask handler - formats as dd-mm-yy
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value.replace(/\D/g, "");
@@ -185,31 +190,23 @@ export default function DashboardPage() {
     const formatted = formatDateInput(rawValue);
     setBirthDate(formatted);
     setTouched((prev) => ({ ...prev, birthDate: true }));
+
+    // Real-time validation: clear error immediately when valid date is entered
+    if (touched.birthDate && errors.birthDate && formatted.trim()) {
+      const validationError = validateDate(formatted);
+      updateFieldError("birthDate", validationError);
+    }
   };
 
   // Validate date when user leaves the field (onBlur)
   const handleDateBlur = () => {
     if (!birthDate.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        birthDate: t.dashboard.errors.fillBirthDate,
-      }));
+      updateFieldError("birthDate", t.dashboard.errors.fillBirthDate);
       return;
     }
 
     const validationError = validateDate(birthDate);
-    if (validationError) {
-      setErrors((prev) => ({ ...prev, birthDate: validationError }));
-    } else {
-      // Clear error if date is valid
-      setErrors((prev) => {
-        const newErrors = { ...prev };
-        if (newErrors.birthDate) {
-          delete newErrors.birthDate;
-        }
-        return newErrors;
-      });
-    }
+    updateFieldError("birthDate", validationError);
   };
 
   useEffect(() => {
@@ -233,18 +230,16 @@ export default function DashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locale]);
 
-  // Unified error management - auto-clear errors when user interactions resolve validation issues
+  // Auto-clear errors when user interactions resolve validation issues
   useEffect(() => {
     const updatedErrors = { ...errors };
     let hasChanges = false;
 
-    // Clear photo error when skip photo checkbox is clicked or photo is uploaded
+    // Clear photo error when photo step is completed
     if ((photoStepCompleted || skipPhoto) && updatedErrors.photo) {
       delete updatedErrors.photo;
       hasChanges = true;
     }
-
-    // Don't auto-clear birth date error - it should only be cleared on blur or when explicitly validated
 
     // Clear question error when question is filled
     if (question.trim() && updatedErrors.question) {
@@ -255,12 +250,10 @@ export default function DashboardPage() {
     // Validate cards in real-time when spread is created
     if (spreadCreated) {
       const cardError = validateCards();
-      if (cardError) {
-        if (updatedErrors.cards !== cardError) {
-          updatedErrors.cards = cardError;
-          hasChanges = true;
-        }
-      } else if (updatedErrors.cards) {
+      if (cardError && updatedErrors.cards !== cardError) {
+        updatedErrors.cards = cardError;
+        hasChanges = true;
+      } else if (!cardError && updatedErrors.cards) {
         delete updatedErrors.cards;
         hasChanges = true;
       }
@@ -278,7 +271,6 @@ export default function DashboardPage() {
     revealedCardsCount,
     cardSelectionMode,
     errors,
-    t.dashboard.errors,
   ]);
 
   if (status === "loading") {
@@ -395,7 +387,6 @@ export default function DashboardPage() {
                   </p>
                 )}
               </FormField>
-
               {/* User Image Upload */}
               <ImageUpload
                 label={t.dashboard.uploadUserPhoto}
@@ -413,7 +404,6 @@ export default function DashboardPage() {
                 }
                 disabled={spreadCreated}
               />
-
               {/* Birth Date */}
               <FormField
                 label={t.dashboard.birthDate}
@@ -440,7 +430,6 @@ export default function DashboardPage() {
                   }
                 />
               </FormField>
-
               {/* Question */}
               <div>
                 <QuestionSelector
@@ -462,7 +451,6 @@ export default function DashboardPage() {
                   </p>
                 )}
               </div>
-
               {/* Cards Selection - Random or Manual - Only show after spread is created */}
               {spreadCreated && (
                 <div className="space-y-4">
@@ -492,15 +480,21 @@ export default function DashboardPage() {
                       .join(", ")}
                   />
                 )}
-
               {/* General error message - for errors not tied to specific fields */}
               {errors.general && <ErrorMessage message={errors.general} />}
-
               {/* Show cards error above button if it exists */}
               {errors.cards && spreadCreated && createReadingAttempted && (
                 <ErrorMessage message={errors.cards} />
-              )}
-
+              )}{" "}
+              {!hasCredits &&
+                spreadCreated &&
+                !isWhitelisted &&
+                photoStepCompleted &&
+                dateAndQuestionCompleted && (
+                  <ErrorMessage
+                    message={t.dashboard.errors.insufficientCredits}
+                  />
+                )}
               {/* Create Spread Button or Loading Phrases */}
               <div className="flex justify-center">
                 {!spreadCreated ? (
@@ -532,14 +526,6 @@ export default function DashboardPage() {
                   </Button>
                 )}
               </div>
-              {!hasCredits &&
-                !isWhitelisted &&
-                photoStepCompleted &&
-                dateAndQuestionCompleted && (
-                  <p className="text-xs text-red-400 mt-2">
-                    {t.dashboard.errors.insufficientCredits}
-                  </p>
-                )}
             </form>
           </Card>
         </div>

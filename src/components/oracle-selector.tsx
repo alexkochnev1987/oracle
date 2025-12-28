@@ -43,7 +43,9 @@ export function OracleSelector({
                 fill
                 className="object-cover"
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 200px"
-                unoptimized
+                quality={85}
+                loading="lazy"
+                unoptimized={oracle.imagePath.startsWith("http")}
               />
               <div
                 className={cn(

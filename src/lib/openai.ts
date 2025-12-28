@@ -3,9 +3,23 @@ import { TarotReaderId, getTarotReader } from "./tarot-readers";
 import { getTranslations } from "./i18n";
 import { buildReadingPrompt } from "./reading-prompt-builder";
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization of OpenAI client to avoid errors during build
+let openaiInstance: OpenAI | null = null;
+
+function getOpenAIClient(): OpenAI {
+  if (!openaiInstance) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error(
+        "OPENAI_API_KEY is not set. Please provide it in your environment variables."
+      );
+    }
+    openaiInstance = new OpenAI({
+      apiKey,
+    });
+  }
+  return openaiInstance;
+}
 
 /**
  * Analyzes a user image and returns a textual description.
@@ -32,6 +46,7 @@ export async function analyzeUserImage(
 
     const formattedImage = formatImageBase64(userImageBase64);
 
+    const openai = getOpenAIClient();
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
@@ -144,6 +159,7 @@ export async function createTarotReading({
   // The image analysis result is already included in the text prompt
   const systemMessageContent = reader.systemPrompt;
 
+  const openai = getOpenAIClient();
   const response = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [
@@ -222,6 +238,7 @@ export async function createTarotReadingForTest({
   // Create prediction request (text-only, no image)
   const systemMessageContent = reader.systemPrompt;
 
+  const openai = getOpenAIClient();
   const response = await openai.chat.completions.create({
     model: "gpt-4o-mini",
     messages: [

@@ -117,6 +117,9 @@ export function ImageUpload({
               alt={t.common.preview}
               fill
               className="object-contain"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              quality={85}
+              priority={false}
               unoptimized={value.startsWith("data:")}
             />
             {!disabled && (

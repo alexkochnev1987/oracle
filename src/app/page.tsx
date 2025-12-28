@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/navbar";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { ShareAppButton } from "@/components/share-app-button";
 import { Sparkles, Star, Moon, Gem } from "lucide-react";
 import { getTranslations } from "@/lib/i18n";
 import { useLocale } from "@/hooks/use-locale";
@@ -50,7 +51,7 @@ export default function Home() {
               {t.landing.description}
             </p>
 
-            <div className="flex justify-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
               <Link href={status === "authenticated" ? "/dashboard" : "/auth/signin"}>
                 <Button
                   variant="primary"
@@ -62,6 +63,7 @@ export default function Home() {
                   {t.landing.cta}
                 </Button>
               </Link>
+              <ShareAppButton />
             </div>
           </div>
 

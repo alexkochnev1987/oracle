@@ -92,30 +92,36 @@ export function QRCodeDisplay({
   }
 
   return (
-    <Card className="p-4 sm:p-6 md:p-8 text-center" glow>
-      <h3 className="mb-4 text-lg sm:text-xl font-semibold text-white">
+    <Card className="p-4 sm:p-6 md:p-8 text-center w-full" glow>
+      <h3 className="mb-4 text-lg sm:text-xl md:text-2xl font-semibold text-white">
         {t.common.shareReading}
       </h3>
       {question && (
-        <p className="mb-4 text-sm sm:text-base text-[#9ca3af] line-clamp-2">
+        <p className="mb-4 text-sm sm:text-base text-[#e5e7eb] line-clamp-2 break-words px-2">
           {question}
         </p>
       )}
-      <div
-        ref={qrRef}
-        className="mx-auto mb-4 inline-block rounded-lg border-2 border-[rgba(100,200,255,0.4)] bg-white p-2 sm:p-3 md:p-4 mystical-glow max-w-full"
-        style={{ maxWidth: `${qrSize + 32}px` }}
-      >
-        <QRCode
-          value={shareUrl}
-          size={qrSize}
-          level="H"
-          bgColor="#ffffff"
-          fgColor="#000000"
-          style={{ width: "100%", height: "auto", maxWidth: "100%" }}
-        />
+      <div className="flex justify-center mb-4">
+        <div
+          ref={qrRef}
+          className="inline-block rounded-lg border-2 border-[rgba(100,200,255,0.4)] bg-white p-2 sm:p-3 md:p-4 mystical-glow"
+          style={{ 
+            maxWidth: `min(100%, ${qrSize + 32}px)`,
+            width: `${qrSize + 32}px`,
+            height: `${qrSize + 32}px`
+          }}
+        >
+          <QRCode
+            value={shareUrl}
+            size={qrSize}
+            level="H"
+            bgColor="#ffffff"
+            fgColor="#000000"
+            style={{ width: "100%", height: "100%" }}
+          />
+        </div>
       </div>
-      <div className="mb-4 break-all rounded-md bg-[rgba(26,26,58,0.5)] p-2 sm:p-3 text-xs sm:text-sm text-[#9ca3af] max-w-full overflow-hidden">
+      <div className="mb-4 break-all rounded-md bg-[rgba(26,26,58,0.5)] p-2 sm:p-3 text-xs sm:text-sm text-[#e5e7eb] max-w-full overflow-hidden word-break">
         {shareUrl}
       </div>
       <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
