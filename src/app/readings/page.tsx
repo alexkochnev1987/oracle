@@ -155,7 +155,7 @@ export default function ReadingsPage() {
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent side="bottom" className="max-h-[90vh] overflow-y-auto">
           <SheetHeader>
-            <SheetTitle className="text-white">Поделиться прогнозом</SheetTitle>
+            <SheetTitle className="text-white">{t.common.shareReading}</SheetTitle>
           </SheetHeader>
           <div className="mt-6">
             {selectedReading && (

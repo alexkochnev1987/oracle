@@ -31,6 +31,7 @@ export function ReadingCard({
   onShareClick,
   onDeleteClick,
 }: ReadingCardProps) {
+  const t = getTranslations(locale);
   const date =
     typeof reading.createdAt === "string"
       ? new Date(reading.createdAt)
@@ -74,7 +75,7 @@ export function ReadingCard({
                 <button
                   onClick={handleShareClick}
                   className="p-2 sm:p-2.5 rounded-md hover:bg-[rgba(100,200,255,0.1)] transition-colors text-[rgba(100,200,255,0.8)] hover:text-[rgba(100,200,255,1)]"
-                  title="Поделиться"
+                  title={t.common.share}
                 >
                   <QrCode className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                 </button>
@@ -83,7 +84,7 @@ export function ReadingCard({
                 <button
                   onClick={handleDeleteClick}
                   className="p-2 sm:p-2.5 rounded-md hover:bg-[rgba(239,68,68,0.1)] transition-colors text-[rgba(239,68,68,0.8)] hover:text-[rgba(239,68,68,1)]"
-                  title="Удалить"
+                  title={t.readings.delete}
                 >
                   <Trash2 className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
                 </button>

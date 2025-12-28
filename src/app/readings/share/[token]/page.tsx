@@ -110,10 +110,10 @@ export default function PublicReadingPage() {
           <div className="mx-auto max-w-4xl">
             <Card className="p-6 text-center">
               <h1 className="mb-4 text-2xl font-bold text-white">
-                Прогноз не найден
+                {t.common.readingNotFound}
               </h1>
               <p className="text-[#9ca3af]">
-                {error || "Запрашиваемый прогноз не существует или был удален."}
+                {error || t.common.readingNotFoundOrDeleted}
               </p>
             </Card>
           </div>

@@ -7,6 +7,74 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+/**
+ * Analyzes a user image and returns a textual description.
+ * This is the first step in the two-step process for creating readings with images.
+ * @param userImageBase64 - Base64 encoded image (with or without data URI prefix)
+ * @param locale - Locale for the prompt ("ru" or "en")
+ * @returns Textual description of the image, or null if analysis fails
+ */
+async function analyzeUserImage(
+  userImageBase64: string,
+  locale: "ru" | "en"
+): Promise<string | null> {
+  try {
+    const translations = getTranslations(locale);
+    const imageAnalysisPrompts = translations.imageAnalysisPrompts;
+
+    // Ensure image is in correct format for OpenAI API
+    const formatImageBase64 = (base64: string): string => {
+      if (base64.startsWith("data:image/")) {
+        return base64;
+      }
+      return `data:image/jpeg;base64,${base64}`;
+    };
+
+    const formattedImage = formatImageBase64(userImageBase64);
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: imageAnalysisPrompts.systemPrompt,
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "text",
+              text: imageAnalysisPrompts.userPrompt,
+            },
+            {
+              type: "image_url",
+              image_url: {
+                url: formattedImage,
+                detail: "low",
+              },
+            },
+          ],
+        },
+      ],
+      max_tokens: 500,
+      temperature: 0.7,
+    });
+
+    const analysisText = response.choices[0]?.message?.content || "";
+
+    if (!analysisText) {
+      console.warn("Image analysis returned empty response");
+      return null;
+    }
+
+    console.log("Image analysis result:", analysisText);
+    return analysisText;
+  } catch (error) {
+    console.error("Error analyzing user image:", error);
+    return null;
+  }
+}
+
 export interface CreateReadingParams {
   userImageBase64?: string;
   selectedCardsNames?: string;
@@ -24,11 +92,30 @@ export async function createTarotReading({
   tarotReaderId,
   locale,
 }: CreateReadingParams): Promise<string> {
+  // Step 1: Analyze image if provided (first request)
+  let imageAnalysisResult: string | null = null;
+  if (userImageBase64) {
+    try {
+      console.log("Starting image analysis...");
+      imageAnalysisResult = await analyzeUserImage(userImageBase64, locale);
+      if (!imageAnalysisResult) {
+        console.warn(
+          "Image analysis returned null, continuing without photo analysis"
+        );
+      } else {
+        console.log("Image analysis completed successfully");
+      }
+    } catch (error) {
+      console.warn(
+        "Image analysis failed, continuing without photo:",
+        error instanceof Error ? error.message : error
+      );
+      // Continue without photo - not critical for prediction
+    }
+  }
+
   // Get localized tarot reader
   const reader = getTarotReader(tarotReaderId, locale);
-
-  // Build content array based on whether we have card names or image
-  const content: any[] = [];
 
   // Get translations
   const translations = getTranslations(locale);
@@ -37,11 +124,14 @@ export async function createTarotReading({
   const firstPerson = translations.promptLanguage.firstPerson;
   const mantraTitle = translations.mantra.title;
 
-  // Build localized prompt using the prompt builder
+  // Step 2: Build reading prompt with image analysis result (if available)
+  // Note: We pass userImageBase64 only if imageAnalysisResult is null (fallback to old behavior)
+  // Otherwise, we use imageAnalysisResult which contains the textual description
   const textPrompt = buildReadingPrompt({
     birthDate,
     question,
-    userImageBase64,
+    userImageBase64: imageAnalysisResult ? undefined : userImageBase64,
+    imageAnalysisResult: imageAnalysisResult || undefined,
     selectedCardsNames,
     locale,
     addressForm,
@@ -50,23 +140,8 @@ export async function createTarotReading({
     mantraTitle,
   });
 
-  content.push({
-    type: "text",
-    text: textPrompt,
-  });
-
-  // Add user image only if provided
-  if (userImageBase64) {
-    content.push({
-      type: "image_url",
-      image_url: {
-        url: userImageBase64,
-        detail: "low", // Use low detail to save tokens
-      },
-    });
-  }
-
-  // System prompt is already localized
+  // Step 3: Create prediction request (text-only, no image)
+  // The image analysis result is already included in the text prompt
   const systemMessageContent = reader.systemPrompt;
 
   const response = await openai.chat.completions.create({
@@ -78,7 +153,12 @@ export async function createTarotReading({
       },
       {
         role: "user",
-        content,
+        content: [
+          {
+            type: "text",
+            text: textPrompt,
+          },
+        ],
       },
     ],
     max_tokens: 2000,

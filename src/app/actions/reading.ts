@@ -12,6 +12,7 @@ import {
   parseDateString,
   formatDateForAI,
 } from "@/lib/date-validation";
+import { getTranslations, type Locale } from "@/lib/i18n";
 
 export async function createReading(formData: FormData) {
   try {
@@ -54,11 +55,7 @@ export async function createReading(formData: FormData) {
       });
 
       if (!user || user.credits < 1) {
-        throw new Error(
-          locale === "ru"
-            ? "Недостаточно кредитов. Пожалуйста, приобретите кредиты для создания расклада."
-            : "Insufficient credits. Please purchase credits to create a reading."
-        );
+        throw new Error(getTranslations(locale).common.insufficientCreditsPurchase);
       }
       // If we reach here, user has credits >= 1
       hasCredits = true;
@@ -72,21 +69,14 @@ export async function createReading(formData: FormData) {
     }
 
     // Validate that 3 cards are selected
+    const t = getTranslations(locale as Locale);
     if (!selectedCardsJson) {
-      throw new Error(
-        locale === "ru"
-          ? "Пожалуйста, выберите 3 карты"
-          : "Please select 3 cards"
-      );
+      throw new Error(t.common.pleaseSelect3Cards);
     }
 
     const selectedCardsArray = JSON.parse(selectedCardsJson) as string[];
     if (selectedCardsArray.length !== 3) {
-      throw new Error(
-        locale === "ru"
-          ? "Пожалуйста, выберите ровно 3 карты"
-          : "Please select exactly 3 cards"
-      );
+      throw new Error(t.common.pleaseSelectExactly3Cards);
     }
 
     // Parse date from dd-mm-yy format

@@ -26,6 +26,7 @@ import {
 } from "@/lib/date-validation";
 import { ErrorMessage } from "@/components/ui/error-message";
 import { CreditsWarning } from "@/components/credits-warning";
+import { LoadingPhrases } from "@/components/loading-phrases";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -350,6 +351,8 @@ export default function DashboardPage() {
     }
   };
 
+  const hasPhoto = !!(userImage && !skipPhoto);
+
   return (
     <div className="min-h-screen mystical-gradient">
       <Navbar />
@@ -498,7 +501,7 @@ export default function DashboardPage() {
                 <ErrorMessage message={errors.cards} />
               )}
 
-              {/* Create Spread Button - Show always until spread is created */}
+              {/* Create Spread Button or Loading Phrases */}
               <div className="flex justify-center">
                 {!spreadCreated ? (
                   <Button
@@ -510,14 +513,19 @@ export default function DashboardPage() {
                   >
                     {t.dashboard.createSpread}
                   </Button>
+                ) : isLoading ? (
+                  <LoadingPhrases
+                    tarotReaderId={selectedReader as any}
+                    locale={locale}
+                    hasPhoto={hasPhoto}
+                  />
                 ) : (
                   <Button
                     type="submit"
                     variant="primary"
                     size="lg"
-                    loading={isLoading}
                     onClick={() => setCreateReadingAttempted(true)}
-                    disabled={!hasCredits || isLoading}
+                    disabled={!hasCredits}
                     icon={<Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />}
                   >
                     {t.dashboard.createReading}

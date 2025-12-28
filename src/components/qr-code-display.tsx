@@ -5,6 +5,8 @@ import QRCode from "react-qr-code";
 import { Download, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useLocale } from "@/hooks/use-locale";
+import { getTranslations } from "@/lib/i18n";
 
 interface QRCodeDisplayProps {
   shareToken: string | null;
@@ -17,6 +19,8 @@ export function QRCodeDisplay({
   shareUrl,
   question,
 }: QRCodeDisplayProps) {
+  const [locale] = useLocale();
+  const t = getTranslations(locale);
   const qrRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
   const [qrSize, setQrSize] = useState(256);
@@ -90,7 +94,7 @@ export function QRCodeDisplay({
   return (
     <Card className="p-4 sm:p-6 md:p-8 text-center" glow>
       <h3 className="mb-4 text-lg sm:text-xl font-semibold text-white">
-        Поделиться прогнозом
+        {t.common.shareReading}
       </h3>
       {question && (
         <p className="mb-4 text-sm sm:text-base text-[#9ca3af] line-clamp-2">
@@ -122,7 +126,7 @@ export function QRCodeDisplay({
           icon={<Download className="h-4 w-4" />}
           className="w-full sm:w-auto sm:min-w-[140px]"
         >
-          Скачать QR
+          {t.common.downloadQR}
         </Button>
         <Button
           variant="secondary"
@@ -131,7 +135,7 @@ export function QRCodeDisplay({
           icon={copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           className="w-full sm:w-auto sm:min-w-[160px]"
         >
-          {copied ? "Скопировано!" : "Копировать ссылку"}
+          {copied ? t.common.copied : t.common.copyLink}
         </Button>
       </div>
     </Card>

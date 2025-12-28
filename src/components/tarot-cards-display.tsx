@@ -9,6 +9,7 @@ import {
   type TarotCard,
 } from "@/lib/tarot-cards";
 import type { Locale } from "@/lib/i18n";
+import { getTranslations } from "@/lib/i18n";
 
 interface TarotCardsDisplayProps {
   cardIds: string[] | null | undefined;
@@ -21,6 +22,7 @@ export function TarotCardsDisplay({
   locale = "ru",
   className,
 }: TarotCardsDisplayProps) {
+  const t = getTranslations(locale);
   if (!cardIds || cardIds.length === 0) {
     return null;
   }
@@ -52,7 +54,7 @@ export function TarotCardsDisplay({
   return (
     <Card className={`p-4 sm:p-6 ${className || ""}`} glow>
       <h2 className="mb-4 text-xl sm:text-2xl font-semibold text-white">
-        {locale === "ru" ? "Карты расклада" : "Tarot Cards Spread"}
+        {t.common.tarotCardsSpread}
       </h2>
       <div className={`grid ${getGridCols(cards.length)} gap-3 sm:gap-4`}>
         {cards.map((card, index) => {

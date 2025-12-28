@@ -31,9 +31,7 @@ export default function BillingPage() {
       setError(
         err instanceof Error
           ? err.message
-          : locale === "ru"
-          ? "Ошибка при создании сессии оплаты"
-          : "Failed to create checkout session"
+          : t.common.errorCreatingCheckout
       );
       setIsLoading(false);
     }
@@ -112,7 +110,7 @@ export default function BillingPage() {
 
           <Card className="mt-6 sm:mt-8 p-4 border-[rgba(212,175,55,0.3)] bg-[rgba(212,175,55,0.1)]">
             <p className="text-xs sm:text-sm text-[#d4af37]">
-              <strong>{locale === "ru" ? "Примечание:" : "Note:"}</strong> {t.billing.note}
+              <strong>{t.common.note}</strong> {t.billing.note}
             </p>
           </Card>
         </div>

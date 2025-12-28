@@ -52,7 +52,7 @@ export function Navbar() {
           <button
             onClick={toggleLocale}
             className="px-3 py-2 text-sm text-white hover:text-[rgba(100,200,255,0.8)] hover:bg-[rgba(100,200,255,0.1)] rounded-xl transition-colors min-h-[44px] flex items-center gap-2 border border-[rgba(100,200,255,0.3)] hover:border-[rgba(100,200,255,0.5)]"
-            aria-label="Toggle language"
+            aria-label={t.common.toggleLanguage}
           >
             <Globe className="h-4 w-4" />
             <span className="uppercase font-medium">{locale}</span>
@@ -110,7 +110,7 @@ export function Navbar() {
           <SheetTrigger asChild>
             <button
               className="sm:hidden text-white p-2.5 bg-[rgba(100,200,255,0.1)] hover:bg-[rgba(100,200,255,0.2)] rounded-xl transition-all duration-200 min-w-[44px] min-h-[44px] flex items-center justify-center border border-[rgba(100,200,255,0.3)] hover:border-[rgba(100,200,255,0.5)]"
-              aria-label="Toggle menu"
+              aria-label={t.common.toggleMenu}
             >
               <Menu className="h-5 w-5" />
             </button>
@@ -120,7 +120,7 @@ export function Navbar() {
             className="w-[85vw] sm:w-[400px] bg-[rgba(26,26,58,0.95)] backdrop-blur-md border-[rgba(100,200,255,0.3)] p-0"
           >
             <SheetHeader className="px-6 pt-6 pb-4 border-b border-[rgba(100,200,255,0.2)]">
-              <SheetTitle className="text-white">Menu</SheetTitle>
+              <SheetTitle className="text-white">{t.common.menu}</SheetTitle>
             </SheetHeader>
             <div className="p-6 space-y-2">
               {/* Language Toggle */}
@@ -129,7 +129,7 @@ export function Navbar() {
                 className="flex items-center gap-3 px-4 py-3 text-white hover:text-[rgba(100,200,255,0.8)] hover:bg-[rgba(100,200,255,0.1)] rounded-xl transition-colors min-h-[44px] w-full"
               >
                 <Globe className="h-5 w-5 text-[rgba(100,200,255,0.8)] flex-shrink-0" />
-                <span>{locale === "ru" ? "English" : "Русский"}</span>
+                <span>{t.common.language}</span>
               </button>
 
               {mounted && status !== "loading" && session ? (

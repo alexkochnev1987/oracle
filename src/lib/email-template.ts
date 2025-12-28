@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
-import { Locale } from "./i18n";
+import { Locale, getTranslations } from "./i18n";
 import { getTarotReader, TarotReaderId } from "./tarot-readers";
 import { getCardById } from "./tarot-cards";
 
@@ -17,6 +17,7 @@ export function generateEmailHTML(
   reading: ReadingData,
   locale: Locale = "ru"
 ): string {
+  const t = getTranslations(locale);
   const date =
     typeof reading.createdAt === "string"
       ? new Date(reading.createdAt)
@@ -44,7 +45,7 @@ export function generateEmailHTML(
         <tr>
           <td style="padding: 20px 0;">
             <h3 style="color: #64c8ff; font-size: 18px; margin: 0 0 10px 0; font-weight: 600;">
-              ${locale === "ru" ? "Выбранные карты" : "Selected Cards"}
+              ${getTranslations(locale).common.selectedCards.replace(":", "")}
             </h3>
             <p style="color: #e5e7eb; font-size: 16px; margin: 0; line-height: 1.6;">
               ${cardNames}
@@ -61,7 +62,7 @@ export function generateEmailHTML(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${locale === "ru" ? "Ваш прогноз Таро" : "Your Tarot Reading"}</title>
+  <title>${getTranslations(locale).common.yourTarotReading}</title>
 </head>
 <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background: linear-gradient(135deg, #0d0d1a 0%, #1a1a3a 100%);">
   <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background: linear-gradient(135deg, #0d0d1a 0%, #1a1a3a 100%); padding: 40px 20px;">
@@ -88,7 +89,7 @@ export function generateEmailHTML(
           <tr>
             <td style="padding: 30px 40px 20px;">
               <h2 style="color: #ffffff; font-size: 22px; margin: 0 0 15px 0; font-weight: 600;">
-                ${locale === "ru" ? "Ваш вопрос:" : "Your Question:"}
+                ${t.common.yourQuestion}
               </h2>
               <p style="color: #e5e7eb; font-size: 18px; margin: 0; line-height: 1.6; font-weight: 500;">
                 ${reading.question}
@@ -116,7 +117,7 @@ export function generateEmailHTML(
           <tr>
             <td style="padding: 20px 40px 30px;">
               <h2 style="color: #64c8ff; font-size: 20px; margin: 0 0 15px 0; font-weight: 600;">
-                ${locale === "ru" ? "Ваш прогноз:" : "Your Reading:"}
+                ${t.common.yourReading}
               </h2>
               <div style="color: #e5e7eb; font-size: 16px; line-height: 1.8; white-space: pre-wrap; background: rgba(13, 13, 26, 0.5); padding: 20px; border-radius: 8px; border: 1px solid rgba(100, 200, 255, 0.2);">
                 ${reading.predictionText.replace(/\n/g, "<br>")}
@@ -191,10 +192,10 @@ export function generateEmailText(
   const reader = getTarotReader(reading.tarotReaderId as TarotReaderId, locale);
   const shareUrl = reading.shareUrl || "";
 
-  let text =
-    locale === "ru" ? "Ваш прогноз Таро\n\n" : "Your Tarot Reading\n\n";
-  text += `${locale === "ru" ? "Дата:" : "Date:"} ${formattedDate}\n\n`;
-  text += `${locale === "ru" ? "Ваш вопрос:" : "Your Question:"} ${
+  const t = getTranslations(locale);
+  let text = `${t.common.yourTarotReading}\n\n`;
+  text += `${t.common.date} ${formattedDate}\n\n`;
+  text += `${t.common.yourQuestion} ${
     reading.question
   }\n\n`;
   text += `${reader.name} - ${reader.description}\n\n`;
@@ -210,25 +211,22 @@ export function generateEmailText(
 
     if (cardNames) {
       text += `${
-        locale === "ru" ? "Выбранные карты:" : "Selected Cards:"
+        t.common.selectedCards
       } ${cardNames}\n\n`;
     }
   }
 
-  text += `${locale === "ru" ? "Ваш прогноз:" : "Your Reading:"}\n${
+  text += `${t.common.yourReading}\n${
     reading.predictionText
   }\n\n`;
 
   if (shareUrl) {
     text += `${
-      locale === "ru" ? "Поделиться прогнозом:" : "Share this reading:"
+      t.common.shareThisReading
     } ${shareUrl}\n\n`;
   }
 
-  text +=
-    locale === "ru"
-      ? "С уважением, команда Oracle"
-      : "Best regards, Oracle Team";
+  text += t.common.bestRegards;
 
   return text;
 }

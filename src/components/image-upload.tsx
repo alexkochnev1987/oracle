@@ -6,6 +6,8 @@ import { Upload, X, Loader2 } from "lucide-react";
 import { compressImage, fileToBase64 } from "@/lib/image-compression";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useLocale } from "@/hooks/use-locale";
+import { getTranslations } from "@/lib/i18n";
 
 interface ImageUploadProps {
   label: string;
@@ -32,6 +34,8 @@ export function ImageUpload({
   errorMessage,
   disabled = false,
 }: ImageUploadProps) {
+  const [locale] = useLocale();
+  const t = getTranslations(locale);
   const [isCompressing, setIsCompressing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -40,7 +44,7 @@ export function ImageUpload({
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
-      alert("Please select an image file");
+      alert(t.common.selectImageFile);
       return;
     }
 
@@ -51,7 +55,7 @@ export function ImageUpload({
       onChange(base64);
     } catch (error) {
       console.error("Error processing image:", error);
-      alert("Failed to process image");
+      alert(t.common.failedToProcessImage);
     } finally {
       setIsCompressing(false);
     }
@@ -93,7 +97,7 @@ export function ImageUpload({
               disabled={disabled}
             />
             <span className="text-sm text-[rgba(100,200,255,0.8)]">
-              {skipPhotoLabel || "Skip"}
+              {skipPhotoLabel || t.common.skip}
             </span>
           </label>
         )}
@@ -110,7 +114,7 @@ export function ImageUpload({
           >
             <Image
               src={value}
-              alt="Preview"
+              alt={t.common.preview}
               fill
               className="object-contain"
               unoptimized={value.startsWith("data:")}
@@ -120,7 +124,7 @@ export function ImageUpload({
                 type="button"
                 className="absolute right-2 top-2 h-11 w-11 sm:h-10 sm:w-10 flex items-center justify-center bg-red-600/80 hover:bg-red-700/80 text-white rounded-xl transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-transparent min-w-[44px] min-h-[44px] sm:min-w-[40px] sm:min-h-[40px] z-10"
                 onClick={handleRemove}
-                aria-label="Remove image"
+                aria-label={t.common.removeImage}
               >
                 <X className="h-5 w-5 sm:h-5 sm:w-5" />
               </button>
@@ -148,14 +152,14 @@ export function ImageUpload({
               <>
                 <Loader2 className="mb-3 h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 text-[rgba(100,200,255,0.6)] animate-spin" />
                 <p className="text-sm sm:text-base text-[#9ca3af] font-medium">
-                  Compressing...
+                  {t.common.compressing}
                 </p>
               </>
             ) : (
               <>
                 <Upload className="mb-3 h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 text-[rgba(100,200,255,0.6)]" />
                 <p className="text-sm sm:text-base text-[#9ca3af] font-medium">
-                  Click to upload
+                  {t.common.clickToUpload}
                 </p>
               </>
             )}

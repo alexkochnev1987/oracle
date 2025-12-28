@@ -14,6 +14,7 @@ import {
   getCardImageUrl,
 } from "@/lib/tarot-cards";
 import type { Locale } from "@/lib/i18n";
+import { getTranslations } from "@/lib/i18n";
 
 type SelectionMode = "random" | "manual";
 
@@ -40,6 +41,7 @@ export function TarotCardSelector({
   allCardsRevealed = false,
   onRevealedCardsChange,
 }: TarotCardSelectorProps) {
+  const t = getTranslations(locale);
   const [internalMode, setInternalMode] = useState<SelectionMode>("random");
   const [internalSelectedCards, setInternalSelectedCards] = useState<
     TarotCard[]
@@ -207,10 +209,10 @@ export function TarotCardSelector({
           >
             <Shuffle className="h-4 w-4" />
             <span className="hidden sm:inline">
-              {locale === "ru" ? "Случайный расклад" : "Random Spread"}
+              {t.dashboard.randomSpread}
             </span>
             <span className="sm:hidden">
-              {locale === "ru" ? "Расклад" : "Spread"}
+              {t.common.spread}
             </span>
           </button>
           <button
@@ -225,10 +227,10 @@ export function TarotCardSelector({
           >
             <Hand className="h-4 w-4" />
             <span className="hidden sm:inline">
-              {locale === "ru" ? "Выбрать карты" : "Select Cards"}
+              {t.common.selectCards}
             </span>
             <span className="sm:hidden">
-              {locale === "ru" ? "Выбор" : "Select"}
+              {t.common.select}
             </span>
           </button>
         </div>
@@ -299,7 +301,7 @@ export function TarotCardSelector({
                                   🔮
                                 </div>
                                 <div className="text-[10px] sm:text-xs text-[rgba(212,175,55,0.7)] font-semibold uppercase tracking-wider">
-                                  {locale === "ru" ? "Таро" : "Tarot"}
+                                  {t.common.tarot}
                                 </div>
                                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(212,175,55,0.1)_100%)]" />
                               </div>
@@ -406,7 +408,7 @@ export function TarotCardSelector({
                   }
                 }}
               >
-                {locale === "ru" ? "Очистить" : "Clear"}
+                {t.common.clear}
               </Button>
             )}
           </div>
@@ -415,7 +417,7 @@ export function TarotCardSelector({
           {currentSelectedCards.length > 0 && (
             <div className="space-y-3 overflow-visible mb-6 sm:mb-8">
               <h3 className="text-sm sm:text-base font-semibold text-white">
-                {locale === "ru" ? "Выбранные карты:" : "Selected Cards:"}
+                {t.common.selectedCards}
               </h3>
               <div className="grid grid-cols-3 gap-6 sm:gap-8 overflow-visible">
                 {currentSelectedCards.map((card, index) => {

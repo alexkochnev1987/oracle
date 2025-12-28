@@ -24,9 +24,7 @@ export default function BillingSuccessPage() {
     const fetchSessionDetails = async () => {
       const sessionId = searchParams.get("session_id");
       if (!sessionId) {
-        setError(
-          locale === "ru" ? "ID сессии не найден" : "Session ID not found"
-        );
+        setError(t.common.sessionIdNotFound);
         setLoading(false);
         return;
       }
@@ -36,9 +34,7 @@ export default function BillingSuccessPage() {
         const sessionData = await getCheckoutSession(sessionId);
 
         if (!sessionData.isPaid) {
-          setError(
-            locale === "ru" ? "Оплата не завершена" : "Payment not completed"
-          );
+          setError(t.common.paymentNotCompleted);
           setLoading(false);
           return;
         }
@@ -49,9 +45,7 @@ export default function BillingSuccessPage() {
         setError(
           err instanceof Error
             ? err.message
-            : locale === "ru"
-            ? "Ошибка при получении информации о сессии"
-            : "Error fetching session details"
+            : t.common.errorFetchingSession
         );
       } finally {
         setLoading(false);
@@ -73,12 +67,10 @@ export default function BillingSuccessPage() {
                   <Loader2 className="h-8 w-8 sm:h-10 sm:w-10 text-blue-400 animate-spin" />
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-                  {locale === "ru"
-                    ? "Проверка оплаты..."
-                    : "Verifying payment..."}
+                  {t.common.verifyingPayment}
                 </h1>
                 <p className="text-[#9ca3af] text-sm sm:text-base">
-                  {locale === "ru" ? "Пожалуйста, подождите" : "Please wait"}
+                  {t.common.pleaseWait}
                 </p>
               </div>
             ) : error ? (
@@ -87,7 +79,7 @@ export default function BillingSuccessPage() {
                   <CheckCircle className="h-8 w-8 sm:h-10 sm:w-10 text-red-400" />
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-                  {locale === "ru" ? "Ошибка" : "Error"}
+                  {t.common.error}
                 </h1>
                 <p className="text-[#9ca3af] text-sm sm:text-base mb-4">
                   {error}
@@ -100,23 +92,17 @@ export default function BillingSuccessPage() {
                     <CheckCircle className="h-8 w-8 sm:h-10 sm:w-10 text-green-400" />
                   </div>
                   <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-                    {locale === "ru"
-                      ? "Оплата успешна!"
-                      : "Payment Successful!"}
+                    {t.common.paymentSuccessful}
                   </h1>
                   <p className="text-[#9ca3af] text-sm sm:text-base">
-                    {locale === "ru"
-                      ? "Спасибо за покупку!"
-                      : "Thank you for your purchase!"}
+                    {t.common.thankYou}
                   </p>
                 </div>
 
                 {credits && credits > 0 && (
                   <div className="mb-6 p-4 bg-[rgba(100,200,255,0.1)] rounded-lg border border-[rgba(100,200,255,0.3)]">
                     <p className="text-white text-sm sm:text-base mb-2">
-                      {locale === "ru"
-                        ? "Кредиты добавлены на ваш счет:"
-                        : "Credits added to your account:"}
+                      {t.common.creditsAdded}
                     </p>
                     <p className="text-3xl sm:text-4xl font-bold text-[rgba(100,200,255,0.9)]">
                       +{credits}
@@ -133,7 +119,7 @@ export default function BillingSuccessPage() {
                   size="lg"
                   icon={<Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />}
                 >
-                  {locale === "ru" ? "Создать расклад" : "Create Reading"}
+                  {t.common.createReading}
                 </Button>
               </Link>
               <Link href="/readings">
@@ -142,7 +128,7 @@ export default function BillingSuccessPage() {
                   size="lg"
                   icon={<ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />}
                 >
-                  {locale === "ru" ? "Мои расклады" : "My Readings"}
+                  {t.common.myReadings}
                 </Button>
               </Link>
             </div>

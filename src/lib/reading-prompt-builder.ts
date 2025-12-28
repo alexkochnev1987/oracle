@@ -4,6 +4,7 @@ interface BuildReadingPromptParams {
   birthDate: string;
   question: string;
   userImageBase64?: string;
+  imageAnalysisResult?: string;
   selectedCardsNames?: string;
   locale: Locale;
   addressForm: string;
@@ -16,6 +17,7 @@ export function buildReadingPrompt({
   birthDate,
   question,
   userImageBase64,
+  imageAnalysisResult,
   selectedCardsNames,
   locale,
   addressForm,
@@ -25,13 +27,18 @@ export function buildReadingPrompt({
 }: BuildReadingPromptParams): string {
   const t = getTranslations(locale).readingPrompts;
 
+  // Determine if we have image data (either original or analysis result)
+  const hasImageData = !!imageAnalysisResult || !!userImageBase64;
+
   // Build context section
   let prompt = `${t.role}
 CONTEXT:
 - ${t.context.birthDate}: ${birthDate}
 - ${t.context.question}: "${question}"
 ${
-  userImageBase64
+  imageAnalysisResult
+    ? `- ${t.context.userPhoto}\n- ${tCommon(locale).photoAnalysisResult}: ${imageAnalysisResult}`
+    : userImageBase64
     ? `- ${t.context.userPhoto}`
     : ""
 }
@@ -53,36 +60,50 @@ ${t.synthesis.description}
 ${t.synthesis.task}
 
 ${t.synthesis.means}
-${userImageBase64 ? t.synthesis.meansList.map((item) => `- ${item}`).join("\n") : `- ${t.synthesis.meansList[0]}\n- ${t.synthesis.meansList[2]}`}
+${hasImageData ? t.synthesis.meansList.map((item) => `- ${item}`).join("\n") : `- ${t.synthesis.meansList[0]}\n- ${t.synthesis.meansList[2]}`}
 
 ${t.synthesis.instead}
 
-${userImageBase64 ? t.synthesis.compareList.map((item) => `• ${item}`).join("\n") : `• ${t.synthesis.compareList[0]}`}
+${hasImageData ? t.synthesis.compareList.map((item) => `• ${item}`).join("\n") : `• ${t.synthesis.compareList[0]}`}
 
-${userImageBase64 ? t.synthesis.example : ""}
+${hasImageData ? t.synthesis.example : ""}
 
 ${t.synthesis.important}
 ${
-  userImageBase64
+  hasImageData
     ? t.synthesis.importantList.map((item) => `- ${item}`).join("\n")
     : `- ${t.synthesis.noPhoto}`
 }
 
-${userImageBase64 ? t.photoAnalysis.title : ""}
-${userImageBase64 ? "\n" + t.photoAnalysis.description : ""}
-${userImageBase64 ? "\n" + t.photoAnalysis.mandatoryAnalysis : ""}
-${userImageBase64 ? "\n" + t.photoAnalysis.analyzeAnyImage : ""}
-${userImageBase64 ? "\n" + t.photoAnalysis.observe : ""}
-${userImageBase64 ? t.photoAnalysis.observeList.map((item) => `- ${item}`).join("\n") : ""}
-${userImageBase64 ? "\n" + t.photoAnalysis.important : ""}
-${userImageBase64 ? "\n" + t.photoAnalysis.fallback : ""}
-${userImageBase64 ? "\n" + t.photoAnalysis.connect : ""}
-${userImageBase64 ? t.photoAnalysis.connectList.map((item) => `- ${item.replace("{question}", question)}`).join("\n") : ""}
+${
+  imageAnalysisResult
+    ? `2. ${t.photoAnalysis.title.replace("(КРИТИЧНО - ОБЯЗАТЕЛЬНО)", "(УЖЕ ВЫПОЛНЕН)").replace("(CRITICAL - MANDATORY)", "(ALREADY COMPLETED)")}:
+
+${tCommon(locale).photoAnalysisResult}:
+${imageAnalysisResult}
+
+${tCommon(locale).usePhotoAnalysis}
+- ${tCommon(locale).theQuestion} "${question}"
+- ${tCommon(locale).birthDateSynthesis}
+- ${tCommon(locale).tarotCardsNextStep}`
+    : userImageBase64
+    ? `${t.photoAnalysis.title}
+${t.photoAnalysis.description}
+${t.photoAnalysis.mandatoryAnalysis}
+${t.photoAnalysis.analyzeAnyImage}
+${t.photoAnalysis.observe}
+${t.photoAnalysis.observeList.map((item) => `- ${item}`).join("\n")}
+${t.photoAnalysis.important}
+${t.photoAnalysis.fallback}
+${t.photoAnalysis.connect}
+${t.photoAnalysis.connectList.map((item) => `- ${item.replace("{question}", question)}`).join("\n")}`
+    : ""
+}
 `;
 
   // Add card spread section
   if (selectedCardsNames) {
-    const stepNumber = userImageBase64 ? "3" : "2";
+    const stepNumber = hasImageData ? "3" : "2";
     prompt += `
 ${stepNumber}. ${t.cardSpread.title}
 
@@ -98,25 +119,25 @@ ${selectedCardsNames}
 
 ${t.cardSpread.forEachCard}
 ${t.cardSpread.forEachCardList.map((item) => `- ${item}`).join("\n")}
-  ${userImageBase64 ? `• ${t.cardSpread.connectTo.person}` : ""}
+  ${hasImageData ? `• ${t.cardSpread.connectTo.person}` : ""}
   • ${t.cardSpread.connectTo.question}
   • ${t.cardSpread.connectTo.lifeStage}
 
 ${t.cardSpread.doNotMix}
 `;
   } else {
-    const stepNumber = userImageBase64 ? "3" : "2";
+    const stepNumber = hasImageData ? "3" : "2";
     prompt += `
-${stepNumber}. ${t.intuitiveReading.title} ${userImageBase64 ? t.intuitiveReading.withPhoto : t.intuitiveReading.description}
+${stepNumber}. ${t.intuitiveReading.title} ${hasImageData ? t.intuitiveReading.withPhoto : t.intuitiveReading.description}
 `;
   }
 
   // Add final synthesis section
   const finalStepNumber = selectedCardsNames
-    ? userImageBase64
+    ? hasImageData
       ? "4"
       : "3"
-    : userImageBase64
+    : hasImageData
     ? "3"
     : "2";
 
@@ -141,14 +162,14 @@ ${t.finalSynthesis.card3List.map((item) => `- ${item}`).join("\n")}
 
 ${t.finalSynthesis.synthesisTitle}
 ${t.finalSynthesis.synthesisDescription.replace("{question}", question)}:
-${userImageBase64 ? t.finalSynthesis.synthesisList.map((item) => `- ${item}`).join("\n") : t.finalSynthesis.synthesisList.filter((_, i) => i !== 1).map((item) => `- ${item}`).join("\n")}
+${hasImageData ? t.finalSynthesis.synthesisList.map((item) => `- ${item}`).join("\n") : t.finalSynthesis.synthesisList.filter((_, i) => i !== 1).map((item) => `- ${item}`).join("\n")}
 
 ${t.finalSynthesis.important}
 ${t.finalSynthesis.importantText}`;
   } else {
     prompt += `${t.finalSynthesis.intuitiveTitle}
 ${t.finalSynthesis.intuitiveDescription.replace("{question}", question)}:
-${userImageBase64 ? t.finalSynthesis.intuitiveList.map((item) => `- ${item}`).join("\n") : t.finalSynthesis.intuitiveList.filter((_, i) => i !== 0).map((item) => `- ${item}`).join("\n")}`;
+${hasImageData ? t.finalSynthesis.intuitiveList.map((item) => `- ${item}`).join("\n") : t.finalSynthesis.intuitiveList.filter((_, i) => i !== 0).map((item) => `- ${item}`).join("\n")}`;
   }
 
   // Add text requirements
@@ -163,10 +184,10 @@ ${t.textRequirements.title}
 
   // Add mantra generation section
   const mantraStepNumber = selectedCardsNames
-    ? userImageBase64
+    ? hasImageData
       ? "5"
       : "4"
-    : userImageBase64
+    : hasImageData
     ? "4"
     : "3";
 
