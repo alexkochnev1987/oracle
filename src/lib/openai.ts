@@ -92,6 +92,7 @@ export async function analyzeUserImage(
 
 export interface CreateReadingParams {
   userImageBase64?: string;
+  imageAnalysisResult?: string; // Pre-analyzed image result to avoid duplicate analysis
   selectedCardsNames?: string;
   birthDate: string;
   question: string;
@@ -101,15 +102,16 @@ export interface CreateReadingParams {
 
 export async function createTarotReading({
   userImageBase64,
+  imageAnalysisResult: providedImageAnalysisResult,
   selectedCardsNames,
   birthDate,
   question,
   tarotReaderId,
   locale,
 }: CreateReadingParams): Promise<string> {
-  // Step 1: Analyze image if provided (first request)
-  let imageAnalysisResult: string | null = null;
-  if (userImageBase64) {
+  // Step 1: Analyze image if provided and not already analyzed
+  let imageAnalysisResult: string | null = providedImageAnalysisResult || null;
+  if (userImageBase64 && !imageAnalysisResult) {
     try {
       console.log("Starting image analysis...");
       imageAnalysisResult = await analyzeUserImage(userImageBase64, locale);
@@ -127,6 +129,8 @@ export async function createTarotReading({
       );
       // Continue without photo - not critical for prediction
     }
+  } else if (imageAnalysisResult) {
+    console.log("Using pre-analyzed image result");
   }
 
   // Get localized tarot reader

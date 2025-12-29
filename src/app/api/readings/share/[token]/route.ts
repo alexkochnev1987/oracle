@@ -24,6 +24,7 @@ export async function GET(
         shareToken: true,
         selectedCards: true,
         cardSelectionMode: true,
+        userImageUrl: true,
       },
     });
 

@@ -51,6 +51,26 @@ Fill in the following variables:
 3. Create a new secret key
 4. Copy the key (starts with `sk-`)
 
+#### AWS S3 (Optional - for image storage)
+
+> **Note**: If AWS S3 is not configured, images will still work but won't be saved to S3. The app will continue to function normally.
+
+1. Go to [AWS Console](https://console.aws.amazon.com/)
+2. Create an S3 bucket (or use existing)
+3. Configure bucket policy for public read access (if needed)
+4. Create IAM user with `s3:PutObject` and `s3:GetObject` permissions
+5. Generate Access Key ID and Secret Access Key
+
+Required environment variables:
+
+- `AWS_ACCESS_KEY_ID` - Your AWS access key
+- `AWS_SECRET_ACCESS_KEY` - Your AWS secret key
+- `AWS_REGION` - AWS region (e.g., `us-east-1`)
+- `AWS_S3_BUCKET_NAME` - Name of your S3 bucket
+- `AWS_S3_BUCKET_URL` - Public URL of your bucket (optional, will be auto-generated)
+
+See [AWS_S3_SETUP.md](./AWS_S3_SETUP.md) for detailed setup instructions.
+
 ### 3. Set Up Database
 
 ```bash

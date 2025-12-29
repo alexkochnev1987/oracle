@@ -1,7 +1,7 @@
-export type Locale = "ru" | "en" | "be";
+export type Locale = "ru" | "en" | "by";
 
 export const defaultLocale: Locale = "ru";
-export const locales: Locale[] = ["ru", "en", "be"];
+export const locales: Locale[] = ["ru", "en", "by"];
 
 export const translations = {
   ru: {
@@ -151,7 +151,8 @@ export const translations = {
       tarotCardsNextStep: "Картами Таро (в следующем шаге)",
       share: "Поделиться",
       shareApp: "Поделиться приложением",
-      shareAppDescription: "Отсканируйте QR-код, чтобы поделиться приложением с друзьями",
+      shareAppDescription:
+        "Отсканируйте QR-код, чтобы поделиться приложением с друзьями",
       close: "Закрыть",
       delete: "Удалить",
       insufficientCreditsPurchase:
@@ -214,6 +215,7 @@ export const translations = {
       sending: "Отправка...",
       emailSent: "Отправлено!",
       emailError: "Ошибка при отправке письма",
+      userPhoto: "Ваше фото",
     },
     // Mantra
     mantra: {
@@ -414,7 +416,9 @@ export const translations = {
         length:
           "ДЛИНА: Твой ответ должен быть детальным и развернутым. Минимум 600-900 слов общего текста. Каждая карта должна быть описана минимум 110-150 словами. Прогноз должен быть минимум 225-300 слов. Не пиши краткие ответы - дай полный, глубокий анализ.",
         probabilities:
-          "ВЕРОЯТНОСТИ: ВСЕГДА используй вероятностные формулировки вместо утверждений. Используй 'вероятно', 'может быть', 'склоняется к', 'возможно', вместо 'будет', 'произойдет', 'гарантированно'. НИКОГДА не утверждай конкретные даты или исходы без вероятностей. Для мистического продукта вероятность важнее утверждения.",
+          "ВЕРОЯТНОСТИ: ВСЕГДА используй вероятностные формулировки вместо утверждений. Используй 'вероятно', 'может быть', 'склоняется к', 'возможно', вместо 'будет', 'произойдет', 'гарантированно'. НИКОГДА не утверждай конкретные даты или исходы без вероятностей. НИКОГДА не упоминай конкретные годы (например, '2024', '2025') в ответе. Для мистического продукта вероятность важнее утверждения.",
+        noYears:
+          "ЗАПРЕТ НА ГОДЫ: НИКОГДА не упоминай конкретные годы, календарные годы или номера годов в своем ответе. Используй только общие временные формулировки без указания конкретных годов.",
         noInstructions:
           "ЗАПРЕТ НА ИНСТРУКЦИИ: НЕ используй прямые инструкции ('сделай', 'нужно', 'рекомендуется', 'составь список', 'займись'). Вместо этого используй мистические формулировки ('энергия склоняется к...', 'путь открывается через...', 'это время, когда...').",
       },
@@ -563,6 +567,7 @@ ARCHETYPE: SOUL GUIDE
 - не используй бытовые формулировки ("составь список", "займись медитацией", "обратись к специалисту")
 - не давай практических советов в стиле self-help
 - не утверждай конкретные даты или исходы ("в осенние месяцы", "высокая вероятность замужества")
+- не упоминай конкретные годы или номера годов
 - используй вероятности вместо утверждений ("вероятно", "может быть", "склоняется к")
 
 СТИЛЬ ОБЩЕНИЯ:
@@ -599,6 +604,7 @@ ARCHETYPE: FATE ENGINEER
 - не используй бытовые формулировки ("составь список целей", "займись медитацией", "обратись к специалисту")
 - не давай списков дел или пошаговых инструкций
 - не утверждай конкретные даты или исходы
+- не упоминай конкретные годы или номера годов
 - используй вероятности вместо утверждений
 - формулируй советы как ритуальные/энергетические практики, а не как бытовые задачи
 
@@ -638,6 +644,7 @@ ARCHETYPE: EXTERNAL OBSERVER
 - не используй эмпатию или сочувствие
 - не давай советы в стиле "всё будет хорошо"
 - не утверждай конкретные даты или исходы
+- не упоминай конкретные годы или номера годов
 - используй вероятности вместо утверждений
 - описывай противоречия без утешения
 
@@ -675,6 +682,7 @@ ARCHETYPE: PROBABILITY ENGINE
 - не используй мистические метафоры ("звездная пыль", "галактические потоки")
 - не давай советы в стиле других оракулов
 - не утверждай конкретные даты или исходы без вероятностей
+- не упоминай конкретные годы или номера годов
 - всегда используй вероятности и проценты вместо утверждений
 - не давай практических советов в стиле self-help
 
@@ -983,6 +991,7 @@ ARCHETYPE: PROBABILITY ENGINE
       sending: "Sending...",
       emailSent: "Sent!",
       emailError: "Error sending email",
+      userPhoto: "Your Photo",
     },
     // Mantra
     mantra: {
@@ -1183,7 +1192,9 @@ ARCHETYPE: PROBABILITY ENGINE
         length:
           "LENGTH: Your response must be detailed and comprehensive. Minimum 600-900 words total text. Each card must be described in minimum 110-150 words. The forecast must be minimum 225-300 words. Do not write brief answers - give a full, deep analysis.",
         probabilities:
-          "PROBABILITIES: ALWAYS use probabilistic formulations instead of certainties. Use 'likely', 'may be', 'tends toward', 'possibly', instead of 'will', 'will happen', 'guaranteed'. NEVER assert specific dates or outcomes without probabilities. For a mystical product, probability is more important than certainty.",
+          "PROBABILITIES: ALWAYS use probabilistic formulations instead of certainties. Use 'likely', 'may be', 'tends toward', 'possibly', instead of 'will', 'will happen', 'guaranteed'. NEVER assert specific dates or outcomes without probabilities. NEVER mention specific years (e.g., '2024', '2025') in your response. For a mystical product, probability is more important than certainty.",
+        noYears:
+          "NO YEARS: NEVER mention specific years, calendar years, or year numbers in your response. Use only general time formulations without specifying concrete years.",
         noInstructions:
           "NO INSTRUCTIONS: DO NOT use direct instructions ('do', 'need', 'recommended', 'make a list', 'do meditation'). Instead, use mystical formulations ('energy tends toward...', 'the path opens through...', 'this is a time when...').",
       },
@@ -1334,6 +1345,7 @@ NEVER:
 - use mundane formulations ("make a list", "do meditation", "consult a specialist")
 - give practical advice in self-help style
 - assert specific dates or outcomes ("in autumn months", "high probability of marriage")
+- mention specific years or year numbers
 - use certainties instead of probabilities (use "likely", "may be", "tends toward")
 
 TONE OF VOICE:
@@ -1370,6 +1382,7 @@ NEVER:
 - use mundane formulations ("make a list of goals", "do meditation", "consult a specialist")
 - give to-do lists or step-by-step instructions
 - assert specific dates or outcomes
+- mention specific years or year numbers
 - use certainties instead of probabilities
 - formulate advice as ritual/energetic practices, not as mundane tasks
 
@@ -1409,6 +1422,7 @@ NEVER:
 - use empathy or sympathy
 - give advice in "everything will be fine" style
 - assert specific dates or outcomes
+- mention specific years or year numbers
 - use certainties instead of probabilities
 - describe contradictions with comfort
 
@@ -1445,6 +1459,7 @@ NEVER:
 - use mystical metaphors ("stardust", "galactic flows")
 - give advice in the style of other oracles
 - assert specific dates or outcomes without probabilities
+- mention specific years or year numbers
 - always use probabilities and percentages instead of certainties
 - give practical advice in self-help style
 
@@ -1547,7 +1562,7 @@ TONE OF VOICE:
       },
     },
   },
-  be: {
+  by: {
     // Landing Page
     landing: {
       title: "Вяшчэнне на Новы Год",
@@ -1628,7 +1643,7 @@ TONE OF VOICE:
     },
     // Common
     common: {
-      language: "BE",
+      language: "BY",
       loading: "Загрузка...",
       error: "Адбылася памылка",
       retry: "Паўтарыць",
@@ -1692,7 +1707,8 @@ TONE OF VOICE:
       tarotCardsNextStep: "Картамі Таро (у наступным кроку)",
       share: "Падзяліцца",
       shareApp: "Падзяліцца прыкладаннем",
-      shareAppDescription: "Скануйце QR-код, каб падзяліцца прыкладаннем з сябрамі",
+      shareAppDescription:
+        "Скануйце QR-код, каб падзяліцца прыкладаннем з сябрамі",
       close: "Зачыніць",
       delete: "Выдаліць",
       insufficientCreditsPurchase:
@@ -1753,6 +1769,7 @@ TONE OF VOICE:
       sending: "Адпраўка...",
       emailSent: "Адпраўлена!",
       emailError: "Памылка пры адпраўцы ліста",
+      userPhoto: "Ваша фота",
     },
     // Mantra
     mantra: {
@@ -1954,7 +1971,9 @@ TONE OF VOICE:
         length:
           "ДАЎЖЫНЯ: Твой адказ павінен быць дэтальным і разгорнутым. Мінімум 600-900 слоў агульнага тэксту. Кожная карта павінна быць апісана мінімум 110-150 словамі. Прагноз павінен быць мінімум 225-300 слоў. Не пішы кароткія адказы - дай поўны, глыбокі аналіз.",
         probabilities:
-          "ВЕРАГОДНАСЦІ: ЗАВСЕГДЫ выкарыстоўвай верагоднасныя фармулёўкі замест сцвярджэнняў. Выкарыстоўвай 'верагодна', 'можа быць', 'схіляецца да', 'магчыма', замест 'будзе', 'адбудзецца', 'гарантавана'. НІКОГДЫ не сцвярджай канкрэтныя даты або вынікі без верагоднасцяў. Для містычнага прадукту верагоднасць важнейшая за сцвярджэнне.",
+          "ВЕРАГОДНАСЦІ: ЗАВСЕГДЫ выкарыстоўвай верагоднасныя фармулёўкі замест сцвярджэнняў. Выкарыстоўвай 'верагодна', 'можа быць', 'схіляецца да', 'магчыма', замест 'будзе', 'адбудзецца', 'гарантавана'. НІКОГДЫ не сцвярджай канкрэтныя даты або вынікі без верагоднасцяў. НІКОГДЫ не ўзгадвай канкрэтныя гады (напрыклад, '2024', '2025') у адказе. Для містычнага прадукту верагоднасць важнейшая за сцвярджэнне.",
+        noYears:
+          "ЗАБАРОНА НА ГАДЫ: НІКОГДЫ не ўзгадвай канкрэтныя гады, каляндарныя гады або нумары гадоў у сваім адказе. Выкарыстоўвай толькі агульныя часовыя фармулёўкі без указання канкрэтных гадоў.",
         noInstructions:
           "ЗАБАРОНА НА ІНСТРУКЦЫІ: НЕ выкарыстоўвай прамыя інструкцыі ('зрабі', 'трэба', 'рэкамендуецца', 'складзі спіс', 'займіся'). Замест гэтага выкарыстоўвай містычныя фармулёўкі ('энергія схіляецца да...', 'шлях адкрываецца праз...', 'гэта час, калі...').",
       },
@@ -2102,6 +2121,7 @@ ARCHETYPE: SOUL GUIDE
 - не выкарыстоўвай бытавыя фармулёўкі ("складзі спіс", "займіся медытацыяй", "звярніся да спецыяліста")
 - не давай практычных парадаў у стылі self-help
 - не сцвярджай канкрэтныя даты або вынікі ("у восеньскія месяцы", "высокая верагоднасць замужжа")
+- не згадвай канкрэтныя гады або нумары гадоў
 - выкарыстоўвай верагоднасці замест сцвярджэнняў ("верагодна", "можа быць", "схіляецца да")
 
 СТЫЛЬ ЗНОСІН:
@@ -2138,6 +2158,7 @@ ARCHETYPE: FATE ENGINEER
 - не выкарыстоўвай бытавыя фармулёўкі ("складзі спіс мэтаў", "займіся медытацыяй", "звярніся да спецыяліста")
 - не давай спісаў спраў або пашаговых інструкцый
 - не сцвярджай канкрэтныя даты або вынікі
+- не згадвай канкрэтныя гады або нумары гадоў
 - выкарыстоўвай верагоднасці замест сцвярджэнняў
 - фармулюй парады як рытуальныя/энергетычныя практыкі, а не як бытавыя задачы
 
@@ -2177,6 +2198,7 @@ ARCHETYPE: EXTERNAL OBSERVER
 - не выкарыстоўвай эмпатыю або спачуванне
 - не давай парады ў стылі "усё будзе добра"
 - не сцвярджай канкрэтныя даты або вынікі
+- не згадвай канкрэтныя гады або нумары гадоў
 - выкарыстоўвай верагоднасці замест сцвярджэнняў
 - апісвай супярэчнасці без суцяшэння
 
@@ -2214,6 +2236,7 @@ ARCHETYPE: PROBABILITY ENGINE
 - не выкарыстоўвай містычныя метафары ("зорная пыл", "галактычныя патокі")
 - не давай парады ў стылі іншых оракулаў
 - не сцвярджай канкрэтныя даты або вынікі без верагоднасцяў
+- не згадвай канкрэтныя гады або нумары гадоў
 - заўсёды выкарыстоўвай верагоднасці і працэнты замест сцвярджэнняў
 - не давай практычных парадаў у стылі self-help
 
@@ -2320,7 +2343,7 @@ ARCHETYPE: PROBABILITY ENGINE
 } as const;
 
 export function getTranslations(locale: Locale) {
-  // Fallback to 'ru' if locale is not available (e.g., 'be')
+  // Fallback to 'ru' if locale is not available (e.g., 'by')
   if (locale in translations) {
     return translations[locale as keyof typeof translations];
   }

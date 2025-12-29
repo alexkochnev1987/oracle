@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import { QRCodeDisplay } from "@/components/qr-code-display";
 import { TarotCardsDisplay } from "@/components/tarot-cards-display";
 import { EmailReadingForm } from "@/components/email-reading-form";
+import Image from "next/image";
 import { format } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
 import { useLocale } from "@/hooks/use-locale";
@@ -107,6 +108,26 @@ export default function ReadingDetailPage() {
                 locale={locale}
               />
             )}
+
+          {/* User Image Display - show if image exists */}
+          {reading.userImageUrl && (
+            <Card className="p-4 sm:p-6" glow>
+              <h2 className="mb-4 text-xl sm:text-2xl font-semibold text-white">
+                {t.readings.userPhoto}
+              </h2>
+              <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-[rgba(100,200,255,0.4)] bg-[rgba(26,26,58,0.7)]">
+                <Image
+                  src={reading.userImageUrl}
+                  alt={t.readings.userPhoto}
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  quality={90}
+                  unoptimized={reading.userImageUrl.startsWith("http")}
+                />
+              </div>
+            </Card>
+          )}
 
           <Card className="p-4 sm:p-6 md:p-8 cosmic-particles" glow>
             <h2 className="mb-4 text-xl sm:text-2xl font-semibold text-white">

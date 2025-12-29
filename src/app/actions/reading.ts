@@ -2,17 +2,19 @@
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { createTarotReading, CreateReadingParams } from "@/lib/openai";
+import {
+  createTarotReading,
+  CreateReadingParams,
+  analyzeUserImage,
+} from "@/lib/openai";
 import { createTarotReadingStub } from "@/lib/tarot-reading-stub";
 import { isUserAllowedForAI } from "@/lib/ai-whitelist";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { getCardById, formatCardsForPrompt } from "@/lib/tarot-cards";
-import {
-  parseDateString,
-  formatDateForAI,
-} from "@/lib/date-validation";
+import { parseDateString, formatDateForAI } from "@/lib/date-validation";
 import { getTranslations, type Locale } from "@/lib/i18n";
+import { uploadImageToS3 } from "@/lib/s3";
 
 export async function createReading(formData: FormData) {
   try {
@@ -55,7 +57,9 @@ export async function createReading(formData: FormData) {
       });
 
       if (!user || user.credits < 1) {
-        throw new Error(getTranslations(locale).common.insufficientCreditsPurchase);
+        throw new Error(
+          getTranslations(locale).common.insufficientCreditsPurchase
+        );
       }
       // If we reach here, user has credits >= 1
       hasCredits = true;
@@ -120,13 +124,42 @@ export async function createReading(formData: FormData) {
       .filter((card) => card !== undefined);
     const selectedCardsNames = formatCardsForPrompt(cards as any[], locale);
 
+    // Parallel execution: Upload to S3 and analyze image in GPT simultaneously
+    let s3Url: string | null = null;
+    let imageAnalysisResult: string | null = null;
+
+    if (formattedUserImage && isAllowed) {
+      // Run S3 upload and GPT image analysis in parallel
+      const [uploadResult, analysisResult] = await Promise.all([
+        uploadImageToS3(userImageBase64!, userId).catch((error) => {
+          console.error("S3 upload failed:", error);
+          return null;
+        }),
+        analyzeUserImage(formattedUserImage, locale).catch((error) => {
+          console.error("Image analysis failed:", error);
+          return null;
+        }),
+      ]);
+
+      s3Url = uploadResult;
+      imageAnalysisResult = analysisResult;
+    } else if (formattedUserImage && !isAllowed) {
+      // For non-whitelisted users, still upload to S3 but skip GPT analysis
+      s3Url = await uploadImageToS3(userImageBase64!, userId).catch((error) => {
+        console.error("S3 upload failed:", error);
+        return null;
+      });
+    }
+
     // Create AI prediction - use real AI for whitelisted users, stub for others
     let predictionText: string;
     try {
       if (isAllowed) {
-        // Use real AI with image analysis or card names
+        // Use real AI with pre-analyzed image result (if available) or card names
+        // Pass imageAnalysisResult if we already have it from parallel execution
         predictionText = await createTarotReading({
-          userImageBase64: formattedUserImage,
+          userImageBase64: imageAnalysisResult ? undefined : formattedUserImage,
+          imageAnalysisResult: imageAnalysisResult || undefined,
           selectedCardsNames,
           birthDate: formattedDate,
           question,
@@ -165,16 +198,14 @@ export async function createReading(formData: FormData) {
       }
     }
 
-    // Save to database
+    // Save to database with S3 URL if available
     const reading = await prisma.reading.create({
       data: {
         userId,
         question,
         birthDate: parsedDate,
         predictionText,
-        userImageUrl: userImageBase64
-          ? userImageBase64.substring(0, 100) + "..."
-          : null, // Store reference only
+        userImageUrl: s3Url, // Store full S3 URL instead of truncated base64
         cardsImageUrl: null, // No longer used
         selectedCards: selectedCardsArray,
         cardSelectionMode,
