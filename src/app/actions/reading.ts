@@ -8,7 +8,12 @@ import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { getCardById, formatCardsForPrompt } from "@/lib/tarot-cards";
 import { parseDateString, formatDateForAI } from "@/lib/date-validation";
-import { getTranslations, type Locale } from "@/lib/i18n";
+import {
+  getTranslations,
+  type Locale,
+  defaultLocale,
+  locales,
+} from "@/lib/i18n";
 import { uploadImageToS3 } from "@/lib/s3";
 
 export async function createReading(formData: FormData) {
@@ -35,7 +40,10 @@ export async function createReading(formData: FormData) {
     const question = formData.get("question") as string;
     const tarotReaderId =
       (formData.get("tarotReaderId") as string) || "default";
-    const locale = (formData.get("locale") as "ru" | "en") || "ru";
+    const localeValue = formData.get("locale") as string;
+    const locale: Locale = (locales as readonly string[]).includes(localeValue)
+      ? (localeValue as Locale)
+      : defaultLocale;
 
     // Check if user is in whitelist (unlimited credits)
     const userEmail = session.user.email;

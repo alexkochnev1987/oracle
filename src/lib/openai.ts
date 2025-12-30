@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { TarotReaderId, getTarotReader } from "./tarot-readers";
-import { getTranslations } from "./i18n";
+import { getTranslations, type Locale } from "./i18n";
 import { buildReadingPrompt } from "./reading-prompt-builder";
 
 // Lazy initialization of OpenAI client to avoid errors during build
@@ -25,12 +25,12 @@ function getOpenAIClient(): OpenAI {
  * Analyzes a user image and returns a textual description.
  * This is the first step in the two-step process for creating readings with images.
  * @param userImageBase64 - Base64 encoded image (with or without data URI prefix)
- * @param locale - Locale for the prompt ("ru" or "en")
+ * @param locale - Locale for the prompt
  * @returns Textual description of the image, or null if analysis fails
  */
 export async function analyzeUserImage(
   userImageBase64: string,
-  locale: "ru" | "en"
+  locale: Locale
 ): Promise<string | null> {
   try {
     const translations = getTranslations(locale);
@@ -97,7 +97,7 @@ export interface CreateReadingParams {
   birthDate: string;
   question: string;
   tarotReaderId: TarotReaderId;
-  locale: "ru" | "en";
+  locale: Locale;
 }
 
 export async function createTarotReading({
@@ -311,7 +311,7 @@ export async function createTarotReadingForTest({
   birthDate: string;
   question: string;
   tarotReaderId: TarotReaderId;
-  locale: "ru" | "en";
+  locale: Locale;
 }): Promise<string> {
   // Get localized tarot reader
   const reader = getTarotReader(tarotReaderId, locale);

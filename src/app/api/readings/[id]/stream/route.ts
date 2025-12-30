@@ -6,6 +6,7 @@ import { createTarotReadingStub } from "@/lib/tarot-reading-stub";
 import { isUserAllowedForAI } from "@/lib/ai-whitelist";
 import { formatDateForAI } from "@/lib/date-validation";
 import { getCardById, formatCardsForPrompt } from "@/lib/tarot-cards";
+import { type Locale, defaultLocale, locales } from "@/lib/i18n";
 
 export async function POST(
   request: Request,
@@ -46,7 +47,9 @@ export async function POST(
     const body = await request.json().catch(() => ({}));
     const imageAnalysisResult = body.imageAnalysisResult || null;
     const isAllowed = body.isAllowed !== undefined ? body.isAllowed : true;
-    const locale = (body.locale as "ru" | "en") || "ru";
+    const validLocale: Locale = (locales as readonly string[]).includes(body.locale as string)
+      ? (body.locale as Locale)
+      : defaultLocale;
 
     // Check if user is in whitelist
     const userEmail = session.user.email;
@@ -63,7 +66,7 @@ export async function POST(
     const cards = selectedCardsArray
       .map((cardId) => getCardById(cardId))
       .filter((card) => card !== undefined);
-    const selectedCardsNames = formatCardsForPrompt(cards as any[], locale);
+    const selectedCardsNames = formatCardsForPrompt(cards as any[], validLocale);
 
     // Create a readable stream for the response
     const stream = new ReadableStream({
@@ -86,7 +89,7 @@ export async function POST(
                 birthDate: formattedDate,
                 question: reading.question,
                 tarotReaderId: reading.tarotReaderId as any,
-                locale,
+                locale: validLocale,
               });
 
               for await (const chunk of streamGenerator) {
@@ -103,7 +106,7 @@ export async function POST(
                 birthDate: formattedDate,
                 question: reading.question,
                 tarotReaderId: reading.tarotReaderId as any,
-                locale,
+                locale: validLocale,
               });
               fullText = stubText;
               controller.enqueue(encoder.encode(stubText));
@@ -116,7 +119,7 @@ export async function POST(
               birthDate: formattedDate,
               question: reading.question,
               tarotReaderId: reading.tarotReaderId as any,
-              locale,
+              locale: validLocale,
             });
             fullText = stubText;
             // Send stub text as single chunk

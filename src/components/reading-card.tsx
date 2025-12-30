@@ -56,7 +56,7 @@ export function ReadingCard({
   };
 
   return (
-    <Link href={href}>
+    <Link href={href} prefetch={true}>
       <Card
         hover
         glow

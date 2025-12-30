@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { FormField } from "@/components/ui/form-field";
-import { createReading } from "@/app/actions/reading";
 import { getTranslations } from "@/lib/i18n";
 import { useLocale } from "@/hooks/use-locale";
 import { getAllTarotReaders } from "@/lib/tarot-readers";
@@ -43,11 +42,6 @@ export default function DashboardPage() {
   const [photoStepCompleted, setPhotoStepCompleted] = useState(false);
   const [spreadCreated, setSpreadCreated] = useState(false);
   const [isStreamingModalOpen, setIsStreamingModalOpen] = useState(false);
-  const [currentReadingId, setCurrentReadingId] = useState<string | null>(null);
-  const [currentImageAnalysisResult, setCurrentImageAnalysisResult] = useState<
-    string | null
-  >(null);
-  const [currentIsAllowed, setCurrentIsAllowed] = useState<boolean>(true);
   const [selectedCards, setSelectedCards] = useState<TarotCard[]>([]);
   const [revealedCardsCount, setRevealedCardsCount] = useState<number>(0);
   const [cardSelectionMode, setCardSelectionMode] = useState<
@@ -360,45 +354,8 @@ export default function DashboardPage() {
       return;
     }
 
-    setIsLoading(true);
-
-    const formData = new FormData();
-    if (userImage) {
-      formData.append("userImage", userImage);
-    }
-
-    // Send selected cards as JSON
-    formData.append(
-      "selectedCards",
-      JSON.stringify(selectedCards.map((card) => card.id))
-    );
-
-    formData.append("cardSelectionMode", cardSelectionMode);
-    formData.append("birthDate", skipDate ? "" : birthDate);
-    formData.append("question", question);
-    formData.append("tarotReaderId", selectedReader);
-    formData.append("locale", locale);
-
-    const result = await createReading(formData);
-
-    setIsLoading(false);
-
-    if (result.success && result.readingId) {
-      // Open streaming modal instead of redirecting
-      setCurrentReadingId(result.readingId);
-      const imageAnalysis =
-        result.imageAnalysisResult !== undefined &&
-        result.imageAnalysisResult !== null
-          ? result.imageAnalysisResult
-          : null;
-      setCurrentImageAnalysisResult(imageAnalysis);
-      setCurrentIsAllowed(
-        result.isAllowed !== undefined ? result.isAllowed : true
-      );
-      setIsStreamingModalOpen(true);
-    } else {
-      setErrors({ general: result.error || "Failed to create reading" });
-    }
+    // Open modal immediately with form data
+    setIsStreamingModalOpen(true);
   };
 
   const hasPhoto = !!(userImage && !skipPhoto);
@@ -648,19 +605,20 @@ export default function DashboardPage() {
       </PageContainer>
 
       {/* Streaming Modal */}
-      {currentReadingId && (
-        <StreamingReadingModal
-          open={isStreamingModalOpen}
-          onOpenChange={setIsStreamingModalOpen}
-          readingId={currentReadingId}
-          imageAnalysisResult={currentImageAnalysisResult}
-          isAllowed={currentIsAllowed}
-          locale={locale}
-          tarotReaderId={selectedReader as any}
-          hasPhoto={hasPhoto}
-          onResetForm={resetForm}
-        />
-      )}
+      <StreamingReadingModal
+        open={isStreamingModalOpen}
+        onOpenChange={setIsStreamingModalOpen}
+        userImage={userImage}
+        selectedCards={selectedCards}
+        birthDate={skipDate ? "" : birthDate}
+        question={question}
+        tarotReaderId={selectedReader as any}
+        cardSelectionMode={cardSelectionMode}
+        skipDate={skipDate}
+        skipPhoto={skipPhoto}
+        locale={locale}
+        onResetForm={resetForm}
+      />
     </div>
   );
 }

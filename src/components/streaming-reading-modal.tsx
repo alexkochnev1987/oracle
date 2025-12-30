@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
@@ -14,65 +14,122 @@ import {
 import { Button } from "@/components/ui/button";
 import { LoadingPhrases } from "@/components/loading-phrases";
 import { TarotReaderId } from "@/lib/tarot-readers";
+import { type TarotCard } from "@/lib/tarot-cards";
 import { Share2, Plus } from "lucide-react";
 import { getTranslations, type Locale } from "@/lib/i18n";
+import { createReading } from "@/app/actions/reading";
 
 interface StreamingReadingModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  readingId: string;
-  imageAnalysisResult: string | null;
-  isAllowed: boolean;
-  locale: Locale;
+  userImage: string;
+  selectedCards: TarotCard[];
+  birthDate: string;
+  question: string;
   tarotReaderId: TarotReaderId;
-  hasPhoto: boolean;
+  cardSelectionMode: "random" | "manual";
+  skipDate: boolean;
+  skipPhoto: boolean;
+  locale: Locale;
   onResetForm: () => void;
 }
 
 export function StreamingReadingModal({
   open,
   onOpenChange,
-  readingId,
-  imageAnalysisResult,
-  isAllowed,
-  locale,
+  userImage,
+  selectedCards,
+  birthDate,
+  question,
   tarotReaderId,
-  hasPhoto,
+  cardSelectionMode,
+  skipDate,
+  skipPhoto,
+  locale,
   onResetForm,
 }: StreamingReadingModalProps) {
-  const router = useRouter();
   const t = getTranslations(locale);
-  const [stage, setStage] = useState<"analyzing" | "streaming" | "completed">(
-    "analyzing"
-  );
+  const [stage, setStage] = useState<
+    "analyzing" | "creating" | "streaming" | "completed"
+  >("analyzing");
   const [streamingText, setStreamingText] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamError, setStreamError] = useState<string | null>(null);
-  const hasStartedStreaming = useRef(false);
+  const [readingId, setReadingId] = useState<string | null>(null);
+  const [imageAnalysisResult, setImageAnalysisResult] = useState<string | null>(
+    null
+  );
+  const [isAllowed, setIsAllowed] = useState<boolean>(true);
+  const hasStartedProcess = useRef(false);
 
-  // Reset state when modal opens
-  useEffect(() => {
-    if (open) {
-      setStage("analyzing");
-      setStreamingText("");
-      setIsStreaming(false);
-      setStreamError(null);
-      hasStartedStreaming.current = false;
+  const hasPhoto = !!(userImage && !skipPhoto);
 
-      // Start streaming after a short delay to show LoadingPhrases
-      const timer = setTimeout(() => {
-        if (!hasStartedStreaming.current) {
-          hasStartedStreaming.current = true;
-          setStage("streaming");
-          startStreaming();
-        }
-      }, 2000); // Show LoadingPhrases for 2 seconds
+  const analyzeImage = async (imageBase64: string): Promise<string | null> => {
+    try {
+      const response = await fetch("/api/analyze-image", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userImage: imageBase64,
+          locale,
+        }),
+      });
 
-      return () => clearTimeout(timer);
+      if (!response.ok) {
+        throw new Error("Failed to analyze image");
+      }
+
+      const data = await response.json();
+      return data.success ? data.imageAnalysisResult : null;
+    } catch (error) {
+      console.error("Image analysis failed:", error);
+      return null;
     }
-  }, [open]);
+  };
 
-  const startStreaming = async () => {
+  const createReadingRecord = async (
+    analysisResult: string | null
+  ): Promise<string | null> => {
+    try {
+      const formData = new FormData();
+      if (userImage && !skipPhoto) {
+        formData.append("userImage", userImage);
+      }
+
+      formData.append(
+        "selectedCards",
+        JSON.stringify(selectedCards.map((card) => card.id))
+      );
+
+      formData.append("cardSelectionMode", cardSelectionMode);
+      formData.append("birthDate", skipDate ? "" : birthDate);
+      formData.append("question", question);
+      formData.append("tarotReaderId", tarotReaderId);
+      formData.append("locale", locale);
+
+      const result = await createReading(formData);
+
+      if (result.success && result.readingId) {
+        setIsAllowed(result.isAllowed !== undefined ? result.isAllowed : true);
+        return result.readingId;
+      } else {
+        throw new Error(result.error || "Failed to create reading");
+      }
+    } catch (error) {
+      console.error("Error creating reading:", error);
+      setStreamError(
+        error instanceof Error ? error.message : "Failed to create reading"
+      );
+      return null;
+    }
+  };
+
+  const startStreaming = async (
+    readingId: string,
+    analysisResult: string | null
+  ) => {
     setIsStreaming(true);
     setStreamError(null);
     setStreamingText("");
@@ -84,7 +141,7 @@ export function StreamingReadingModal({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          imageAnalysisResult: imageAnalysisResult || null,
+          imageAnalysisResult: analysisResult || null,
           isAllowed,
           locale,
         }),
@@ -127,10 +184,50 @@ export function StreamingReadingModal({
     }
   };
 
-  const handleShare = () => {
-    onOpenChange(false);
-    router.push(`/readings/${readingId}`);
-  };
+  // Process: analyze image (if photo) -> create reading -> stream
+  useEffect(() => {
+    if (open && !hasStartedProcess.current) {
+      hasStartedProcess.current = true;
+      setStreamingText("");
+      setIsStreaming(false);
+      setStreamError(null);
+      setReadingId(null);
+      setImageAnalysisResult(null);
+
+      const processReading = async () => {
+        let analysisResult: string | null = null;
+
+        // Step 1: Analyze image if photo exists
+        if (hasPhoto && userImage) {
+          setStage("analyzing");
+          analysisResult = await analyzeImage(userImage);
+          setImageAnalysisResult(analysisResult);
+        }
+
+        // Step 2: Create reading
+        setStage("creating");
+        const newReadingId = await createReadingRecord(analysisResult);
+
+        if (!newReadingId) {
+          setStage("completed");
+          return;
+        }
+
+        setReadingId(newReadingId);
+
+        // Step 3: Start streaming
+        setStage("streaming");
+        await startStreaming(newReadingId, analysisResult);
+      };
+
+      processReading();
+    } else if (!open) {
+      // Reset when modal closes
+      hasStartedProcess.current = false;
+      setStage("analyzing");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, hasPhoto, userImage]);
 
   const handleCreateNew = () => {
     onOpenChange(false);
@@ -152,73 +249,73 @@ export function StreamingReadingModal({
           </SheetHeader>
 
           <div>
-          {stage === "analyzing" && (
-            <LoadingPhrases
-              tarotReaderId={tarotReaderId}
-              locale={locale}
-              hasPhoto={hasPhoto}
-            />
-          )}
+            {(stage === "analyzing" ||
+              stage === "creating" ||
+              (stage === "streaming" && !streamingText)) && (
+              <LoadingPhrases
+                tarotReaderId={tarotReaderId}
+                locale={locale}
+                hasPhoto={stage === "analyzing" && hasPhoto}
+              />
+            )}
 
-          {stage === "streaming" && (
-            <div className="space-y-4">
-              {streamError ? (
-                <div className="text-red-400 text-center">{streamError}</div>
-              ) : (
-                <div className="prose prose-invert max-w-none text-[#e5e7eb]">
-                  {streamingText ? (
-                    <>
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {streamingText}
-                      </ReactMarkdown>
-                      {isStreaming && (
-                        <span className="inline-block w-2 h-5 bg-[rgba(100,200,255,0.8)] animate-pulse ml-1" />
-                      )}
-                    </>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <div className="animate-pulse">●</div>
-                      <span className="text-[#9ca3af]">
-                        {t.loadingPhrases[tarotReaderId]?.loadingText || t.common.loading}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-
-          {stage === "completed" && (
-            <div className="space-y-6">
-              <div className="prose prose-invert max-w-none text-[#e5e7eb]">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {streamingText}
-                </ReactMarkdown>
+            {stage === "streaming" && streamingText && (
+              <div className="space-y-4">
+                {streamError ? (
+                  <div className="text-red-400 text-center">{streamError}</div>
+                ) : (
+                  <div className="prose prose-invert max-w-none text-[#e5e7eb]">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {streamingText}
+                    </ReactMarkdown>
+                    {isStreaming && (
+                      <span className="inline-block w-2 h-5 bg-[rgba(100,200,255,0.8)] animate-pulse ml-1" />
+                    )}
+                  </div>
+                )}
               </div>
-              <SheetFooter className="mt-6 gap-3 sm:gap-0">
-                <Button
-                  onClick={handleShare}
-                  variant="primary"
-                  className="w-full sm:w-auto"
-                  icon={<Share2 className="h-4 w-4" />}
-                >
-                  {t.common.share}
-                </Button>
-                <Button
-                  onClick={handleCreateNew}
-                  variant="secondary"
-                  className="w-full sm:w-auto"
-                  icon={<Plus className="h-4 w-4" />}
-                >
-                  {locale === "ru" ? "Создать новый прогноз" : "Create new reading"}
-                </Button>
-              </SheetFooter>
-            </div>
-          )}
+            )}
+
+            {stage === "completed" && (
+              <div className="space-y-6">
+                <div className="prose prose-invert max-w-none text-[#e5e7eb]">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {streamingText}
+                  </ReactMarkdown>
+                </div>
+                <SheetFooter className="mt-6 gap-3 sm:gap-0">
+                  {readingId ? (
+                    <Link
+                      href={`/readings/${readingId}`}
+                      prefetch={true}
+                      onClick={() => onOpenChange(false)}
+                      className="w-full sm:w-auto"
+                    >
+                      <Button
+                        variant="primary"
+                        className="w-full sm:w-auto"
+                        icon={<Share2 className="h-4 w-4" />}
+                      >
+                        {t.common.share}
+                      </Button>
+                    </Link>
+                  ) : null}
+                  <Button
+                    onClick={handleCreateNew}
+                    variant="secondary"
+                    className="w-full sm:w-auto"
+                    icon={<Plus className="h-4 w-4" />}
+                  >
+                    {locale === "ru"
+                      ? "Создать новый прогноз"
+                      : "Create new reading"}
+                  </Button>
+                </SheetFooter>
+              </div>
+            )}
           </div>
         </div>
       </SheetContent>
     </Sheet>
   );
 }
-

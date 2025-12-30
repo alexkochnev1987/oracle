@@ -109,6 +109,7 @@ export function Navbar() {
               {/* Readings - Always show, most important */}
               <Link
                 href="/readings"
+                prefetch={true}
                 className={cn(
                   "px-2.5 lg:px-3 xl:px-4 py-2 text-sm lg:text-base text-white hover:text-[rgba(100,200,255,0.8)] hover:bg-[rgba(100,200,255,0.1)] rounded-xl transition-colors min-h-[44px] flex items-center whitespace-nowrap flex-shrink-0",
                   pathname.startsWith("/readings") && "font-bold"
@@ -195,6 +196,7 @@ export function Navbar() {
                   </Link>
                   <Link
                     href="/readings"
+                    prefetch={true}
                     className="flex items-center gap-3 px-4 py-3 text-white hover:text-[rgba(100,200,255,0.8)] hover:bg-[rgba(100,200,255,0.1)] rounded-xl transition-colors min-h-[44px]"
                   >
                     <User className="h-5 w-5 text-[rgba(100,200,255,0.8)] flex-shrink-0" />
