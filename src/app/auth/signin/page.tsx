@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getTranslations } from "@/lib/i18n";
 import { useLocale } from "@/hooks/use-locale";
+import { PageContainer } from "@/components/page-container";
 
 export default function SignInPage() {
   const [locale] = useLocale();
@@ -14,7 +15,7 @@ export default function SignInPage() {
   return (
     <div className="min-h-screen mystical-gradient">
       <Navbar />
-      <main className="container mx-auto flex min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] items-center justify-center px-4">
+      <PageContainer className="flex min-h-[calc(100vh-3.5rem)] sm:min-h-[calc(100vh-4rem)] items-center justify-center">
         <Card className="w-full max-w-md p-6 sm:p-8">
           <h1 className="mb-4 sm:mb-6 text-center text-2xl sm:text-3xl font-bold text-white">
             {t.auth.signInTitle}
@@ -31,7 +32,7 @@ export default function SignInPage() {
             {t.auth.signInWithGoogle}
           </Button>
         </Card>
-      </main>
+      </PageContainer>
     </div>
   );
 }

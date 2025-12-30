@@ -85,23 +85,25 @@ export function ImageUpload({
 
   return (
     <div className={cn("space-y-2 sm:space-y-3", className)}>
-      <div className="flex items-center justify-between">
-        <label className="block text-sm sm:text-base font-medium text-white">
-          {label}
-        </label>
-        {onSkipPhotoChange && (
-          <label className={cn("flex items-center gap-2", disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer")}>
-            <Checkbox
-              checked={skipPhoto || false}
-              onChange={handleSkipPhotoChange}
-              disabled={disabled}
-            />
-            <span className="text-sm text-[rgba(100,200,255,0.8)]">
-              {skipPhotoLabel || t.common.skip}
-            </span>
+      {label && (
+        <div className="flex items-center justify-between">
+          <label className="block text-sm sm:text-base font-medium text-white">
+            {label}
           </label>
-        )}
-      </div>
+          {onSkipPhotoChange && (
+            <label className={cn("flex items-center gap-2", disabled ? "cursor-not-allowed opacity-50" : "cursor-pointer")}>
+              <Checkbox
+                checked={skipPhoto || false}
+                onChange={handleSkipPhotoChange}
+                disabled={disabled}
+              />
+              <span className="text-sm text-[rgba(100,200,255,0.8)]">
+                {skipPhotoLabel || t.common.skip}
+              </span>
+            </label>
+          )}
+        </div>
+      )}
       <div className="relative">
         {value && !skipPhoto ? (
           <div

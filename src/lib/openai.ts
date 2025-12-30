@@ -181,7 +181,7 @@ export async function createTarotReading({
         ],
       },
     ],
-    max_tokens: 2000,
+    max_tokens: 1000,
     temperature: 0.8,
   });
 
@@ -192,6 +192,104 @@ export async function createTarotReading({
   }
 
   return predictionText;
+}
+
+/**
+ * Creates a streaming tarot reading using OpenAI streaming API.
+ * Returns an async iterable that yields text chunks as they are generated.
+ * @param params - Reading parameters
+ * @returns AsyncIterable that yields text chunks
+ */
+export async function* createTarotReadingStream({
+  userImageBase64,
+  imageAnalysisResult: providedImageAnalysisResult,
+  selectedCardsNames,
+  birthDate,
+  question,
+  tarotReaderId,
+  locale,
+}: CreateReadingParams): AsyncGenerator<string, void, unknown> {
+  // Step 1: Analyze image if provided and not already analyzed
+  let imageAnalysisResult: string | null = providedImageAnalysisResult || null;
+  if (userImageBase64 && !imageAnalysisResult) {
+    try {
+      console.log("Starting image analysis...");
+      imageAnalysisResult = await analyzeUserImage(userImageBase64, locale);
+      if (!imageAnalysisResult) {
+        console.warn(
+          "Image analysis returned null, continuing without photo analysis"
+        );
+      } else {
+        console.log("Image analysis completed successfully");
+      }
+    } catch (error) {
+      console.warn(
+        "Image analysis failed, continuing without photo:",
+        error instanceof Error ? error.message : error
+      );
+      // Continue without photo - not critical for prediction
+    }
+  } else if (imageAnalysisResult) {
+    console.log("Using pre-analyzed image result");
+  }
+
+  // Get localized tarot reader
+  const reader = getTarotReader(tarotReaderId, locale);
+
+  // Get translations
+  const translations = getTranslations(locale);
+  const responseLanguage = translations.promptLanguage.responseLanguage;
+  const addressForm = translations.promptLanguage.addressForm;
+  const firstPerson = translations.promptLanguage.firstPerson;
+  const mantraTitle = translations.mantra.title;
+
+  // Step 2: Build reading prompt with image analysis result (if available)
+  const textPrompt = buildReadingPrompt({
+    birthDate,
+    question,
+    userImageBase64: imageAnalysisResult ? undefined : userImageBase64,
+    imageAnalysisResult: imageAnalysisResult || undefined,
+    selectedCardsNames,
+    locale,
+    addressForm,
+    firstPerson,
+    responseLanguage,
+    mantraTitle,
+  });
+
+  // Step 3: Create streaming prediction request
+  const systemMessageContent = reader.systemPrompt;
+
+  const openai = getOpenAIClient();
+  const stream = await openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      {
+        role: "system",
+        content: systemMessageContent,
+      },
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: textPrompt,
+          },
+        ],
+      },
+    ],
+    max_tokens: 1000,
+    temperature: 0.8,
+    stream: true,
+  });
+
+  // Yield text chunks as they arrive
+  for await (const chunk of stream) {
+    const content = chunk.choices[0]?.delta?.content || "";
+    if (content) {
+      yield content;
+    }
+  }
 }
 
 /**
@@ -260,7 +358,7 @@ export async function createTarotReadingForTest({
         ],
       },
     ],
-    max_tokens: 2000,
+    max_tokens: 1000,
     temperature: 0.8,
   });
 

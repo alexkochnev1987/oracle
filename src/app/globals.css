@@ -194,6 +194,18 @@
   }
 }
 
+/* Cards fade-in animation for dashboard */
+@keyframes fadeInUpCards {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Markdown styles for reading text */
 .prose-invert {
   --tw-prose-body: #e5e7eb;

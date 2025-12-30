@@ -19,6 +19,7 @@ export const translations = {
       subtitle: "Создайте свой персонализированный прогноз на Новый Год",
       uploadUserPhoto: "Загрузите ваше фото",
       skipPhoto: "Без фото",
+      skipDate: "Без даты",
       uploadCardsPhoto:
         "Загрузите фото расклада карт или выберите случайный расклад",
       birthDate: "Дата рождения",
@@ -357,7 +358,7 @@ export const translations = {
       finalSynthesis: {
         title: "ФИНАЛЬНЫЙ СИНТЕЗ:",
         description:
-          "Твое заключение ДОЛЖНО быть структурировано следующим образом. Весь ответ должен быть детальным и развернутым (минимум 600-900 слов общего текста).",
+          "Твое заключение ДОЛЖНО быть структурировано следующим образом. Весь ответ должен быть детальным и развернутым (минимум 300-450 слов общего текста).",
         threeCardsTitle: "### 📜 Чтение трех карт",
         card1Title: "**Карта 1 - Прошлое/Основа:**",
         card1List: [
@@ -382,7 +383,7 @@ export const translations = {
         ],
         synthesisTitle: "### 💫 Прогноз",
         synthesisDescription:
-          'Предоставь четкий, обоснованный и детальный ответ на вопрос "{question}" (минимум 225-300 слов):',
+          'Предоставь четкий, обоснованный и детальный ответ на вопрос "{question}" (минимум 112-150 слов):',
         synthesisList: [
           "Синтезируй все три карты в связное, развернутое повествование",
           "Свяжи с текущей энергией и внешностью человека (если фото предоставлено)",
@@ -414,7 +415,7 @@ export const translations = {
         language:
           "ЯЗЫК: ВАЖНО - Ты ДОЛЖЕН отвечать полностью на {responseLanguage}. Весь твой текст, включая названия карт, интерпретации и советы, должен быть на {responseLanguage}.",
         length:
-          "ДЛИНА: Твой ответ должен быть детальным и развернутым. Минимум 600-900 слов общего текста. Каждая карта должна быть описана минимум 110-150 словами. Прогноз должен быть минимум 225-300 слов. Не пиши краткие ответы - дай полный, глубокий анализ.",
+          "ДЛИНА: Твой ответ должен быть детальным и развернутым. Минимум 300-450 слов общего текста. Каждая карта должна быть описана минимум 55-75 словами. Прогноз должен быть минимум 112-150 слов. Не пиши краткие ответы - дай полный, глубокий анализ.",
         probabilities:
           "ВЕРОЯТНОСТИ: ВСЕГДА используй вероятностные формулировки вместо утверждений. Используй 'вероятно', 'может быть', 'склоняется к', 'возможно', вместо 'будет', 'произойдет', 'гарантированно'. НИКОГДА не утверждай конкретные даты или исходы без вероятностей. НИКОГДА не упоминай конкретные годы (например, '2024', '2025') в ответе. Для мистического продукта вероятность важнее утверждения.",
         noYears:
@@ -697,6 +698,7 @@ ARCHETYPE: PROBABILITY ENGINE
     // Loading Phrases
     loadingPhrases: {
       "cosmic-oracle": {
+        loadingText: "Читаю карты...",
         imageAnalysis: [
           "Запрос отправлен в глубины Вселенной…",
           "Сознание настраивается на галактические потоки…",
@@ -719,6 +721,7 @@ ARCHETYPE: PROBABILITY ENGINE
         ],
       },
       "astral-sorcerer": {
+        loadingText: "Открываю арканы...",
         imageAnalysis: [
           "Открываю астральный круг…",
           "Считываю натальную матрицу…",
@@ -741,6 +744,7 @@ ARCHETYPE: PROBABILITY ENGINE
         ],
       },
       "alien-seer": {
+        loadingText: "Сканирую...",
         imageAnalysis: [
           "Инициализация наблюдения за человеческой сущностью…",
           "Сканирование временной линии…",
@@ -763,6 +767,7 @@ ARCHETYPE: PROBABILITY ENGINE
         ],
       },
       "mechanical-prophet": {
+        loadingText: "Обрабатываю...",
         imageAnalysis: [
           "Scanning input parameters…",
           "Birth data synchronized.",
@@ -801,6 +806,7 @@ ARCHETYPE: PROBABILITY ENGINE
       subtitle: "Create your personalized New Year reading",
       uploadUserPhoto: "Upload your photo",
       skipPhoto: "Without photo",
+      skipDate: "Skip date",
       uploadCardsPhoto: "Upload Tarot cards photo or select random spread",
       birthDate: "Birth Date",
       question: "Question (select or enter your own)",
@@ -1133,7 +1139,7 @@ ARCHETYPE: PROBABILITY ENGINE
       finalSynthesis: {
         title: "FINAL SYNTHESIS:",
         description:
-          "Your conclusion MUST be structured as follows. The entire response must be detailed and comprehensive (minimum 600-900 words total text).",
+          "Your conclusion MUST be structured as follows. The entire response must be detailed and comprehensive (minimum 300-450 words total text).",
         threeCardsTitle: "### 📜 The Three Cards Reading",
         card1Title: "**Card 1 - Past/Foundation:**",
         card1List: [
@@ -1158,7 +1164,7 @@ ARCHETYPE: PROBABILITY ENGINE
         ],
         synthesisTitle: "### 💫 Forecast",
         synthesisDescription:
-          'Provide a clear, grounded, and detailed answer to the question "{question}" (minimum 225-300 words):',
+          'Provide a clear, grounded, and detailed answer to the question "{question}" (minimum 112-150 words):',
         synthesisList: [
           "Synthesize all three cards into a coherent, detailed narrative",
           "Connect to the person's current energy and appearance (if photo provided)",
@@ -1190,7 +1196,7 @@ ARCHETYPE: PROBABILITY ENGINE
         language:
           "LANGUAGE: IMPORTANT - You MUST respond entirely in {responseLanguage}. All your text, including card names, interpretations, and advice, must be in {responseLanguage}.",
         length:
-          "LENGTH: Your response must be detailed and comprehensive. Minimum 600-900 words total text. Each card must be described in minimum 110-150 words. The forecast must be minimum 225-300 words. Do not write brief answers - give a full, deep analysis.",
+          "LENGTH: Your response must be detailed and comprehensive. Minimum 300-450 words total text. Each card must be described in minimum 55-75 words. The forecast must be minimum 112-150 words. Do not write brief answers - give a full, deep analysis.",
         probabilities:
           "PROBABILITIES: ALWAYS use probabilistic formulations instead of certainties. Use 'likely', 'may be', 'tends toward', 'possibly', instead of 'will', 'will happen', 'guaranteed'. NEVER assert specific dates or outcomes without probabilities. NEVER mention specific years (e.g., '2024', '2025') in your response. For a mystical product, probability is more important than certainty.",
         noYears:
@@ -1473,6 +1479,7 @@ TONE OF VOICE:
     // Loading Phrases
     loadingPhrases: {
       "cosmic-oracle": {
+        loadingText: "Reading cards...",
         imageAnalysis: [
           "Request sent to the depths of the Universe…",
           "Consciousness tuning to galactic streams…",
@@ -1495,6 +1502,7 @@ TONE OF VOICE:
         ],
       },
       "astral-sorcerer": {
+        loadingText: "Opening arcana...",
         imageAnalysis: [
           "Opening the astral circle…",
           "Reading the natal matrix…",
@@ -1517,6 +1525,7 @@ TONE OF VOICE:
         ],
       },
       "alien-seer": {
+        loadingText: "Scanning...",
         imageAnalysis: [
           "Initializing observation of human essence…",
           "Scanning temporal line…",
@@ -1539,6 +1548,7 @@ TONE OF VOICE:
         ],
       },
       "mechanical-prophet": {
+        loadingText: "Processing...",
         imageAnalysis: [
           "Scanning input parameters…",
           "Birth data synchronized.",
@@ -1577,6 +1587,7 @@ TONE OF VOICE:
       subtitle: "Стварыце свой персаналізаваны прагноз на Новы Год",
       uploadUserPhoto: "Загрузіце ваша фота",
       skipPhoto: "Без фота",
+      skipDate: "Без даты",
       uploadCardsPhoto:
         "Загрузіце фота раскладу карт або выберыце выпадковы расклад",
       birthDate: "Дата нараджэння",
@@ -1912,7 +1923,7 @@ TONE OF VOICE:
       finalSynthesis: {
         title: "ФІНАЛЬНЫ СІНТЭЗ:",
         description:
-          "Тваё заключэнне ДОЛЖНА быць структуравана наступным чынам. Увесь адказ павінен быць дэтальным і разгорнутым (мінімум 600-900 слоў агульнага тэксту).",
+          "Тваё заключэнне ДОЛЖНА быць структуравана наступным чынам. Увесь адказ павінен быць дэтальным і разгорнутым (мінімум 300-450 слоў агульнага тэксту).",
         threeCardsTitle: "### 📜 Чытанне трох карт",
         card1Title: "**Карта 1 - Мінулае/Аснова:**",
         card1List: [
@@ -1937,7 +1948,7 @@ TONE OF VOICE:
         ],
         synthesisTitle: "### 💫 Прагноз",
         synthesisDescription:
-          'Прадставь чысты, абгрунтаваны і дэтальны адказ на пытанне "{question}" (мінімум 225-300 слоў):',
+          'Прадставь чысты, абгрунтаваны і дэтальны адказ на пытанне "{question}" (мінімум 112-150 слоў):',
         synthesisList: [
           "Сінтэзуй усе тры карты ў звязанае, разгорнутае апавяданне",
           "Звяжы з бягучай энергіяй і вонкавасцю чалавека (калі фота прадстаўлена)",
@@ -1969,7 +1980,7 @@ TONE OF VOICE:
         language:
           "МОВА: ВАЖНА - Ты ДОЛЖАН адказваць цалкам на {responseLanguage}. Увесь твой тэкст, уключаючы назвы карт, інтэрпрэтацыі і парады, павінен быць на {responseLanguage}.",
         length:
-          "ДАЎЖЫНЯ: Твой адказ павінен быць дэтальным і разгорнутым. Мінімум 600-900 слоў агульнага тэксту. Кожная карта павінна быць апісана мінімум 110-150 словамі. Прагноз павінен быць мінімум 225-300 слоў. Не пішы кароткія адказы - дай поўны, глыбокі аналіз.",
+          "ДАЎЖЫНЯ: Твой адказ павінен быць дэтальным і разгорнутым. Мінімум 300-450 слоў агульнага тэксту. Кожная карта павінна быць апісана мінімум 55-75 словамі. Прагноз павінен быць мінімум 112-150 слоў. Не пішы кароткія адказы - дай поўны, глыбокі аналіз.",
         probabilities:
           "ВЕРАГОДНАСЦІ: ЗАВСЕГДЫ выкарыстоўвай верагоднасныя фармулёўкі замест сцвярджэнняў. Выкарыстоўвай 'верагодна', 'можа быць', 'схіляецца да', 'магчыма', замест 'будзе', 'адбудзецца', 'гарантавана'. НІКОГДЫ не сцвярджай канкрэтныя даты або вынікі без верагоднасцяў. НІКОГДЫ не ўзгадвай канкрэтныя гады (напрыклад, '2024', '2025') у адказе. Для містычнага прадукту верагоднасць важнейшая за сцвярджэнне.",
         noYears:
@@ -2251,6 +2262,7 @@ ARCHETYPE: PROBABILITY ENGINE
     // Loading Phrases
     loadingPhrases: {
       "cosmic-oracle": {
+        loadingText: "Чытаю карты...",
         imageAnalysis: [
           "Запыт адпраўлены ў глыбіні Сусвету…",
           "Свядомасць настройваецца на галактычныя патокі…",
@@ -2273,6 +2285,7 @@ ARCHETYPE: PROBABILITY ENGINE
         ],
       },
       "astral-sorcerer": {
+        loadingText: "Адкрываю арканы...",
         imageAnalysis: [
           "Адкрываю астральны круг…",
           "Счытваю натальную матрыцу…",
@@ -2295,6 +2308,7 @@ ARCHETYPE: PROBABILITY ENGINE
         ],
       },
       "alien-seer": {
+        loadingText: "Сканую...",
         imageAnalysis: [
           "Ініцыялізацыя назірання за чалавечай сутнасцю…",
           "Сканаванне часовой лініі…",
@@ -2317,6 +2331,7 @@ ARCHETYPE: PROBABILITY ENGINE
         ],
       },
       "mechanical-prophet": {
+        loadingText: "Апрацоўваю...",
         imageAnalysis: [
           "Сканаванне ўваходных параметраў…",
           "Даныя нараджэння сінхранізаваны.",

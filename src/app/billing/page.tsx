@@ -8,6 +8,7 @@ import { Sparkles, CreditCard } from "lucide-react";
 import { getTranslations } from "@/lib/i18n";
 import { useLocale } from "@/hooks/use-locale";
 import { createCheckoutSession } from "@/app/actions/billing";
+import { PageContainer } from "@/components/page-container";
 
 export default function BillingPage() {
   const [locale] = useLocale();
@@ -40,8 +41,7 @@ export default function BillingPage() {
   return (
     <div className="min-h-screen mystical-gradient">
       <Navbar />
-      <main className="container mx-auto px-4 py-6 sm:py-8">
-        <div className="mx-auto max-w-4xl">
+      <PageContainer maxWidth="4xl">
           <h1 className="mb-6 sm:mb-8 text-3xl sm:text-4xl font-bold text-white">
             {t.billing.title}
           </h1>
@@ -113,8 +113,7 @@ export default function BillingPage() {
               <strong>{t.common.note}</strong> {t.billing.note}
             </p>
           </Card>
-        </div>
-      </main>
+      </PageContainer>
     </div>
   );
 }

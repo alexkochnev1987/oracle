@@ -1,0 +1,21 @@
+# Allow all search engines to crawl the site
+User-agent: *
+Allow: /
+
+# Disallow private/admin areas
+Disallow: /api/
+Disallow: /auth/
+Disallow: /dashboard/
+Disallow: /billing/
+Disallow: /readings/*/email
+
+# Allow public reading pages
+Allow: /readings/
+Allow: /readings/share/
+
+# Sitemap location
+Sitemap: https://new-year-oracle.vercel.app/sitemap.xml
+
+# Crawl-delay (optional, helps prevent overloading server)
+Crawl-delay: 1
+

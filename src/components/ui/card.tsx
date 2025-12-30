@@ -16,7 +16,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         hover &&
           "hover:border-[rgba(100,200,255,0.6)] hover:-translate-y-0.5 hover:shadow-lg",
         glow && "mystical-glow",
-        "p-5 sm:p-6 md:p-8",
+        "p-4 sm:p-5 md:p-6",
         className
       )}
       {...props}

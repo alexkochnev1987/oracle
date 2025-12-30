@@ -27,6 +27,9 @@ import {
 import { ErrorMessage } from "@/components/ui/error-message";
 import { CreditsWarning } from "@/components/credits-warning";
 import { LoadingPhrases } from "@/components/loading-phrases";
+import { StreamingReadingModal } from "@/components/streaming-reading-modal";
+import { Checkbox } from "@/components/ui/checkbox";
+import { PageContainer } from "@/components/page-container";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -35,9 +38,16 @@ export default function DashboardPage() {
   const t = getTranslations(locale);
   const [createReadingAttempted, setCreateReadingAttempted] = useState(false);
   const [userImage, setUserImage] = useState<string>("");
-  const [skipPhoto, setSkipPhoto] = useState(false);
+  const [skipPhoto, setSkipPhoto] = useState(true); // Default: skip photo
+  const [skipDate, setSkipDate] = useState(true); // Default: skip date
   const [photoStepCompleted, setPhotoStepCompleted] = useState(false);
   const [spreadCreated, setSpreadCreated] = useState(false);
+  const [isStreamingModalOpen, setIsStreamingModalOpen] = useState(false);
+  const [currentReadingId, setCurrentReadingId] = useState<string | null>(null);
+  const [currentImageAnalysisResult, setCurrentImageAnalysisResult] = useState<
+    string | null
+  >(null);
+  const [currentIsAllowed, setCurrentIsAllowed] = useState<boolean>(true);
   const [selectedCards, setSelectedCards] = useState<TarotCard[]>([]);
   const [revealedCardsCount, setRevealedCardsCount] = useState<number>(0);
   const [cardSelectionMode, setCardSelectionMode] = useState<
@@ -61,9 +71,9 @@ export default function DashboardPage() {
     question: false,
   });
 
-  // Check if date and question are completed
+  // Check if date and question are completed (date is optional if skipDate is true)
   const dateAndQuestionCompleted =
-    birthDate.trim().length > 0 && question.trim().length > 0;
+    (skipDate || birthDate.trim().length > 0) && question.trim().length > 0;
 
   // Check if user is in whitelist (unlimited credits)
   const isWhitelisted = session?.user?.email
@@ -97,6 +107,33 @@ export default function DashboardPage() {
     setTouched((prev) => ({ ...prev, photo: true }));
   };
 
+  // Handle skip date checkbox
+  const handleSkipDateChange = (skip: boolean) => {
+    setSkipDate(skip);
+    if (skip) {
+      setBirthDate("");
+    }
+    setTouched((prev) => ({ ...prev, birthDate: true }));
+  };
+
+  // Reset form function
+  const resetForm = () => {
+    setUserImage("");
+    setSkipPhoto(true);
+    setSkipDate(true);
+    setPhotoStepCompleted(false);
+    setSpreadCreated(false);
+    setSelectedCards([]);
+    setRevealedCardsCount(0);
+    setCardSelectionMode("random");
+    setBirthDate("");
+    setQuestion(t.dashboard.questionPlaceholder);
+    setErrors({});
+    setCreateSpreadAttempted(false);
+    setCreateReadingAttempted(false);
+    setTouched({ photo: false, birthDate: false, question: false });
+  };
+
   // Handle step 1: create spread - validate only photo, date, question
   const handleCreateSpread = () => {
     setCreateSpreadAttempted(true);
@@ -105,18 +142,20 @@ export default function DashboardPage() {
     // Collect validation errors
     const newErrors: Record<string, string> = {};
 
-    // Validate photo step
-    if (!photoStepCompleted) {
+    // Validate photo step only if skipPhoto is false
+    if (!skipPhoto && !photoStepCompleted) {
       newErrors.photo = t.dashboard.errors.uploadPhoto;
     }
 
-    // Validate birth date
-    if (!birthDate.trim()) {
-      newErrors.birthDate = t.dashboard.errors.fillBirthDate;
-    } else {
-      const validationError = validateDate(birthDate);
-      if (validationError) {
-        newErrors.birthDate = validationError;
+    // Validate birth date only if skipDate is false
+    if (!skipDate) {
+      if (!birthDate.trim()) {
+        newErrors.birthDate = t.dashboard.errors.fillBirthDate;
+      } else {
+        const validationError = validateDate(birthDate);
+        if (validationError) {
+          newErrors.birthDate = validationError;
+        }
       }
     }
 
@@ -235,9 +274,15 @@ export default function DashboardPage() {
     const updatedErrors = { ...errors };
     let hasChanges = false;
 
-    // Clear photo error when photo step is completed
+    // Clear photo error when photo step is completed or skipPhoto is true
     if ((photoStepCompleted || skipPhoto) && updatedErrors.photo) {
       delete updatedErrors.photo;
+      hasChanges = true;
+    }
+
+    // Clear date error when date is filled or skipDate is true
+    if ((skipDate || birthDate.trim()) && updatedErrors.birthDate) {
+      delete updatedErrors.birthDate;
       hasChanges = true;
     }
 
@@ -265,6 +310,8 @@ export default function DashboardPage() {
   }, [
     photoStepCompleted,
     skipPhoto,
+    skipDate,
+    birthDate,
     question,
     spreadCreated,
     selectedCards.length,
@@ -277,9 +324,9 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen mystical-gradient">
         <Navbar />
-        <div className="container mx-auto px-4 py-16">
+        <PageContainer paddingBottom="pb-16">
           <div className="h-96 w-full bg-black/40 rounded-lg animate-pulse" />
-        </div>
+        </PageContainer>
       </div>
     );
   }
@@ -327,7 +374,7 @@ export default function DashboardPage() {
     );
 
     formData.append("cardSelectionMode", cardSelectionMode);
-    formData.append("birthDate", birthDate);
+    formData.append("birthDate", skipDate ? "" : birthDate);
     formData.append("question", question);
     formData.append("tarotReaderId", selectedReader);
     formData.append("locale", locale);
@@ -336,8 +383,19 @@ export default function DashboardPage() {
 
     setIsLoading(false);
 
-    if (result.success) {
-      router.push(`/readings/${result.readingId}`);
+    if (result.success && result.readingId) {
+      // Open streaming modal instead of redirecting
+      setCurrentReadingId(result.readingId);
+      const imageAnalysis =
+        result.imageAnalysisResult !== undefined &&
+        result.imageAnalysisResult !== null
+          ? result.imageAnalysisResult
+          : null;
+      setCurrentImageAnalysisResult(imageAnalysis);
+      setCurrentIsAllowed(
+        result.isAllowed !== undefined ? result.isAllowed : true
+      );
+      setIsStreamingModalOpen(true);
     } else {
       setErrors({ general: result.error || "Failed to create reading" });
     }
@@ -348,29 +406,35 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen mystical-gradient">
       <Navbar />
-      <main className="container mx-auto px-4 py-6 sm:py-8">
-        <div className="mx-auto max-w-3xl">
-          <div className="mb-6 sm:mb-8 text-center">
-            <h1 className="mb-2 text-3xl sm:text-4xl md:text-5xl font-bold text-white">
-              {t.dashboard.title}
-            </h1>
-            <p className="text-sm sm:text-base text-[#9ca3af]">
-              {t.dashboard.subtitle}
-            </p>
-          </div>
+      <PageContainer maxWidth="3xl">
+        <div className="mb-6 sm:mb-8 text-center">
+          <h1 className="mb-2 text-3xl sm:text-4xl md:text-5xl font-bold text-white">
+            {t.dashboard.title}
+          </h1>
+          <p className="text-sm sm:text-base text-[#9ca3af]">
+            {t.dashboard.subtitle}
+          </p>
+        </div>
 
-          {/* Credits warning */}
-          {session && (
-            <CreditsWarning
-              credits={userCredits}
-              isWhitelisted={isWhitelisted}
-              locale={locale}
-            />
-          )}
+        {/* Credits warning */}
+        {session && (
+          <CreditsWarning
+            credits={userCredits}
+            isWhitelisted={isWhitelisted}
+            locale={locale}
+          />
+        )}
 
-          <Card className="p-4 sm:p-6 md:p-8">
-            <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
-              {/* Oracle Selection */}
+        <Card>
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+            {/* Oracle Selection - Animated collapse */}
+            <div
+              className={`transition-all duration-500 ease-in-out overflow-hidden ${
+                spreadCreated
+                  ? "max-h-0 opacity-0 -translate-y-4 pointer-events-none"
+                  : "max-h-[800px] opacity-100 translate-y-0"
+              }`}
+            >
               <FormField label={t.dashboard.selectTarotReader} required>
                 <OracleSelector
                   oracles={tarotReaders}
@@ -378,58 +442,103 @@ export default function DashboardPage() {
                   onSelect={setSelectedReader}
                   locale={locale}
                 />
-                {selectedReader && (
-                  <p className="text-xs sm:text-sm text-[#9ca3af] mt-2">
-                    {
-                      tarotReaders.find((r) => r.id === selectedReader)
-                        ?.description
+              </FormField>
+              {selectedReader && (
+                <p className="text-xs sm:text-sm text-[#9ca3af]">
+                  {
+                    tarotReaders.find((r) => r.id === selectedReader)
+                      ?.description
+                  }
+                </p>
+              )}
+            </div>
+            {/* Input Fields Section - Animated movement */}
+            <div
+              className={`flex flex-col gap-2 transition-all duration-500 ease-in-out ${
+                spreadCreated ? "-translate-y-2" : "translate-y-0"
+              }`}
+            >
+              {/* User Image Upload with checkbox */}
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex items-center justify-between">
+                  {!skipPhoto && (
+                    <label className="block text-sm sm:text-base font-medium text-white">
+                      {t.dashboard.uploadUserPhoto}
+                    </label>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      checked={skipPhoto}
+                      onChange={(e) => handleSkipPhotoChange(e.target.checked)}
+                      disabled={spreadCreated}
+                    />
+                    <label className="text-sm text-[rgba(100,200,255,0.8)] cursor-pointer">
+                      {t.dashboard.skipPhoto}
+                    </label>
+                  </div>
+                </div>
+                {/* User Image Upload - hidden if skipPhoto is true */}
+                {!skipPhoto && (
+                  <ImageUpload
+                    label=""
+                    value={userImage}
+                    onChange={handleImageChange}
+                    skipPhoto={false}
+                    onSkipPhotoChange={handleSkipPhotoChange}
+                    skipPhotoLabel={t.dashboard.skipPhoto}
+                    error={touched.photo && !userImage && !skipPhoto}
+                    errorMessage={
+                      errors.photo ||
+                      (touched.photo && !userImage && !skipPhoto
+                        ? t.dashboard.errors.uploadPhotoMessage
+                        : undefined)
                     }
+                    disabled={spreadCreated}
+                  />
+                )}
+              </div>
+              {/* Birth Date with checkbox */}
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex items-center justify-between">
+                  {!skipDate && (
+                    <label className="block text-sm sm:text-base font-medium text-white">
+                      {t.dashboard.birthDate}
+                    </label>
+                  )}
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      checked={skipDate}
+                      onChange={(e) => handleSkipDateChange(e.target.checked)}
+                      disabled={spreadCreated}
+                    />
+                    <label className="text-sm text-[rgba(100,200,255,0.8)] cursor-pointer">
+                      {t.dashboard.skipDate}
+                    </label>
+                  </div>
+                </div>
+                {/* Birth Date Input - hidden if skipDate is true */}
+                {!skipDate && (
+                  <Input
+                    type="text"
+                    value={birthDate}
+                    onChange={handleDateChange}
+                    onBlur={handleDateBlur}
+                    placeholder="12-07-87"
+                    maxLength={8}
+                    pattern="\d{2}-\d{2}-\d{2}"
+                    disabled={spreadCreated}
+                    error={
+                      (touched.birthDate && !birthDate.trim()) ||
+                      !!errors.birthDate
+                    }
+                  />
+                )}
+                {errors.birthDate && (
+                  <p className="text-xs sm:text-sm text-red-400">
+                    {errors.birthDate}
                   </p>
                 )}
-              </FormField>
-              {/* User Image Upload */}
-              <ImageUpload
-                label={t.dashboard.uploadUserPhoto}
-                value={userImage}
-                onChange={handleImageChange}
-                skipPhoto={skipPhoto}
-                onSkipPhotoChange={handleSkipPhotoChange}
-                skipPhotoLabel={t.dashboard.skipPhoto}
-                error={touched.photo && !userImage && !skipPhoto}
-                errorMessage={
-                  errors.photo ||
-                  (touched.photo && !userImage && !skipPhoto
-                    ? t.dashboard.errors.uploadPhotoMessage
-                    : undefined)
-                }
-                disabled={spreadCreated}
-              />
-              {/* Birth Date */}
-              <FormField
-                label={t.dashboard.birthDate}
-                required
-                error={
-                  errors.birthDate ||
-                  (touched.birthDate && !birthDate.trim()
-                    ? t.dashboard.errors.fillBirthDateMessage
-                    : undefined)
-                }
-              >
-                <Input
-                  type="text"
-                  value={birthDate}
-                  onChange={handleDateChange}
-                  onBlur={handleDateBlur}
-                  placeholder="12-07-87"
-                  maxLength={8}
-                  pattern="\d{2}-\d{2}-\d{2}"
-                  disabled={spreadCreated}
-                  error={
-                    (touched.birthDate && !birthDate.trim()) ||
-                    !!errors.birthDate
-                  }
-                />
-              </FormField>
+              </div>
               {/* Question */}
               <div>
                 <QuestionSelector
@@ -451,85 +560,107 @@ export default function DashboardPage() {
                   </p>
                 )}
               </div>
-              {/* Cards Selection - Random or Manual - Only show after spread is created */}
-              {spreadCreated && (
-                <div className="space-y-4">
-                  <TarotCardSelector
-                    label={t.dashboard.uploadCardsPhoto}
-                    selectedCards={selectedCards}
-                    mode={cardSelectionMode}
-                    locale={locale}
-                    onSelectedCardsChange={setSelectedCards}
-                    onModeChange={(mode) => {
-                      setCardSelectionMode(mode);
-                      // Reset revealed cards count when switching modes
-                      setRevealedCardsCount(0);
-                    }}
-                    onRevealedCardsChange={setRevealedCardsCount}
-                    allCardsRevealed={false}
-                  />
-                </div>
-              )}
-              {/* Show errors for photo, birthDate, question above the button if createSpreadAttempted */}
-              {createSpreadAttempted &&
-                !spreadCreated &&
-                (errors.photo || errors.birthDate || errors.question) && (
-                  <ErrorMessage
-                    message={[errors.photo, errors.birthDate, errors.question]
-                      .filter(Boolean)
-                      .join(", ")}
-                  />
-                )}
-              {/* General error message - for errors not tied to specific fields */}
-              {errors.general && <ErrorMessage message={errors.general} />}
-              {/* Show cards error above button if it exists */}
-              {errors.cards && spreadCreated && createReadingAttempted && (
-                <ErrorMessage message={errors.cards} />
-              )}{" "}
-              {!hasCredits &&
-                spreadCreated &&
-                !isWhitelisted &&
-                photoStepCompleted &&
-                dateAndQuestionCompleted && (
-                  <ErrorMessage
-                    message={t.dashboard.errors.insufficientCredits}
-                  />
-                )}
-              {/* Create Spread Button or Loading Phrases */}
-              <div className="flex justify-center">
-                {!spreadCreated ? (
-                  <Button
-                    type="button"
-                    variant="primary"
-                    size="lg"
-                    onClick={handleCreateSpread}
-                    icon={<Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />}
-                  >
-                    {t.dashboard.createSpread}
-                  </Button>
-                ) : isLoading ? (
-                  <LoadingPhrases
-                    tarotReaderId={selectedReader as any}
-                    locale={locale}
-                    hasPhoto={hasPhoto}
-                  />
-                ) : (
-                  <Button
-                    type="submit"
-                    variant="primary"
-                    size="lg"
-                    onClick={() => setCreateReadingAttempted(true)}
-                    disabled={!hasCredits}
-                    icon={<Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />}
-                  >
-                    {t.dashboard.createReading}
-                  </Button>
-                )}
+            </div>
+            {/* Cards Selection - Random or Manual - Animated appearance */}
+            {spreadCreated && (
+              <div
+                className="space-y-4"
+                style={{
+                  animation: "fadeInUpCards 0.6s ease-out 0.2s forwards",
+                  opacity: 0,
+                  transform: "translateY(20px)",
+                }}
+              >
+                <TarotCardSelector
+                  label={t.dashboard.uploadCardsPhoto}
+                  selectedCards={selectedCards}
+                  mode={cardSelectionMode}
+                  locale={locale}
+                  onSelectedCardsChange={setSelectedCards}
+                  onModeChange={(mode) => {
+                    setCardSelectionMode(mode);
+                    // Reset revealed cards count when switching modes
+                    setRevealedCardsCount(0);
+                  }}
+                  onRevealedCardsChange={setRevealedCardsCount}
+                  allCardsRevealed={false}
+                />
               </div>
-            </form>
-          </Card>
-        </div>
-      </main>
+            )}
+            {/* Show errors for photo, birthDate, question above the button if createSpreadAttempted */}
+            {createSpreadAttempted &&
+              !spreadCreated &&
+              (errors.photo || errors.birthDate || errors.question) && (
+                <ErrorMessage
+                  message={[errors.photo, errors.birthDate, errors.question]
+                    .filter(Boolean)
+                    .join(", ")}
+                />
+              )}
+            {/* General error message - for errors not tied to specific fields */}
+            {errors.general && <ErrorMessage message={errors.general} />}
+            {/* Show cards error above button if it exists */}
+            {errors.cards && spreadCreated && createReadingAttempted && (
+              <ErrorMessage message={errors.cards} />
+            )}{" "}
+            {!hasCredits &&
+              spreadCreated &&
+              !isWhitelisted &&
+              photoStepCompleted &&
+              dateAndQuestionCompleted && (
+                <ErrorMessage
+                  message={t.dashboard.errors.insufficientCredits}
+                />
+              )}
+            {/* Create Spread Button or Loading Phrases - Fixed position */}
+            <div className="flex justify-center relative min-h-[60px]">
+              {!spreadCreated ? (
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="lg"
+                  onClick={handleCreateSpread}
+                  icon={<Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />}
+                >
+                  {t.dashboard.createSpread}
+                </Button>
+              ) : isLoading ? (
+                <LoadingPhrases
+                  tarotReaderId={selectedReader as any}
+                  locale={locale}
+                  hasPhoto={hasPhoto}
+                />
+              ) : (
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  onClick={() => setCreateReadingAttempted(true)}
+                  disabled={!hasCredits}
+                  icon={<Sparkles className="h-4 w-4 sm:h-5 sm:w-5" />}
+                >
+                  {t.dashboard.createReading}
+                </Button>
+              )}
+            </div>
+          </form>
+        </Card>
+      </PageContainer>
+
+      {/* Streaming Modal */}
+      {currentReadingId && (
+        <StreamingReadingModal
+          open={isStreamingModalOpen}
+          onOpenChange={setIsStreamingModalOpen}
+          readingId={currentReadingId}
+          imageAnalysisResult={currentImageAnalysisResult}
+          isAllowed={currentIsAllowed}
+          locale={locale}
+          tarotReaderId={selectedReader as any}
+          hasPhoto={hasPhoto}
+          onResetForm={resetForm}
+        />
+      )}
     </div>
   );
 }

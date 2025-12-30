@@ -10,6 +10,7 @@ import { getTranslations } from "@/lib/i18n";
 import { useLocale } from "@/hooks/use-locale";
 import { getCheckoutSession } from "@/app/actions/billing";
 import Link from "next/link";
+import { PageContainer } from "@/components/page-container";
 
 export default function BillingSuccessPage() {
   const [locale] = useLocale();
@@ -58,8 +59,7 @@ export default function BillingSuccessPage() {
   return (
     <div className="min-h-screen mystical-gradient">
       <Navbar />
-      <main className="container mx-auto px-4 py-6 sm:py-8">
-        <div className="mx-auto max-w-2xl">
+      <PageContainer maxWidth="2xl">
           <Card className="p-6 sm:p-8 text-center">
             {loading ? (
               <div className="mb-6">
@@ -133,8 +133,7 @@ export default function BillingSuccessPage() {
               </Link>
             </div>
           </Card>
-        </div>
-      </main>
+      </PageContainer>
     </div>
   );
 }

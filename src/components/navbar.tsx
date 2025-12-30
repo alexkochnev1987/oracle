@@ -50,7 +50,7 @@ export function Navbar() {
   };
 
   return (
-    <nav className="border-b border-[rgba(100,200,255,0.2)] bg-[rgba(0,0,0,0.2)] backdrop-blur-md supports-[backdrop-filter]:bg-[rgba(0,0,0,0.1)]">
+    <nav className="sticky top-0 z-50 border-b border-[rgba(100,200,255,0.2)] bg-[rgba(0,0,0,0.2)] backdrop-blur-md supports-[backdrop-filter]:bg-[rgba(0,0,0,0.1)]">
       <div className="container mx-auto flex h-14 sm:h-16 items-center justify-between px-3 sm:px-4 min-w-0">
         <Link
           href="/"

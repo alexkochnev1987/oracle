@@ -2,12 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import {
-  createTarotReading,
-  CreateReadingParams,
-  analyzeUserImage,
-} from "@/lib/openai";
-import { createTarotReadingStub } from "@/lib/tarot-reading-stub";
+import { analyzeUserImage } from "@/lib/openai";
 import { isUserAllowedForAI } from "@/lib/ai-whitelist";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
@@ -68,7 +63,8 @@ export async function createReading(formData: FormData) {
       hasCredits = true;
     }
 
-    if (!birthDate || !question) {
+    // Validate required fields - question is always required, birthDate only if provided
+    if (!question) {
       throw new Error("Missing required fields");
     }
 
@@ -83,20 +79,28 @@ export async function createReading(formData: FormData) {
       throw new Error(t.common.pleaseSelectExactly3Cards);
     }
 
-    // Parse date from dd-mm-yy format
+    // Parse date from dd-mm-yy format (only if birthDate is provided)
     let parsedDate: Date;
-    try {
-      parsedDate = parseDateString(birthDate);
-    } catch (error) {
-      throw new Error(
-        error instanceof Error
-          ? error.message
-          : "Invalid date format. Please use dd-mm-yy format"
-      );
-    }
+    let formattedDate: string;
 
-    // Format date as YYYY-MM-DD for AI
-    const formattedDate = formatDateForAI(parsedDate);
+    if (birthDate && birthDate.trim().length > 0) {
+      // Date is provided, validate and parse it
+      try {
+        parsedDate = parseDateString(birthDate);
+        formattedDate = formatDateForAI(parsedDate);
+      } catch (error) {
+        throw new Error(
+          error instanceof Error
+            ? error.message
+            : "Invalid date format. Please use dd-mm-yy format"
+        );
+      }
+    } else {
+      // No date provided (skipDate is true), use a default date (e.g., current date or a placeholder)
+      // Using current date as default
+      parsedDate = new Date();
+      formattedDate = formatDateForAI(parsedDate);
+    }
 
     // Generate unique share token for public access
     const shareToken = randomUUID();
@@ -151,60 +155,14 @@ export async function createReading(formData: FormData) {
       });
     }
 
-    // Create AI prediction - use real AI for whitelisted users, stub for others
-    let predictionText: string;
-    try {
-      if (isAllowed) {
-        // Use real AI with pre-analyzed image result (if available) or card names
-        // Pass imageAnalysisResult if we already have it from parallel execution
-        predictionText = await createTarotReading({
-          userImageBase64: imageAnalysisResult ? undefined : formattedUserImage,
-          imageAnalysisResult: imageAnalysisResult || undefined,
-          selectedCardsNames,
-          birthDate: formattedDate,
-          question,
-          tarotReaderId: tarotReaderId as any,
-          locale,
-        });
-      } else {
-        // Use stub for non-whitelisted users
-        predictionText = await createTarotReadingStub({
-          userImageBase64: formattedUserImage,
-          selectedCardsNames,
-          birthDate: formattedDate,
-          question,
-          tarotReaderId: tarotReaderId as any,
-          locale,
-        });
-      }
-    } catch (error) {
-      console.error("Error generating AI prediction:", error);
-      // Fallback to stub if AI fails
-      if (isAllowed) {
-        console.warn(
-          "AI request failed, falling back to stub for user:",
-          userEmail
-        );
-        predictionText = await createTarotReadingStub({
-          userImageBase64: formattedUserImage,
-          selectedCardsNames,
-          birthDate: formattedDate,
-          question,
-          tarotReaderId: tarotReaderId as any,
-          locale,
-        });
-      } else {
-        throw error;
-      }
-    }
-
-    // Save to database with S3 URL if available
+    // Save to database without predictionText - it will be generated via streaming
+    // Store imageAnalysisResult in a JSON field for later use in streaming
     const reading = await prisma.reading.create({
       data: {
         userId,
         question,
         birthDate: parsedDate,
-        predictionText,
+        predictionText: "", // Empty initially, will be filled during streaming
         userImageUrl: s3Url, // Store full S3 URL instead of truncated base64
         cardsImageUrl: null, // No longer used
         selectedCards: selectedCardsArray,
@@ -214,7 +172,14 @@ export async function createReading(formData: FormData) {
       },
     });
 
+    // Store imageAnalysisResult and other streaming params in a temporary way
+    // We'll pass them to the streaming API via the reading metadata
+    // For now, we'll store imageAnalysisResult in the database using a workaround
+    // by updating the reading with metadata (we can use selectedCards JSON field or create a new field)
+    // Actually, we'll pass imageAnalysisResult via API route body instead
+
     // Deduct credit only if user is not in whitelist
+    // Note: We deduct credit now, before streaming starts
     if (!isWhitelisted) {
       await prisma.user.update({
         where: { id: userId },
@@ -226,6 +191,9 @@ export async function createReading(formData: FormData) {
       });
     }
 
+    // Return readingId and imageAnalysisResult for streaming
+    // imageAnalysisResult will be passed to streaming API
+
     revalidatePath("/dashboard");
     revalidatePath("/readings");
 
@@ -233,6 +201,8 @@ export async function createReading(formData: FormData) {
       success: true,
       readingId: reading.id,
       shareToken: reading.shareToken,
+      imageAnalysisResult: imageAnalysisResult || null, // Pass to streaming API
+      isAllowed, // Pass to streaming API to know if we should use AI or stub
     };
   } catch (error) {
     console.error("Error creating reading:", error);

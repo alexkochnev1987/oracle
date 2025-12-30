@@ -10,6 +10,7 @@ import { ShareAppButton } from "@/components/share-app-button";
 import { Sparkles, Star, Moon, Gem } from "lucide-react";
 import { getTranslations } from "@/lib/i18n";
 import { useLocale } from "@/hooks/use-locale";
+import { PageContainer } from "@/components/page-container";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -27,8 +28,7 @@ export default function Home() {
   return (
     <div className="min-h-screen mystical-gradient">
       <Navbar />
-      <main className="container mx-auto px-4 py-12 sm:py-16">
-        <div className="mx-auto max-w-4xl text-center">
+      <PageContainer maxWidth="4xl" paddingBottom="pb-12 sm:pb-16" className="text-center">
           {/* Hero Section */}
           <div className="mb-12 sm:mb-16 space-y-6 sm:space-y-8">
             <div className="flex justify-center">
@@ -99,8 +99,7 @@ export default function Home() {
               </p>
             </Card>
           </div>
-        </div>
-      </main>
+      </PageContainer>
     </div>
   );
 }

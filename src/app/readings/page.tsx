@@ -19,6 +19,7 @@ import {
 import { useLocale } from "@/hooks/use-locale";
 import { getTranslations } from "@/lib/i18n";
 import { BookOpen } from "lucide-react";
+import { PageContainer } from "@/components/page-container";
 
 export default function ReadingsPage() {
   const { data: session, status } = useSession();
@@ -56,11 +57,15 @@ export default function ReadingsPage() {
     return (
       <div className="min-h-screen mystical-gradient">
         <Navbar />
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
-          <div className="mx-auto max-w-4xl flex flex-col gap-3 sm:gap-3 md:gap-4 lg:gap-5">
+        <PageContainer
+          maxWidth="4xl"
+          paddingBottom="pb-8 sm:pb-10 lg:pb-12"
+          className="px-4 sm:px-6 lg:px-8"
+        >
+          <div className="flex flex-col gap-3 sm:gap-3 md:gap-4 lg:gap-5">
             <LoadingSkeleton variant="card" count={3} />
           </div>
-        </div>
+        </PageContainer>
       </div>
     );
   }
@@ -113,44 +118,46 @@ export default function ReadingsPage() {
   return (
     <div className="min-h-screen mystical-gradient">
       <Navbar />
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
-        <div className="mx-auto max-w-4xl">
-          <h1 className="mb-8 sm:mb-10 lg:mb-12 text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
-            {t.nav.readings}
-          </h1>
+      <PageContainer
+        maxWidth="4xl"
+        paddingBottom="pb-8 sm:pb-10 lg:pb-12"
+        className="px-4 sm:px-6 lg:px-8"
+      >
+        <h1 className="mb-8 sm:mb-10 lg:mb-12 text-3xl sm:text-4xl lg:text-5xl font-bold text-white">
+          {t.nav.readings}
+        </h1>
 
-          {readings.length === 0 ? (
-            <div className="mt-8 sm:mt-12">
-              <EmptyState
-                icon={<BookOpen className="h-12 w-12 sm:h-16 sm:w-16" />}
-                title={t.readings.emptyTitle}
-                description={t.readings.emptyDescription}
-                action={
-                  <Button
-                    variant="primary"
-                    onClick={() => router.push("/dashboard")}
-                  >
-                    {t.readings.goToDashboard}
-                  </Button>
-                }
+        {readings.length === 0 ? (
+          <div className="mt-8 sm:mt-12">
+            <EmptyState
+              icon={<BookOpen className="h-12 w-12 sm:h-16 sm:w-16" />}
+              title={t.readings.emptyTitle}
+              description={t.readings.emptyDescription}
+              action={
+                <Button
+                  variant="primary"
+                  onClick={() => router.push("/dashboard")}
+                >
+                  {t.readings.goToDashboard}
+                </Button>
+              }
+            />
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3 sm:gap-3 md:gap-4 lg:gap-5">
+            {readings.map((reading) => (
+              <ReadingCard
+                key={reading.id}
+                reading={reading}
+                href={`/readings/${reading.id}`}
+                locale={locale}
+                onShareClick={handleShareClick}
+                onDeleteClick={handleDeleteClick}
               />
-            </div>
-          ) : (
-            <div className="flex flex-col gap-3 sm:gap-3 md:gap-4 lg:gap-5">
-              {readings.map((reading) => (
-                <ReadingCard
-                  key={reading.id}
-                  reading={reading}
-                  href={`/readings/${reading.id}`}
-                  locale={locale}
-                  onShareClick={handleShareClick}
-                  onDeleteClick={handleDeleteClick}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      </main>
+            ))}
+          </div>
+        )}
+      </PageContainer>
 
       <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
         <SheetContent

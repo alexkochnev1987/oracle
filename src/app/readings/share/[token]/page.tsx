@@ -17,6 +17,7 @@ import { getTranslations } from "@/lib/i18n";
 import { getTarotReader } from "@/lib/tarot-readers";
 import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 import { Navbar } from "@/components/navbar";
+import { PageContainer } from "@/components/page-container";
 
 const BACKGROUND_IMAGES = [
   "/alien/ai.png",
@@ -83,11 +84,9 @@ export default function PublicReadingPage() {
           <div className="absolute inset-0 bg-[rgba(13,13,26,0.7)]" />
         </div>
         <Navbar />
-        <div className="relative z-10 container mx-auto px-4 py-6 sm:py-8">
-          <div className="mx-auto max-w-4xl">
-            <LoadingSkeleton variant="card" count={2} />
-          </div>
-        </div>
+        <PageContainer maxWidth="4xl" className="relative z-10">
+          <LoadingSkeleton variant="card" count={2} />
+        </PageContainer>
       </div>
     );
   }
@@ -106,18 +105,16 @@ export default function PublicReadingPage() {
           <div className="absolute inset-0 bg-[rgba(13,13,26,0.7)]" />
         </div>
         <Navbar />
-        <div className="relative z-10 container mx-auto px-4 py-6 sm:py-8">
-          <div className="mx-auto max-w-4xl">
-            <Card className="p-6 text-center">
-              <h1 className="mb-4 text-2xl font-bold text-white">
-                {t.common.readingNotFound}
-              </h1>
-              <p className="text-[#9ca3af]">
-                {error || t.common.readingNotFoundOrDeleted}
-              </p>
-            </Card>
-          </div>
-        </div>
+        <PageContainer maxWidth="4xl" className="relative z-10">
+          <Card className="p-6 text-center">
+            <h1 className="mb-4 text-2xl font-bold text-white">
+              {t.common.readingNotFound}
+            </h1>
+            <p className="text-[#9ca3af]">
+              {error || t.common.readingNotFoundOrDeleted}
+            </p>
+          </Card>
+        </PageContainer>
       </div>
     );
   }
@@ -146,7 +143,7 @@ export default function PublicReadingPage() {
       <Navbar />
 
       {/* Navigation Buttons */}
-      <div className="fixed top-20 sm:top-24 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+      <div className="fixed top-20 sm:top-24 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2">
         <Button
           variant="secondary"
           size="icon"
@@ -168,72 +165,70 @@ export default function PublicReadingPage() {
       </div>
 
       {/* Main Content */}
-      <main className="relative z-10 container mx-auto px-4 py-6 sm:py-8">
-        <div className="mx-auto max-w-4xl space-y-6">
-          <Card className="p-4 sm:p-6" glow>
-            <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-              <h1 className="text-2xl sm:text-3xl font-bold text-white">
-                {reading.question}
-              </h1>
-              <span className="text-xs sm:text-sm text-[#9ca3af] whitespace-nowrap">
-                {format(date, "PPP", {
-                  locale: locale === "ru" ? ru : enUS,
-                })}
-              </span>
-            </div>
-            <div className="mb-4">
-              <span className="text-sm sm:text-base text-[rgba(100,200,255,0.8)] font-medium">
-                {reader.name} - {reader.description}
-              </span>
-            </div>
-          </Card>
+      <PageContainer maxWidth="4xl" className="relative z-10 space-y-6">
+        <Card className="p-4 sm:p-6" glow>
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">
+              {reading.question}
+            </h1>
+            <span className="text-xs sm:text-sm text-[#9ca3af] whitespace-nowrap">
+              {format(date, "PPP", {
+                locale: locale === "ru" ? ru : enUS,
+              })}
+            </span>
+          </div>
+          <div className="mb-4">
+            <span className="text-sm sm:text-base text-[rgba(100,200,255,0.8)] font-medium">
+              {reader.name} - {reader.description}
+            </span>
+          </div>
+        </Card>
 
-          {/* Tarot Cards Display - show if cards were selected */}
-          {reading.selectedCards &&
-            Array.isArray(reading.selectedCards) &&
-            reading.selectedCards.length > 0 && (
-              <TarotCardsDisplay
-                cardIds={reading.selectedCards as string[]}
-                locale={locale}
-              />
-            )}
-
-          {/* User Image Display - show if image exists */}
-          {reading.userImageUrl && (
-            <Card className="p-4 sm:p-6" glow>
-              <h2 className="mb-4 text-xl sm:text-2xl font-semibold text-white">
-                {t.readings.userPhoto}
-              </h2>
-              <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-[rgba(100,200,255,0.4)] bg-[rgba(26,26,58,0.7)]">
-                <Image
-                  src={reading.userImageUrl}
-                  alt={t.readings.userPhoto}
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  quality={90}
-                  unoptimized={reading.userImageUrl.startsWith("http")}
-                />
-              </div>
-            </Card>
+        {/* Tarot Cards Display - show if cards were selected */}
+        {reading.selectedCards &&
+          Array.isArray(reading.selectedCards) &&
+          reading.selectedCards.length > 0 && (
+            <TarotCardsDisplay
+              cardIds={reading.selectedCards as string[]}
+              locale={locale}
+            />
           )}
 
-          <Card className="p-4 sm:p-6 md:p-8 cosmic-particles" glow>
+        {/* User Image Display - show if image exists */}
+        {reading.userImageUrl && (
+          <Card className="p-4 sm:p-6" glow>
             <h2 className="mb-4 text-xl sm:text-2xl font-semibold text-white">
-              {t.readings.yourReading}
+              {t.readings.userPhoto}
             </h2>
-            <div className="prose prose-invert max-w-none text-[#e5e7eb]">
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                {reading.predictionText}
-              </ReactMarkdown>
+            <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-[rgba(100,200,255,0.4)] bg-[rgba(26,26,58,0.7)]">
+              <Image
+                src={reading.userImageUrl}
+                alt={t.readings.userPhoto}
+                fill
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                quality={90}
+                unoptimized={reading.userImageUrl.startsWith("http")}
+              />
             </div>
           </Card>
+        )}
 
-          <div className="w-full">
-            <EmailReadingForm shareToken={params.token as string} />
+        <Card className="p-4 sm:p-6 md:p-8 cosmic-particles" glow>
+          <h2 className="mb-4 text-xl sm:text-2xl font-semibold text-white">
+            {t.readings.yourReading}
+          </h2>
+          <div className="prose prose-invert max-w-none text-[#e5e7eb]">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {reading.predictionText}
+            </ReactMarkdown>
           </div>
+        </Card>
+
+        <div className="w-full">
+          <EmailReadingForm shareToken={params.token as string} />
         </div>
-      </main>
+      </PageContainer>
     </div>
   );
 }
