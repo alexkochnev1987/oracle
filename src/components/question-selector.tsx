@@ -1,6 +1,6 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { FormField } from "@/components/ui/form-field";
 import { Card } from "@/components/ui/card";
 import { getTranslations, type Locale } from "@/lib/i18n";
@@ -53,14 +53,17 @@ export function QuestionSelector({
             </Card>
           ))}
         </div>
-        <Input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={t.dashboard.questionPlaceholder}
-          disabled={disabled}
-          error={error}
-        />
+        <div className="relative">
+          <Textarea
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={t.dashboard.questionPlaceholder}
+            disabled={disabled}
+            error={error}
+            rows={3}
+            className="border-2 focus:border-[rgba(100,200,255,0.8)] bg-[rgba(26,26,58,0.9)]"
+          />
+        </div>
       </div>
     </FormField>
   );

@@ -47,26 +47,24 @@ export function OracleSelector({
                 loading="lazy"
                 unoptimized={oracle.imagePath.startsWith("http")}
               />
-              <div
+              {/* <div
                 className={cn(
-                  "absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent",
-                  "opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  "absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/20",
+                  "transition-opacity duration-300"
                 )}
-              />
+              /> */}
             </div>
-            <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-4 pb-4 sm:pb-5 text-center z-10">
-              <div className="bg-gradient-to-t from-black/90 via-black/70 to-transparent rounded-b-lg -mx-3 sm:-mx-4 -mb-3 sm:-mb-4 px-3 sm:px-4 pb-3 sm:pb-4 pt-2">
+            <div className="absolute bottom-0 left-0 right-0 p-3  text-center z-10">
+              <div className="bg-gradient-to-t from-black/95 via-black/80 to-transparent rounded-b-lg -mx-3 sm:-mx-4 -mb-3 sm:-mb-4 px-3 sm:px-4 pb-3 sm:pb-4 pt-2">
                 <h3
                   className={cn(
-                    "text-sm sm:text-base font-semibold text-white drop-shadow-lg",
-                    isSelected && "text-[#d4af37]"
+                    "text-xs sm:text-xs font-semibold text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]",
+                    isSelected &&
+                      "text-[#d4af37] drop-shadow-[0_2px_4px_rgba(212,175,55,0.5)]"
                   )}
                 >
                   {oracle.name}
                 </h3>
-                <p className="hidden md:block text-xs text-[#9ca3af] mt-1 line-clamp-2 drop-shadow-md">
-                  {oracle.description}
-                </p>
               </div>
             </div>
             {isSelected && (

@@ -49,6 +49,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   readings      Reading[]
+  qrCodes       QrCode[]
 }
 
 model VerificationToken {
@@ -71,6 +72,7 @@ model Reading {
   shareToken        String?  @unique
   selectedCards     Json? // Array of card IDs when using random spread
   cardSelectionMode String? // "upload" or "random"
+  qrCodeId          String?  // ID QR кода, если reading создан через QR (опционально)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -78,4 +80,19 @@ model Reading {
   @@index([userId])
   @@index([createdAt])
   @@index([shareToken])
+}
+
+model QrCode {
+  id            String   @id @default(cuid())
+  userId        String   // Создатель QR кода
+  token         String   @unique // Уникальный токен для доступа к форме
+  expiresAt     DateTime? // Срок действия (опционально)
+  maxUses       Int      // Максимальное количество использований
+  currentUses   Int      @default(0) // Текущее количество использований
+  isActive      Boolean  @default(true) // Активен ли QR код
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
 }

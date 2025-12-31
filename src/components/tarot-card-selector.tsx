@@ -191,12 +191,12 @@ export function TarotCardSelector({
   return (
     <div className={cn("space-y-4", className)}>
       <div className="space-y-2 sm:space-y-3">
-        <label className="block text-sm sm:text-base font-medium text-white">
+        {/* <label className="block text-sm sm:text-base font-medium text-white">
           {label}
-        </label>
+        </label> */}
 
         {/* Mode Toggle */}
-        <div className="flex gap-2 p-1 bg-[rgba(26,26,58,0.6)] rounded-lg border border-[rgba(100,200,255,0.3)]">
+        {/* <div className="flex gap-2 p-1 bg-[rgba(26,26,58,0.6)] rounded-lg border border-[rgba(100,200,255,0.3)]">
           <button
             type="button"
             onClick={() => handleModeChange("random")}
@@ -208,12 +208,8 @@ export function TarotCardSelector({
             )}
           >
             <Shuffle className="h-4 w-4" />
-            <span className="hidden sm:inline">
-              {t.dashboard.randomSpread}
-            </span>
-            <span className="sm:hidden">
-              {t.common.spread}
-            </span>
+            <span className="hidden sm:inline">{t.dashboard.randomSpread}</span>
+            <span className="sm:hidden">{t.common.spread}</span>
           </button>
           <button
             type="button"
@@ -226,14 +222,10 @@ export function TarotCardSelector({
             )}
           >
             <Hand className="h-4 w-4" />
-            <span className="hidden sm:inline">
-              {t.common.selectCards}
-            </span>
-            <span className="sm:hidden">
-              {t.common.select}
-            </span>
+            <span className="hidden sm:inline">{t.common.selectCards}</span>
+            <span className="sm:hidden">{t.common.select}</span>
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* Random Spread Mode */}
@@ -351,28 +343,18 @@ export function TarotCardSelector({
                             <>
                               {card.arcana === "major" && (
                                 <div className="text-[10px] text-[#9ca3af]">
-                                  {locale === "ru"
-                                    ? "Старший Аркан"
-                                    : "Major Arcana"}
+                                  {t.dashboard.majorArcana}
                                 </div>
                               )}
                               {card.arcana === "minor" && card.suit && (
                                 <div className="text-[10px] text-[#9ca3af]">
-                                  {locale === "ru"
-                                    ? card.suit === "cups"
-                                      ? "Кубки"
-                                      : card.suit === "pentacles"
-                                      ? "Пентакли"
-                                      : card.suit === "swords"
-                                      ? "Мечи"
-                                      : "Жезлы"
-                                    : card.suit === "cups"
-                                    ? "Cups"
+                                  {card.suit === "cups"
+                                    ? t.dashboard.suitCups
                                     : card.suit === "pentacles"
-                                    ? "Pentacles"
+                                    ? t.dashboard.suitPentacles
                                     : card.suit === "swords"
-                                    ? "Swords"
-                                    : "Wands"}
+                                    ? t.dashboard.suitSwords
+                                    : t.dashboard.suitWands}
                                 </div>
                               )}
                             </>

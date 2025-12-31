@@ -11,6 +11,7 @@ import {
   Globe,
   CreditCard,
   Home,
+  QrCode,
 } from "lucide-react";
 import { getTranslations, locales, type Locale } from "@/lib/i18n";
 import { useLocale } from "@/hooks/use-locale";
@@ -118,6 +119,17 @@ export function Navbar() {
               >
                 {t.nav.readings}
               </Link>
+              {/* QR Codes - Show on lg+ (1024px+) */}
+              <Link
+                href="/qr"
+                className={cn(
+                  "hidden lg:flex px-3 xl:px-4 py-2 text-base text-white hover:text-[rgba(100,200,255,0.8)] hover:bg-[rgba(100,200,255,0.1)] rounded-xl transition-colors min-h-[44px] items-center whitespace-nowrap flex-shrink-0",
+                  pathname.startsWith("/qr") && "font-bold"
+                )}
+                title={t.nav.qrCodes || "QR Codes"}
+              >
+                {t.nav.qrCodes || "QR Codes"}
+              </Link>
               {/* Billing - Show on lg+ (1024px+) */}
               <Link
                 href="/billing"
@@ -206,6 +218,19 @@ export function Navbar() {
                       )}
                     >
                       {t.nav.readings}
+                    </span>
+                  </Link>
+                  <Link
+                    href="/qr"
+                    className="flex items-center gap-3 px-4 py-3 text-white hover:text-[rgba(100,200,255,0.8)] hover:bg-[rgba(100,200,255,0.1)] rounded-xl transition-colors min-h-[44px]"
+                  >
+                    <QrCode className="h-5 w-5 text-[rgba(100,200,255,0.8)] flex-shrink-0" />
+                    <span
+                      className={cn(
+                        pathname.startsWith("/qr") && "font-bold"
+                      )}
+                    >
+                      {t.nav.qrCodes || "QR Codes"}
                     </span>
                   </Link>
                   <Link

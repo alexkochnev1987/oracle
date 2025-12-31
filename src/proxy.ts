@@ -3,6 +3,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function proxy(request: NextRequest) {
+  // Allow public access to /qr/[token] routes
+  if (request.nextUrl.pathname.startsWith("/qr/")) {
+    return NextResponse.next();
+  }
+
   // Protect /readings routes (except /readings/share/* which are public)
   if (
     request.nextUrl.pathname.startsWith("/readings") &&

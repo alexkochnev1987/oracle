@@ -9,7 +9,7 @@ import { useLocale } from "@/hooks/use-locale";
 import { getTranslations } from "@/lib/i18n";
 
 interface QRCodeDisplayProps {
-  shareToken: string | null;
+  shareToken: string | null | undefined;
   shareUrl: string;
   question?: string;
 }

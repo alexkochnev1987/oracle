@@ -1,6 +1,7 @@
 import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "./prisma";
+import { isUserAllowedForAI } from "./ai-whitelist";
 import NextAuth from "next-auth";
 import type { Session, User } from "next-auth";
 import type { JWT } from "next-auth/jwt";
@@ -23,6 +24,21 @@ export const authOptions = {
         }),
       ]
     : [],
+  events: {
+    async createUser({ user }: { user: User }) {
+      // Set initial credits for new users (except whitelist)
+      if (user.email) {
+        const isWhitelisted = isUserAllowedForAI(user.email);
+        if (!isWhitelisted) {
+          // Give 10 credits to new users (whitelist users don't need credits)
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { credits: 10 },
+          });
+        }
+      }
+    },
+  },
   callbacks: {
     async session({
       session,

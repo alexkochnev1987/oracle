@@ -25,6 +25,7 @@ export async function GET() {
         tarotReaderId: true,
         shareToken: true,
         userImageUrl: true,
+        qrCodeId: true,
       },
     });
 
