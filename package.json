@@ -12,7 +12,12 @@
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
-    "migrate:credits": "tsx scripts/migrate-existing-users.ts"
+    "migrate:credits": "tsx scripts/migrate-existing-users.ts",
+    "test:ai": "tsx src/testing/cli.ts",
+    "test:ai:run": "tsx src/testing/cli.ts run",
+    "test:ai:performance": "tsx src/testing/cli.ts performance",
+    "test:ai:compare": "tsx src/testing/cli.ts compare",
+    "test:ai:example": "tsx src/testing/example-usage.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.6.0",
@@ -26,6 +31,7 @@
     "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "commander": "^14.0.2",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.468.0",
     "next": "16.1.1",

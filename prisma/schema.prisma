@@ -96,3 +96,50 @@ model QrCode {
 
   @@index([token])
 }
+
+model TestRun {
+  id          String     @id @default(cuid())
+  name        String     // Test run identifier
+  description String?    // Optional description of the test run
+  createdAt   DateTime   @default(now())
+  testCases   TestCase[]
+
+  @@index([createdAt])
+}
+
+model TestCase {
+  id              String       @id @default(cuid())
+  testRunId       String
+  name            String       // Test case name
+  imageUrl        String       // Test image path
+  question        String       @db.Text
+  expectedThemes  Json         // Expected analysis themes
+  difficulty      String       // easy, medium, hard
+  category        String       // portrait, abstract, nature, object
+  createdAt       DateTime     @default(now())
+  results         TestResult[]
+  testRun         TestRun      @relation(fields: [testRunId], references: [id], onDelete: Cascade)
+
+  @@index([testRunId])
+  @@index([category])
+  @@index([difficulty])
+}
+
+model TestResult {
+  id                    String   @id @default(cuid())
+  testCaseId           String
+  oracleType           String   // alien-seer, cosmic-oracle, etc.
+  imageAnalysis        String   @db.Text
+  tarotReading         String   @db.Text
+  responseTimeMs       Int
+  tokenUsage           Int?     // Optional token usage tracking
+  aiEvaluationScore    Json     // Detailed scoring breakdown
+  overallScore         Float
+  createdAt            DateTime @default(now())
+  testCase             TestCase @relation(fields: [testCaseId], references: [id], onDelete: Cascade)
+
+  @@index([testCaseId])
+  @@index([oracleType])
+  @@index([overallScore])
+  @@index([createdAt])
+}

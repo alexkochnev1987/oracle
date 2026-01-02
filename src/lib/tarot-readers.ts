@@ -1,3 +1,4 @@
+import { Delius_Swash_Caps, Sankofa_Display } from "next/font/google";
 import { Locale, getTranslations } from "./i18n";
 
 export type TarotReaderId =

@@ -23,8 +23,8 @@ const nextConfig: NextConfig = {
       // Exclude docs
       "docs/**",
       // Exclude test files
-      "test-reading-prompt-data.json",
       "scripts/**",
+      "oracle/src/testing/**",
     ],
   },
 };
