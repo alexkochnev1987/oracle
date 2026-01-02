@@ -46,14 +46,39 @@ export async function POST(
     // Get request body for imageAnalysisResult and other params
     const body = await request.json().catch(() => ({}));
     const imageAnalysisResult = body.imageAnalysisResult || null;
-    const isAllowed = body.isAllowed !== undefined ? body.isAllowed : true;
-    const validLocale: Locale = (locales as readonly string[]).includes(body.locale as string)
+    const validLocale: Locale = (locales as readonly string[]).includes(
+      body.locale as string
+    )
       ? (body.locale as Locale)
       : defaultLocale;
 
     // Check if user is in whitelist
     const userEmail = session.user.email;
     const isWhitelisted = isUserAllowedForAI(userEmail);
+
+    // Verify user has credits before making GPT request (security check)
+    // Even though credit was deducted in createReading, we should verify again
+    // to prevent race conditions or malicious requests
+    let hasCredits = false;
+    if (!isWhitelisted) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { credits: true },
+      });
+
+      if (!user || user.credits < 1) {
+        // User doesn't have credits - use stub instead
+        hasCredits = false;
+      } else {
+        hasCredits = true;
+      }
+    } else {
+      // Whitelisted users have unlimited access
+      hasCredits = true;
+    }
+
+    // Determine if user is allowed to use AI
+    const isAllowed = isWhitelisted || hasCredits;
 
     // Format date for AI
     const formattedDate = formatDateForAI(reading.birthDate);
@@ -66,7 +91,10 @@ export async function POST(
     const cards = selectedCardsArray
       .map((cardId) => getCardById(cardId))
       .filter((card) => card !== undefined);
-    const selectedCardsNames = formatCardsForPrompt(cards as any[], validLocale);
+    const selectedCardsNames = formatCardsForPrompt(
+      cards as any[],
+      validLocale
+    );
 
     // Create a readable stream for the response
     const stream = new ReadableStream({
@@ -78,12 +106,9 @@ export async function POST(
           // Use streaming AI if user is allowed (whitelisted or has credits)
           // Credit was already deducted in createReading, so we should use AI
           if (isAllowed) {
-            // Use streaming AI
             try {
               const streamGenerator = createTarotReadingStream({
-                userImageBase64: reading.userImageUrl
-                  ? undefined
-                  : undefined, // We already have imageAnalysisResult
+                userImageBase64: reading.userImageUrl ? undefined : undefined, // We already have imageAnalysisResult
                 imageAnalysisResult: imageAnalysisResult || undefined,
                 selectedCardsNames,
                 birthDate: formattedDate,
@@ -159,4 +184,3 @@ export async function POST(
     );
   }
 }
-

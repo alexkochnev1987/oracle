@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
 import { Locale, getTranslations } from "./i18n";
-import { getTarotReader, TarotReaderId } from "./tarot-readers";
+import { TarotReaderId } from "./tarot-readers";
 import { getCardById } from "./tarot-cards";
 
 interface ReadingData {
@@ -26,7 +26,7 @@ export function generateEmailHTML(
     locale: locale === "ru" ? ru : enUS,
   });
 
-  const reader = getTarotReader(reading.tarotReaderId as TarotReaderId, locale);
+  const reader = t.tarotReadersPrompts[reading.tarotReaderId as TarotReaderId];
   const shareUrl = reading.shareUrl || "";
 
   // Get card names if available
@@ -189,15 +189,13 @@ export function generateEmailText(
     locale: locale === "ru" ? ru : enUS,
   });
 
-  const reader = getTarotReader(reading.tarotReaderId as TarotReaderId, locale);
   const shareUrl = reading.shareUrl || "";
 
   const t = getTranslations(locale);
-  let text = `${t.common.yourTarotReading}\n\n`;
+  const reader = t.tarotReadersPrompts[reading.tarotReaderId as TarotReaderId];
+  let text = `${t.common.yourReading}\n\n`;
   text += `${t.common.date} ${formattedDate}\n\n`;
-  text += `${t.common.yourQuestion} ${
-    reading.question
-  }\n\n`;
+  text += `${t.common.yourQuestion} ${reading.question}\n\n`;
   text += `${reader.name} - ${reader.description}\n\n`;
 
   if (reading.selectedCards && Array.isArray(reading.selectedCards)) {
@@ -210,20 +208,14 @@ export function generateEmailText(
       .join(", ");
 
     if (cardNames) {
-      text += `${
-        t.common.selectedCards
-      } ${cardNames}\n\n`;
+      text += `${t.common.selectedCards} ${cardNames}\n\n`;
     }
   }
 
-  text += `${t.common.yourReading}\n${
-    reading.predictionText
-  }\n\n`;
+  text += `${t.common.yourReading}\n${reading.predictionText}\n\n`;
 
   if (shareUrl) {
-    text += `${
-      t.common.shareThisReading
-    } ${shareUrl}\n\n`;
+    text += `${t.common.share} ${shareUrl}\n\n`;
   }
 
   text += t.common.bestRegards;

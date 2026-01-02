@@ -3,10 +3,10 @@ import { prisma } from "@/lib/prisma";
 import { validateQrToken } from "@/app/actions/qr";
 import { createReadingFromQr } from "@/app/actions/reading";
 import { createTarotReadingStream } from "@/lib/openai";
-import { createTarotReadingStub } from "@/lib/tarot-reading-stub";
 import { formatDateForAI } from "@/lib/date-validation";
 import { getCardById, formatCardsForPrompt } from "@/lib/tarot-cards";
 import { type Locale, defaultLocale, locales } from "@/lib/i18n";
+import { createTarotReadingStub } from "@/lib/tarot-reading-stub";
 
 export async function GET(
   request: Request,
@@ -16,10 +16,7 @@ export async function GET(
     const { token } = await params;
 
     if (!token) {
-      return NextResponse.json(
-        { error: "Token is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Token is required" }, { status: 400 });
     }
 
     const validation = await validateQrToken(token);
@@ -58,10 +55,7 @@ export async function POST(
     const { token } = await params;
 
     if (!token) {
-      return NextResponse.json(
-        { error: "Token is required" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Token is required" }, { status: 400 });
     }
 
     // Validate token again before processing
@@ -90,55 +84,20 @@ export async function POST(
       );
     }
 
-    // Start streaming in background (don't wait for it)
-    // The reading will be generated asynchronously
-    if (result.readingId) {
-      // Generate reading in background
-      generateReadingInBackground(
-        result.readingId,
-        result.imageAnalysisResult,
-        result.isAllowed,
-        localeValue
-      ).catch((error) => {
-        console.error("Error generating reading in background:", error);
-      });
+    if (!result.readingId) {
+      return NextResponse.json(
+        { error: "Failed to create reading" },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({
-      success: true,
-      message: "Reading created successfully",
-      readingId: result.readingId,
-    });
-  } catch (error) {
-    console.error("Error processing QR form:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
-  }
-}
-
-// Helper function to generate reading in background
-async function generateReadingInBackground(
-  readingId: string,
-  imageAnalysisResult: string | null,
-  isAllowed: boolean,
-  localeValue: string
-) {
-  try {
     // Get reading from database
     const reading = await prisma.reading.findUnique({
-      where: { id: readingId },
+      where: { id: result.readingId },
     });
 
     if (!reading) {
-      console.error("Reading not found:", readingId);
-      return;
-    }
-
-    // Check if already completed
-    if (reading.predictionText && reading.predictionText.trim().length > 0) {
-      return;
+      return NextResponse.json({ error: "Reading not found" }, { status: 404 });
     }
 
     const validLocale: Locale = (locales as readonly string[]).includes(
@@ -163,57 +122,89 @@ async function generateReadingInBackground(
       validLocale
     );
 
-    let fullText = "";
+    // Create a readable stream for the response
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder();
+        let fullText = "";
 
-    // Generate reading
-    if (isAllowed) {
-      try {
-        const streamGenerator = createTarotReadingStream({
-          userImageBase64: undefined,
-          imageAnalysisResult: imageAnalysisResult || undefined,
-          selectedCardsNames,
-          birthDate: formattedDate,
-          question: reading.question,
-          tarotReaderId: reading.tarotReaderId as any,
-          locale: validLocale,
-        });
+        try {
+          // Use streaming AI if user is allowed
+          if (result.isAllowed) {
+            try {
+              const streamGenerator = createTarotReadingStream({
+                userImageBase64: undefined,
+                imageAnalysisResult: result.imageAnalysisResult || undefined,
+                selectedCardsNames,
+                birthDate: formattedDate,
+                question: reading.question,
+                tarotReaderId: reading.tarotReaderId as any,
+                locale: validLocale,
+              });
 
-        for await (const chunk of streamGenerator) {
-          fullText += chunk;
+              for await (const chunk of streamGenerator) {
+                fullText += chunk;
+                // Send chunk to client
+                controller.enqueue(encoder.encode(chunk));
+              }
+            } catch (error) {
+              console.error("Streaming AI failed:", error);
+
+              const stubText = await createTarotReadingStub({
+                userImageBase64: undefined,
+                selectedCardsNames,
+                birthDate: formattedDate,
+                question: reading.question,
+                tarotReaderId: reading.tarotReaderId as any,
+                locale: validLocale,
+              });
+              fullText = stubText;
+              controller.enqueue(encoder.encode(stubText));
+            }
+          } else {
+            // Use stub for users without credits
+            const stubText = await createTarotReadingStub({
+              userImageBase64: undefined,
+              selectedCardsNames,
+              birthDate: formattedDate,
+              question: reading.question,
+              tarotReaderId: reading.tarotReaderId as any,
+              locale: validLocale,
+            });
+            fullText = stubText;
+            controller.enqueue(encoder.encode(stubText));
+          }
+
+          // Save full text to database
+          await prisma.reading.update({
+            where: { id: result.readingId },
+            data: {
+              predictionText: fullText,
+            },
+          });
+
+          // Close the stream
+          controller.close();
+        } catch (error) {
+          console.error("Error in streaming:", error);
+          controller.error(error);
         }
-      } catch (error) {
-        console.error("Streaming AI failed:", error);
-        // Fallback to stub
-        fullText = await createTarotReadingStub({
-          userImageBase64: undefined,
-          selectedCardsNames,
-          birthDate: formattedDate,
-          question: reading.question,
-          tarotReaderId: reading.tarotReaderId as any,
-          locale: validLocale,
-        });
-      }
-    } else {
-      // Use stub
-      fullText = await createTarotReadingStub({
-        userImageBase64: undefined,
-        selectedCardsNames,
-        birthDate: formattedDate,
-        question: reading.question,
-        tarotReaderId: reading.tarotReaderId as any,
-        locale: validLocale,
-      });
-    }
+      },
+    });
 
-    // Save full text to database
-    await prisma.reading.update({
-      where: { id: readingId },
-      data: {
-        predictionText: fullText,
+    // Return streaming response
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
       },
     });
   } catch (error) {
-    console.error("Error in background reading generation:", error);
+    console.error("Error processing QR form:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
-

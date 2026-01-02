@@ -148,7 +148,7 @@ export function StreamingReadingModal({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to start streaming");
+        throw new Error("Failed to generate reading");
       }
 
       const reader = response.body?.getReader();
@@ -175,9 +175,9 @@ export function StreamingReadingModal({
       setIsStreaming(false);
       setStage("completed");
     } catch (error) {
-      console.error("Streaming error:", error);
+      console.error("Reading generation error:", error);
       setStreamError(
-        error instanceof Error ? error.message : "Failed to stream reading"
+        error instanceof Error ? error.message : "Failed to generate reading"
       );
       setIsStreaming(false);
       setStage("completed");

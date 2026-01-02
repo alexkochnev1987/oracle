@@ -1,38 +1,46 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Navbar } from "@/components/navbar";
 import { Card } from "@/components/ui/card";
-import { QRCodeDisplay } from "@/components/qr-code-display";
 import { TarotCardsDisplay } from "@/components/tarot-cards-display";
 import { EmailReadingForm } from "@/components/email-reading-form";
-import Image from "next/image";
 import { format } from "date-fns";
 import { ru, enUS } from "date-fns/locale";
 import { useLocale } from "@/hooks/use-locale";
-import { getTranslations } from "@/lib/i18n";
-import { TarotReaderId } from "@/lib/tarot-readers";
+import { getTranslations, type Locale } from "@/lib/i18n";
+import { type TarotReaderId } from "@/lib/tarot-readers";
 import { PageContainer } from "@/components/page-container";
+import {
+  BackgroundNavigation,
+  BACKGROUND_IMAGES,
+} from "@/components/background-navigation";
+import { Navbar } from "@/components/navbar";
 
 interface Reading {
   id: string;
   question: string;
   predictionText: string;
-  createdAt: Date;
-  tarotReaderId: string; // From database, will be cast to TarotReaderId when needed
-  shareToken: string | null;
-  userImageUrl: string | null;
-  selectedCards: any;
+  tarotReaderId: string;
+  createdAt: Date | string;
+  selectedCards?: string[] | null;
+  userImageUrl?: string | null;
 }
 
-interface ReadingDetailContentProps {
+interface PublicReadingContentProps {
   reading: Reading;
+  shareToken: string;
 }
 
-export function ReadingDetailContent({ reading }: ReadingDetailContentProps) {
+export function PublicReadingContent({
+  reading,
+  shareToken,
+}: PublicReadingContentProps) {
   const [locale] = useLocale();
   const t = getTranslations(locale);
+  const [backgroundIndex, setBackgroundIndex] = useState(0);
 
   const reader = t.tarotReadersPrompts[reading.tarotReaderId as TarotReaderId];
   const date =
@@ -40,17 +48,31 @@ export function ReadingDetailContent({ reading }: ReadingDetailContentProps) {
       ? new Date(reading.createdAt)
       : reading.createdAt;
 
-  // Generate share URL
-  const shareUrl = reading.shareToken
-    ? typeof window !== "undefined"
-      ? `${window.location.origin}/readings/share/${reading.shareToken}`
-      : `/readings/share/${reading.shareToken}`
-    : "";
-
   return (
-    <div className="min-h-screen mystical-gradient starry-background">
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Background Image */}
+      <div className="fixed inset-0 z-0">
+        <Image
+          src={BACKGROUND_IMAGES[backgroundIndex]}
+          alt="Background"
+          fill
+          className="object-cover transition-opacity duration-500"
+          priority
+        />
+        <div className="absolute inset-0 bg-[rgba(13,13,26,0.7)]" />
+      </div>
+
+      {/* Navbar */}
       <Navbar />
-      <PageContainer maxWidth="4xl" className="space-y-6">
+
+      {/* Navigation Buttons */}
+      <BackgroundNavigation
+        currentIndex={backgroundIndex}
+        onIndexChange={setBackgroundIndex}
+      />
+
+      {/* Main Content */}
+      <PageContainer maxWidth="4xl" className="relative z-10 space-y-6">
         <Card className="p-4 sm:p-6" glow>
           <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
             <h1 className="text-2xl sm:text-3xl font-bold text-white">
@@ -110,18 +132,8 @@ export function ReadingDetailContent({ reading }: ReadingDetailContentProps) {
           </div>
         </Card>
 
-        {reading.shareToken && (
-          <div className="w-full">
-            <QRCodeDisplay
-              shareToken={reading.shareToken}
-              shareUrl={shareUrl}
-              question={reading.question}
-            />
-          </div>
-        )}
-
         <div className="w-full">
-          <EmailReadingForm readingId={reading.id} />
+          <EmailReadingForm shareToken={shareToken} />
         </div>
       </PageContainer>
     </div>

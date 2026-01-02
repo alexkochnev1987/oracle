@@ -13,16 +13,6 @@ export interface TarotReaderConfig {
   themeColor: string;
 }
 
-// Localized tarot reader with texts from translations
-export interface TarotReader {
-  id: TarotReaderId;
-  name: string;
-  description: string;
-  systemPrompt: string;
-  imagePath: string;
-  themeColor: string;
-}
-
 // Configuration for all tarot readers (without texts)
 export const tarotReadersConfig: TarotReaderConfig[] = [
   {
@@ -47,25 +37,22 @@ export const tarotReadersConfig: TarotReaderConfig[] = [
   },
 ];
 
-// Get a single tarot reader with localization
-export function getTarotReader(
-  id: TarotReaderId,
-  locale: Locale = "ru"
-): TarotReader {
-  const config =
-    tarotReadersConfig.find((r) => r.id === id) || tarotReadersConfig[0];
-  const translations = getTranslations(locale);
-  const readerData = translations.tarotReadersPrompts[config.id];
-
-  return {
-    ...config,
-    name: readerData.name,
-    description: readerData.description,
-    systemPrompt: readerData.systemPrompt,
-  };
+export interface TarotReader {
+  id: TarotReaderId;
+  name: string;
+  description: string;
+  imagePath: string;
+  themeColor: string;
 }
-
 // Get all tarot readers with localization
 export function getAllTarotReaders(locale: Locale = "ru"): TarotReader[] {
-  return tarotReadersConfig.map((config) => getTarotReader(config.id, locale));
+  const t = getTranslations(locale);
+  return tarotReadersConfig.map((config) => {
+    return {
+      ...config,
+      name: t.tarotReadersPrompts[config.id as TarotReaderId].name,
+      description:
+        t.tarotReadersPrompts[config.id as TarotReaderId].description,
+    };
+  });
 }

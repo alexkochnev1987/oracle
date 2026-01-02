@@ -1,4 +1,4 @@
-import { TarotReaderId, getTarotReader } from "./tarot-readers";
+import { getTarotReader } from "./get-tarot-reader";
 import { CreateReadingParams } from "./openai";
 
 // Stub function for chatbot - generates realistic predictions based on templates
@@ -150,4 +150,3 @@ export async function createTarotReadingStub({
 
   return prediction;
 }
-

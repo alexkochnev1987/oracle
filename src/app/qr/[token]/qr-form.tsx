@@ -14,6 +14,8 @@ import { useLocale } from "@/hooks/use-locale";
 import { type TarotCard, getRandomSpread } from "@/lib/tarot-cards";
 import { type TarotReader } from "@/lib/tarot-readers";
 import { Sparkles, CheckCircle2 } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   validateDateString,
   formatDateInput,
@@ -34,6 +36,9 @@ export function QrForm({ token, initialReaderId, tarotReaders }: QrFormProps) {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamingText, setStreamingText] = useState("");
+  const [streamError, setStreamError] = useState<string | null>(null);
 
   const [userImage, setUserImage] = useState<string>("");
   const [skipPhoto, setSkipPhoto] = useState(true);
@@ -298,13 +303,39 @@ export function QrForm({ token, initialReaderId, tarotReaders }: QrFormProps) {
         body: formData,
       });
 
-      const data = await response.json();
-
-      if (data.success) {
-        setIsSuccess(true);
-      } else {
-        setErrors({ general: data.error || "Failed to submit form" });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to submit form");
       }
+
+      // Handle streaming response
+      setIsStreaming(true);
+      setStreamError(null);
+      setStreamingText("");
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+
+      if (!reader) {
+        throw new Error("No reader available");
+      }
+
+      let accumulatedText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+
+        if (done) {
+          break;
+        }
+
+        const chunk = decoder.decode(value, { stream: true });
+        accumulatedText += chunk;
+        setStreamingText(accumulatedText);
+      }
+
+      setIsStreaming(false);
+      setIsSuccess(true);
     } catch (error) {
       console.error("Error submitting form:", error);
       setErrors({
@@ -315,17 +346,52 @@ export function QrForm({ token, initialReaderId, tarotReaders }: QrFormProps) {
     }
   };
 
+  if (isStreaming) {
+    return (
+      <Card className="p-8" glow>
+        <div className="space-y-4">
+          {streamError ? (
+            <div className="text-red-400 text-center">{streamError}</div>
+          ) : (
+            <>
+              {streamingText ? (
+                <div className="prose prose-invert max-w-none text-[#e5e7eb]">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {streamingText}
+                  </ReactMarkdown>
+                  <span className="inline-block w-2 h-5 bg-[rgba(100,200,255,0.8)] animate-pulse ml-1" />
+                </div>
+              ) : (
+                <div className="text-center text-[#e5e7eb]">
+                  <Sparkles className="mx-auto mb-4 h-12 w-12 animate-pulse text-purple-400" />
+                  <p>{t.qr.generating}</p>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </Card>
+    );
+  }
+
   if (isSuccess) {
     return (
-      <Card className="p-8 text-center" glow>
-        <CheckCircle2 className="mx-auto mb-4 h-16 w-16 text-green-400" />
-        <h2 className="mb-4 text-2xl font-bold text-white">
-          {t.qr?.successTitle || "Form submitted successfully!"}
-        </h2>
-        <p className="text-[#e5e7eb]">
-          {t.qr?.successMessage ||
-            "Your reading request has been submitted. The reading will be generated and sent to the QR code creator."}
-        </p>
+      <Card className="p-8" glow>
+        <div className="space-y-6">
+          <div className="text-center">
+            <CheckCircle2 className="mx-auto mb-4 h-16 w-16 text-green-400" />
+            <h2 className="mb-4 text-2xl font-bold text-white">
+              {t.qr?.successTitle || "Reading completed!"}
+            </h2>
+          </div>
+          {streamingText && (
+            <div className="prose prose-invert max-w-none text-[#e5e7eb]">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                {streamingText}
+              </ReactMarkdown>
+            </div>
+          )}
+        </div>
       </Card>
     );
   }
