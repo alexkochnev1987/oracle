@@ -2,7 +2,7 @@ import { Locale } from "./i18n";
 import { loadReadingPrompt, renderPrompt } from "./oracle-prompt-loader";
 
 interface BuildReadingPromptParams {
-  birthDate: string;
+  birthDate?: string;
   question: string;
   userImageBase64?: string;
   imageAnalysisResult?: string;

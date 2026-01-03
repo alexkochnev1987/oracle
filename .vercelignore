@@ -1,46 +1,59 @@
 # Dependencies (installed separately by Vercel)
+
 node_modules
 
 # Build outputs
+
 .next
 out
 dist
 build
 
 # Development files
-*.log
+
+\*.log
 .DS_Store
 
 # Documentation
+
 docs
-*.md
+
+_.md
+!agents/_.md
 !README.md
 
 # Test files
+
 test-reading-prompt-data.json
 scripts
 
 # Large images that might not be needed in serverless functions
+
 # (Keep public folder for static assets, but exclude very large files if needed)
-# public/alien/*.png
+
+# public/alien/\*.png
 
 # TypeScript
-*.tsbuildinfo
+
+\*.tsbuildinfo
 next-env.d.ts
 
 # Prisma migrations (not needed in production)
+
 prisma/migrations
 
 # Git
+
 .git
 .gitignore
 
 # IDE
+
 .vscode
 .idea
-*.swp
-*.swo
+_.swp
+_.swo
 
 # Vercel
-.vercel
 
+.vercel

@@ -95,7 +95,7 @@ export interface CreateReadingParams {
   userImageBase64?: string;
   imageAnalysisResult?: string; // Pre-analyzed image result to avoid duplicate analysis
   selectedCardsNames?: string;
-  birthDate: string;
+  birthDate?: string;
   question: string;
   tarotReaderId: TarotReaderId;
   locale: Locale;

@@ -7,7 +7,7 @@ import { isUserAllowedForAI } from "@/lib/ai-whitelist";
 import { revalidatePath } from "next/cache";
 import { randomUUID } from "crypto";
 import { getCardById, formatCardsForPrompt } from "@/lib/tarot-cards";
-import { parseDateString, formatDateForAI } from "@/lib/date-validation";
+import { parseDateString } from "@/lib/date-validation";
 import {
   getTranslations,
   type Locale,
@@ -89,14 +89,12 @@ export async function createReading(formData: FormData) {
     }
 
     // Parse date from dd-mm-yy format (only if birthDate is provided)
-    let parsedDate: Date;
-    let formattedDate: string;
+    let parsedDate: Date | null = null;
 
     if (birthDate && birthDate.trim().length > 0) {
       // Date is provided, validate and parse it
       try {
         parsedDate = parseDateString(birthDate);
-        formattedDate = formatDateForAI(parsedDate);
       } catch (error) {
         throw new Error(
           error instanceof Error
@@ -104,11 +102,6 @@ export async function createReading(formData: FormData) {
             : "Invalid date format. Please use dd-mm-yy format"
         );
       }
-    } else {
-      // No date provided (skipDate is true), use a default date (e.g., current date or a placeholder)
-      // Using current date as default
-      parsedDate = new Date();
-      formattedDate = formatDateForAI(parsedDate);
     }
 
     // Generate unique share token for public access
@@ -294,13 +287,11 @@ export async function createReadingFromQr(formData: FormData, qrToken: string) {
     }
 
     // Parse date from dd-mm-yy format (only if birthDate is provided)
-    let parsedDate: Date;
-    let formattedDate: string;
+    let parsedDate: Date | null = null;
 
     if (birthDate && birthDate.trim().length > 0) {
       try {
         parsedDate = parseDateString(birthDate);
-        formattedDate = formatDateForAI(parsedDate);
       } catch (error) {
         throw new Error(
           error instanceof Error
@@ -308,9 +299,6 @@ export async function createReadingFromQr(formData: FormData, qrToken: string) {
             : "Invalid date format. Please use dd-mm-yy format"
         );
       }
-    } else {
-      parsedDate = new Date();
-      formattedDate = formatDateForAI(parsedDate);
     }
 
     // Generate unique share token for public access

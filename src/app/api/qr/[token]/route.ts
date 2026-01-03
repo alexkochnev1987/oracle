@@ -106,8 +106,10 @@ export async function POST(
       ? (localeValue as Locale)
       : defaultLocale;
 
-    // Format date for AI
-    const formattedDate = formatDateForAI(reading.birthDate);
+    // Format date for AI when available
+    const formattedDate = reading.birthDate
+      ? formatDateForAI(reading.birthDate)
+      : undefined;
 
     // Parse selected cards and get their names
     const selectedCardsArray =
