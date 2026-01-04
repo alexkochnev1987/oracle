@@ -1,0 +1,17 @@
+# dependencies
+node_modules
+.next
+dist
+build
+coverage
+
+# assets
+public
+assets
+images
+videos
+
+# configs
+*.json
+*.lock
+.env*

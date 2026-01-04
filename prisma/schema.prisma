@@ -1,0 +1,145 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  credits       Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  readings      Reading[]
+  qrCodes       QrCode[]
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Reading {
+  id                String   @id @default(cuid())
+  userId            String
+  question          String   @db.Text
+  birthDate         DateTime?
+  predictionText    String   @db.Text
+  cardsImageUrl     String?
+  userImageUrl      String?
+  tarotReaderId     String   @default("default")
+  shareToken        String?  @unique
+  selectedCards     Json? // Array of card IDs when using random spread
+  cardSelectionMode String? // "upload" or "random"
+  qrCodeId          String?  // ID QR кода, если reading создан через QR (опционально)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([shareToken])
+}
+
+model QrCode {
+  id            String   @id @default(cuid())
+  userId        String   // Создатель QR кода
+  token         String   @unique // Уникальный токен для доступа к форме
+  expiresAt     DateTime? // Срок действия (опционально)
+  maxUses       Int      // Максимальное количество использований
+  currentUses   Int      @default(0) // Текущее количество использований
+  isActive      Boolean  @default(true) // Активен ли QR код
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+}
+
+model TestRun {
+  id          String     @id @default(cuid())
+  name        String     // Test run identifier
+  description String?    // Optional description of the test run
+  createdAt   DateTime   @default(now())
+  testCases   TestCase[]
+
+  @@index([createdAt])
+}
+
+model TestCase {
+  id              String       @id @default(cuid())
+  testRunId       String
+  name            String       // Test case name
+  imageUrl        String       // Test image path
+  question        String       @db.Text
+  expectedThemes  Json         // Expected analysis themes
+  difficulty      String       // easy, medium, hard
+  category        String       // portrait, abstract, nature, object
+  createdAt       DateTime     @default(now())
+  results         TestResult[]
+  testRun         TestRun      @relation(fields: [testRunId], references: [id], onDelete: Cascade)
+
+  @@index([testRunId])
+  @@index([category])
+  @@index([difficulty])
+}
+
+model TestResult {
+  id                    String   @id @default(cuid())
+  testCaseId           String
+  oracleType           String   // alien-seer, cosmic-oracle, etc.
+  imageAnalysis        String   @db.Text
+  tarotReading         String   @db.Text
+  responseTimeMs       Int
+  tokenUsage           Int?     // Optional token usage tracking
+  aiEvaluationScore    Json     // Detailed scoring breakdown
+  overallScore         Float
+  createdAt            DateTime @default(now())
+  testCase             TestCase @relation(fields: [testCaseId], references: [id], onDelete: Cascade)
+
+  @@index([testCaseId])
+  @@index([oracleType])
+  @@index([overallScore])
+  @@index([createdAt])
+}
